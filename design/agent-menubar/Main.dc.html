@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+.сцена { width: 720px; height: 460px; background: linear-gradient(160deg, #6f7f95 0%, #47566b 60%, #2f3a49 100%); position: relative; overflow: hidden; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.строка-меню { position: absolute; top: 0; left: 0; right: 0; height: 26px; background: rgba(245,245,247,.72); backdrop-filter: blur(20px); display: flex; align-items: center; gap: 16px; padding: 0 12px; font-size: 12px; color: #1c1c1e; }
+.строка-меню .яблоко { font-size: 13px; }
+.строка-меню .право { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.значок { display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 5px; }
+.значок.открыт { background: rgba(0,0,0,.10); }
+.значок { position: relative; }
+.значок.с-точкой::after { content: ""; position: absolute; top: 1px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: #c4271c; box-shadow: 0 0 0 1.5px rgba(245,245,247,.9); }
+.меню { position: absolute; top: 30px; width: 262px; background: rgba(246,246,248,.96); backdrop-filter: blur(30px); border: .5px solid rgba(0,0,0,.14); border-radius: 10px; box-shadow: 0 14px 40px rgba(0,0,0,.28); padding: 5px 0; font-size: 13px; }
+.пункт { display: flex; align-items: center; gap: 8px; height: 22px; padding: 0 12px; }
+.пункт .ярлык { margin-left: auto; color: #8e8e93; font-size: 12px; }
+.пункт.тихо { color: #8e8e93; font-size: 12px; }
+.пункт.выбран { background: #0071e3; color: #fff; border-radius: 5px; margin: 0 5px; padding: 0 7px; }
+.пункт.выбран .ярлык { color: rgba(255,255,255,.85); }
+.разделитель { height: 1px; background: rgba(0,0,0,.10); margin: 5px 12px; }
+.точка { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
+.зелёная { background: #2f9e44; } .красная { background: #c4271c; } .серая { background: #8e8e93; }
+.подпись { position: absolute; left: 20px; bottom: 16px; right: 20px; color: rgba(255,255,255,.92); font-size: 12px; line-height: 1.45; }
+.подпись b { font-weight: 600; }
+
+  </style>
+</helmet>
+  <div class="строка-меню">
+    <span class="яблоко">&#63743;</span><b>Finder</b><span>Файл</span><span>Правка</span><span>Вид</span>
+    <span class="право">
+      <span class="значок открыт с-точкой"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4.2h9.2v6.1H5.1L2 12.8z"></path><path d="M11.4 7h2.6v6l-1.9-1.5H7.4"></path></svg></span>
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 5.5a9 9 0 0113 0M4 8a5.5 5.5 0 018 0"></path><circle cx="8" cy="11" r=".9" fill="currentColor" stroke="none"></circle></svg>
+      <svg width="22" height="12" viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="2" width="20" height="10" rx="3"></rect><rect x="3" y="4" width="13" height="6" rx="1.6" fill="currentColor" stroke="none"></rect><path d="M23 5.5v3" stroke-linecap="round"></path></svg>
+      <span>вт 8 сент 13:41</span>
+    </span>
+  </div>
+  <div class="меню" style="right: 96px">
+    <div class="пункт"><span class="точка зелёная"></span><span>Сёма на связи</span></div>
+    <div class="пункт тихо">sema.local:8766 · с 09:12</div>
+    <div class="разделитель"></div>
+    <div class="пункт выбран"><span>Открыть Сёму</span><span class="ярлык">&#8984;O</span></div>
+    <div class="пункт"><span>Переподключиться</span></div>
+    <div class="пункт"><span>Открыть журнал</span></div>
+    <div class="разделитель"></div>
+    <div class="пункт"><span class="точка красная"></span><span>Ждут вас: 3 уведомления</span></div>
+    <div class="пункт тихо">Последнее: 13:12 · srv-bots</div>
+    <div class="разделитель"></div>
+    <div class="пункт"><span>Выйти</span><span class="ярлык">&#8984;Q</span></div>
+  </div>
+  <div class="подпись"><b>На связи, три записи ждут.</b> Значок закрашен, красная точка — непрочитанные у Сёмы; разобрали их в браузере, и точка гаснет сама. Экраны Сёмы открываются в браузере: «Открыть Сёму» ведёт на его адрес, нажатие на уведомление — на нужный экран. В Dock значка нет.</div>
+</x-dc>
+</body>
+</html>

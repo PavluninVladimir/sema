@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+    a { color: #0071e3; } a:hover { color: #0058b0; }
+    .тел { width: 390px; height: 844px; background: #f5f5f7; display: flex; flex-direction: column; overflow: hidden; }
+    .верх { display: flex; align-items: center; gap: 10px; padding: 54px 16px 10px; border-bottom: 1px solid rgba(0,0,0,0.10); }
+    .верх h1 { font-size: 20px; font-weight: 700; margin: 0; }
+    .группа { font-size: 10px; letter-spacing: 0.6px; text-transform: uppercase; color: #8e8e93; padding: 14px 16px 4px; }
+    .чат { display: flex; flex-direction: column; gap: 2px; padding: 10px 16px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .чат .имя { display: flex; align-items: center; gap: 6px; font-weight: 500; font-size: 15px; }
+    .чат .мелко { font-size: 12px; color: #6e6e73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .чат .время { margin-left: auto; font-size: 12px; color: #8e8e93; font-weight: 400; }
+    .контейнер { color: #6e6e73; font-weight: 600; }
+    .шеврон { width: 14px; height: 14px; flex: 0 0 14px; }
+    .вложенный { padding-left: 34px; }
+    .тред { padding-left: 40px; position: relative; background: rgba(0,113,227,0.04); }
+    .тред::before { content: ""; position: absolute; left: 26px; top: 0; bottom: 0; border-left: 2px solid rgba(0,113,227,0.35); }
+    .свёрнут { color: #8e8e93; }
+    .низ { margin-top: auto; padding: 12px 16px 28px; font-size: 11px; color: #6e6e73; border-top: 1px solid rgba(0,0,0,0.10); }
+  </style>
+</helmet>
+<div class="тел">
+  <div class="верх"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#1c1c1e" stroke-width="1.6" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h10"></path></svg><h1>Чаты</h1><span style="margin-left: auto; color: #0071e3; font-size: 22px">+</span></div>
+  <div class="группа">Telegram · 1</div>
+  <div class="чат"><div class="имя контейнер"><svg class="шеврон" viewBox="0 0 12 12" fill="none" stroke="#8e8e93" stroke-width="1.5"><path d="M3 4.5l3 3 3-3"></path></svg>Дом · группа<span class="время">3 топика</span></div></div>
+  <div class="чат вложенный"><div class="имя">Заявки<span class="время">10:36</span></div><div class="мелко">Митя: только не раньше двенадцати</div></div>
+  <div class="чат тред"><div class="имя"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5h9v6H5l-3 2.5z"></path><path d="M11 6.5h3v6l-2-1.5H7"></path></svg>Сёма<span class="время">10:37</span></div><div class="мелко">черновик ждёт кнопки</div></div>
+  <div class="чат вложенный"><div class="имя">Общий<span class="время">вчера</span></div><div class="мелко">Петя: приду в семь</div></div>
+  <div class="чат вложенный свёрнут"><div class="имя">ещё 1 топик</div></div>
+  <div class="чат"><div class="имя">Иван<span class="время">09:54</span></div><div class="мелко">Посмотри ещё раз файл #302: это чек…</div></div>
+  <div class="чат тред"><div class="имя"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5h9v6H5l-3 2.5z"></path><path d="M11 6.5h3v6l-2-1.5H7"></path></svg>Сёма<span class="время">10:32</span></div><div class="мелко">Чек #302 — 06.04.2026, Петрова О.</div></div>
+  <div class="чат"><div class="имя контейнер"><svg class="шеврон" viewBox="0 0 12 12" fill="none" stroke="#8e8e93" stroke-width="1.5"><path d="M4.5 3l3 3-3 3"></path></svg>Новости города · канал<span class="время">12 постов</span></div></div>
+  <div class="группа">MAX</div>
+  <div class="чат"><div class="имя">Соседи<span class="время">05.09</span></div><div class="мелко">Привет</div></div>
+  <div class="группа">Мои чаты</div>
+  <div class="чат"><div class="имя">Выключать vpn на микротике…<span class="время">вчера</span></div><div class="мелко">статус «провода» не виден</div></div>
+  <div class="низ">Контейнеры свёрнуты, пока их не тронули; ветки видны только у открытого разговора и у тех, где ждёт кнопка.</div>
+</div>
+</x-dc>
+</body>
+</html>

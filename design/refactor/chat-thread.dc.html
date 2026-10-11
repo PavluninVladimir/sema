@@ -1,0 +1,265 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; background: #F5F4F2; }
+    .sheet { width: 1160px; min-height: 1560px; box-sizing: border-box; padding: 28px 32px; background: #F5F4F2; color: #1D1D1F; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 4px 0; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 22px 0; line-height: 1.55; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 24px 0 8px 0; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; margin-top: 6px; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); line-height: 1.5; }
+    .facts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 4px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 8px; line-height: 1.55; }
+    .note b { color: #1D1D1F; }
+    .bad { color: #C93400; }
+    .good { color: #1E7A32; }
+    .col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .lane { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .bub { font-size: 13px; line-height: 1.5; padding: 9px 13px; border-radius: 15px; max-width: 420px; box-sizing: border-box; }
+    .me { background: #007AFF; color: #FFF; align-self: flex-end; }
+    .bysema { background: rgba(0,122,255,0.10); border: 1px solid rgba(0,122,255,0.45); align-self: flex-end; }
+    .peer { background: rgba(40,200,64,0.14); align-self: flex-start; }
+    .bmeta { font-size: 11px; color: rgba(60,60,67,0.45); }
+    .thread { border-left: 3px solid #007AFF; background: rgba(0,122,255,0.045); border-radius: 0 10px 10px 0; padding: 10px 13px 11px 12px; }
+    .thhead { display: flex; align-items: center; gap: 8px; }
+    .chev { color: rgba(60,60,67,0.45); font-size: 10px; width: 10px; flex-shrink: 0; }
+    .thttl { font-size: 13px; font-weight: 600; }
+    .thbody { display: flex; flex-direction: column; gap: 8px; margin-top: 9px; }
+    .ask { font-size: 13px; line-height: 1.5; padding: 8px 12px; border-radius: 12px; background: rgba(0,122,255,0.14); align-self: flex-end; max-width: 380px; }
+    .sema { font-size: 13px; line-height: 1.5; padding: 9px 13px; border-radius: 15px; background: rgba(0,0,0,0.055); max-width: 380px; align-self: flex-start; }
+    .tool { background: #FFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 11px 13px; }
+    .toolhead { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+    .draft { font-size: 13px; line-height: 1.5; padding: 8px 11px; border-radius: 9px; background: rgba(0,0,0,0.03); border: 1px dashed rgba(60,60,67,0.4); }
+    .cmd { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.45; background: rgba(0,0,0,0.045); border-radius: 7px; padding: 8px 10px; }
+    .btn { font-size: 12px; padding: 4px 11px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.15); background: #FFF; white-space: nowrap; }
+    .btn.pri { background: #007AFF; border-color: #007AFF; color: #FFF; font-weight: 500; }
+    table.rules { border-collapse: collapse; width: 100%; }
+    table.rules td, table.rules th { border-bottom: 1px solid rgba(0,0,0,0.07); padding: 9px 12px; font-size: 12px; vertical-align: top; text-align: left; }
+    table.rules th { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.55); }
+    table.rules tr:last-child td { border-bottom: none; }
+  </style>
+</helmet>
+<div class="sheet">
+  <div class="h1">Ветка Сёмы в переписке</div>
+  <div class="sub">
+    В телеграм-чате два потока: живая переписка (моё сообщение уходит человеку сразу, без модели) и
+    подключение Сёмы (зову словом «сёма, …»). Второй поток собирается в ветку — свёртываемую врезку внутри
+    ленты. Проверено на живых чатах <span class="mono">chat:71</span>, <span class="mono">chat:74</span> и на
+    <span class="mono">engine/tg_chat.go</span>: слово вызова — настройка <span class="mono">tg.help_word</span>,
+    привязка чата к собеседнику — <span class="mono">tg.chat.&lt;id&gt;</span>.
+  </div>
+
+  <div class="grouptitle">Четыре состояния ветки</div>
+  <div class="col2">
+    <div>
+      <div class="lane">
+        <div class="thread">
+          <div class="thhead"><div class="chev">▶</div><div class="thttl" style="flex:1">Сёма · собрал черновик Анне</div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">ждёт вашей кнопки</span><span class="meta">11:12</span></div>
+        </div>
+        <div class="thread">
+          <div class="thhead"><div class="chev">▶</div><div class="thttl" style="flex:1">Сёма · проверил, свободен ли dpkg</div><span class="tag" style="background:rgba(0,0,0,.06); color:rgba(60,60,67,0.7)">3 шага</span><span class="meta">09:56</span></div>
+        </div>
+        <div class="thread" style="border-left-color:#FEBC2E; background:rgba(255,188,46,0.07)">
+          <div class="thhead"><div class="chev">▶</div><div class="thttl" style="flex:1">Сёма · команда на srv-vpn</div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">требует подтверждения</span><span class="meta">08:03</span></div>
+        </div>
+        <div class="thread">
+          <div class="thhead"><div class="chev">▶</div><div class="thttl" style="flex:1">Сёма · думает…</div><span class="tag" style="background:rgba(0,122,255,.14); color:#0058B0">идёт</span><span class="meta">сейчас</span></div>
+        </div>
+      </div>
+      <div class="note">
+        Свёрнутая ветка — <b>одна строка высотой 44</b>: итог, состояние, время. Итог берётся из блока
+        <span class="mono">sema-done</span>, а без него — из первой фразы последнего ответа Сёмы.
+        Цвет рельса — уровень: обычная ветка синяя, ветка с чем-то ждущим — жёлтая.
+        Ветка «идёт» не сворачивается никогда.
+      </div>
+    </div>
+    <div>
+      <div class="lane">
+        <div class="thread">
+          <div class="thhead">
+            <div class="chev" style="transform:rotate(90deg)">▶</div>
+            <div class="thttl" style="flex:1">Сёма · собрал черновик Анне</div>
+            <span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">ждёт вашей кнопки</span>
+            <span class="meta">11:12</span><div class="more">⋯</div>
+          </div>
+          <div class="meta" style="margin-top:4px">Собеседник этого не видит</div>
+          <div class="thbody">
+            <div class="ask">сёма, подготовь текст — коротко</div>
+            <div class="bmeta" style="align-self:flex-end">Вы — Сёме · 11:12</div>
+            <div class="sema">Вот текст. Отправлю только по вашей кнопке.</div>
+            <div class="bmeta">DeepseekPro · 2,4 с · 1 180 токенов</div>
+            <div class="tool" style="border-color:rgba(255,188,46,0.55); background:rgba(255,188,46,0.07)">
+              <div class="toolhead"><div class="dot" style="background:#FEBC2E; margin-top:0"></div><div class="ttl" style="flex:1">Черновик Анне — ещё не отправлен</div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">не отправлено</span></div>
+              <div class="draft">Ань, привет. Как выставка — всё успели?</div>
+              <div style="display:flex; gap:7px; align-items:center; margin-top:9px">
+                <div class="btn pri">Отправить</div><div class="btn">Не отправлять</div>
+                <div class="link" style="margin-left:4px">Поправить</div>
+                <div style="margin-left:auto" class="more">⋯</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        Раскрытая ветка держит весь обмен: обращение, ответ, карточки. Внутри действует то же правило
+        «одно действие в строке»: у карточки «Отправить» — <b>primary</b>, «Не отправлять» — рядом
+        (нужны оба), остальное в «⋯».
+      </div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Правила, по которым ветка живёт</div>
+  <div class="card">
+    <table class="rules">
+      <tr><th style="width:210px">Когда</th><th>Что делает ветка</th><th style="width:230px">Почему так</th></tr>
+      <tr>
+        <td><b>Открыли чат</b></td>
+        <td>Ветки, начатые до открытия, приходят свёрнутыми; ветка, родившаяся на глазах, раскрыта и остаётся такой, пока чат открыт.</td>
+        <td>Документ обновляется раз в 5 с. Свернись ветка под руками — лента подскочит, а человек читает.</td>
+      </tr>
+      <tr>
+        <td><b>Внутри что-то ждёт человека</b></td>
+        <td>Не сворачивается: ни сама, ни при следующем открытии. Черновик, команда на подтверждение, тикающий таймер держат ветку раскрытой.</td>
+        <td>Спрятать вопрос — потерять его. То же правило, что у «Ждут вашего решения» внизу чата.</td>
+      </tr>
+      <tr>
+        <td><b>Пришла реплика собеседника</b></td>
+        <td>Ветка закрывается для новых сообщений и остаётся на своём месте по времени. Реплика идёт <b>после</b> ветки, в общем потоке.</td>
+        <td>Живая переписка не переносится и не прячется внутрь служебного никогда.</td>
+      </tr>
+      <tr>
+        <td><b>Вы написали собеседнику</b></td>
+        <td>То же: ветка закрыта, сообщение идёт в поток. Следующее «сёма, …» открывает новую ветку.</td>
+        <td>Слово вызова — граница ветки, а не время.</td>
+      </tr>
+      <tr>
+        <td><b>Ветка короче порога</b></td>
+        <td>Не сворачивается вовсе — одна реплика Сёмы под строкой-заголовком выглядит глупее, чем сама реплика.</td>
+        <td>Порог — настройка <span class="mono">chats.thread_fold_after</span>, а не число в коде.</td>
+      </tr>
+      <tr>
+        <td><b>Раскрыли руками</b></td>
+        <td>Остаётся раскрытой, пока не свернёте. Клиент помнит раскрытие в <span class="mono">expandedOverride</span> по id ветки.</td>
+        <td>Так уже устроены аккордеоны провайдеров и карточки чата.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="grouptitle">Где веток нет</div>
+  <div class="card">
+    <div class="row">
+      <div class="dot" style="background:#8E8E93"></div>
+      <div style="flex:1">
+        <div class="ttl">Чат с самим Сёмой</div>
+        <div class="meta">
+          Там весь разговор — с моделью, и ветка обернула бы 100 % содержимого: пометка, которая стоит
+          везде, не значит ничего. Служебное в этом чате уже сжимается иначе — раскрываемыми карточками.
+        </div>
+      </div>
+      <span class="tag" style="background:rgba(0,0,0,.06); color:rgba(60,60,67,0.7)">без веток</span>
+    </div>
+    <div class="row">
+      <div class="dot" style="background:#8E8E93"></div>
+      <div style="flex:1">
+        <div class="ttl">Чат разбора уведомления и чат задачи</div>
+        <div class="meta">
+          Тоже разговор с моделью от первой строки до последней. Ветка появляется только там, где в одной
+          ленте есть <b>третий</b> голос — живой собеседник.
+        </div>
+      </div>
+      <span class="tag" style="background:rgba(0,0,0,.06); color:rgba(60,60,67,0.7)">без веток</span>
+    </div>
+    <div class="row">
+      <div class="dot" style="background:#007AFF"></div>
+      <div style="flex:1">
+        <div class="ttl">Телеграм-чат</div>
+        <div class="meta">Единственное место, где ветка нужна: два потока в одной ленте.</div>
+      </div>
+      <span class="tag" style="background:rgba(0,122,255,.14); color:#0058B0">ветки</span>
+    </div>
+  </div>
+
+  <div class="grouptitle">Автоответ — не ветка</div>
+  <div class="col2">
+    <div>
+      <div class="lane">
+        <div class="bub peer">Привет! Мы на выставке, всё по плану</div>
+        <div class="bmeta">Анна · 11:09</div>
+        <div class="bub bysema">Красиво! Как погода, не слишком жарко?</div>
+        <div class="bmeta" style="align-self:flex-end">Сёма ответил сам · DeepseekPro · 11:10</div>
+        <div class="bub me">Спасибо, посмотрю вечером</div>
+        <div class="bmeta" style="align-self:flex-end">Вы — Анне · 11:39</div>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:0">
+        Сообщение, отправленное Сёмой по праву «Отвечать», <b>для собеседника — ваше</b>: оно стоит на
+        стороне исходящих, иначе в переписке зияет дыра там, где ответ был. Но рука не ваша, поэтому
+        пузырь не залит, а <b>обведён</b>, и подпись говорит прямо: «Сёма ответил сам».
+      </div>
+      <div class="note">
+        Та же форма у сообщения, ушедшего по вашей кнопке: подпись «Сёма · по вашей кнопке». Разница между
+        ними — в подписи, а не в цвете: и то и другое ушло от вашего имени.
+      </div>
+      <div class="note">
+        Ветку автоответ не заводит: там нечего разворачивать — обмена с вами не было. Разбор, почему Сёма
+        ответил именно так, лежит в «Что ушло», ссылка — в «⋯» сообщения.
+      </div>
+      <div class="note bad">
+        Сегодня автоответ и реплика Сёмы вам — один и тот же серый пузырь слева. В живом
+        <span class="mono">chat:71</span> «Привет! Всё в порядке» ушло Ивану, а «Связь есть, я на
+        связи» — не уходило никуда, и различить их в переписке нечем.
+      </div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Чем это выражается в DSL</div>
+  <div class="card">
+    <div class="row">
+      <div style="flex:1">
+        <div class="ttl">Ветка — <span class="mono">section</span> со <span class="mono">style: "thread"</span></div>
+        <div class="meta">Новый тип компонента не нужен: <span class="mono">collapsed</span>, <span class="mono">children</span> и память раскрытия у секции уже есть. <span class="mono">style</span> меняет вид заголовка (13 вместо капслока 11), добавляет рельс и капсулу состояния.</div>
+        <div class="facts">
+          <span class="fact">Сервер <b>api/screens.go, сборка чата</b></span>
+          <span class="fact">Клиент <b>SectionView</b></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div style="flex:1">
+        <div class="ttl">Роль пузыря — <span class="mono">user</span> / <span class="mono">peer</span> / <span class="mono">assistant</span> / <span class="mono">sent</span></div>
+        <div class="meta">Не хватает четвёртой: «ушло от вашего имени, но написал не человек». Сейчас такое сообщение приходит как <span class="mono">assistant</span> и рисуется слева серым.</div>
+        <div class="facts">
+          <span class="fact">Сервер <b>ui.go: Role</b></span>
+          <span class="fact">Клиент <b>BubbleView</b></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div style="flex:1">
+        <div class="ttl">Заголовок ветки — <span class="mono">title</span>, <span class="mono">caption</span>, <span class="mono">badges</span>, <span class="mono">level</span></div>
+        <div class="meta">Всё уже есть у компонента. Уровень ветки — максимум уровней внутри: есть ждущее — <span class="mono">warn</span>, есть отказ — <span class="mono">alert</span>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

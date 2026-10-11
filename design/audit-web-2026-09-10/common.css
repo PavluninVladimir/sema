@@ -1,0 +1,16 @@
+:root{
+  --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+  --ink:#17181C; --ink2:#585B64; --ink3:#6E717A;
+  --line:#E3E0D8; --line2:#EFECE4;
+  --accent:#1F4FD8; --accent-soft:#E8EDFC;
+  --ok:#2E7D4F; --ok-soft:#E4F1E9;
+  --warn:#9C6100; --warn-soft:#FBF0DC;
+  --alert:#BE3320; --alert-soft:#FBE7E3;
+  --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+  --lift:0 1px 2px rgba(24,20,12,.07);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased}
+.m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}

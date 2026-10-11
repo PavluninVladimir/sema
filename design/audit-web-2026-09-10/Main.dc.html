@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#6E717A;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3; --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .phone{width:390px;height:844px;position:relative;overflow:hidden;background:var(--paper);
+    display:flex;flex-direction:column}
+
+  /* ---- шапка в один ярус: имя экрана, поиск и «ещё» на одной строке ---- */
+  .top{display:flex;align-items:center;gap:10px;padding:10px 14px 0;flex:0 0 auto}
+  .top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em;flex:1 1 auto;min-width:0}
+  .icb{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    color:var(--ink2);flex:0 0 32px}
+  .icb .glass{width:15px;height:15px;border:1.7px solid currentColor;border-radius:50%;position:relative}
+  .icb .glass::after{content:"";position:absolute;right:-4px;bottom:-4px;width:6px;height:1.7px;
+    background:currentColor;transform:rotate(45deg)}
+  .icb .dts{display:flex;gap:3px}
+  .icb .dts i{width:3px;height:3px;border-radius:50%;background:currentColor;display:block}
+  .sub{padding:2px 14px 0;font-size:11px;line-height:1.35;color:var(--ink3);flex:0 0 auto}
+  .segs{display:flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk);margin:8px 14px 0;
+    width:max-content;flex:0 0 auto}
+  .segs span{height:26px;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;
+    color:var(--ink2);display:inline-flex;align-items:center;white-space:nowrap}
+  .segs span.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+
+  .body{flex:1 1 auto;overflow:hidden;padding:12px 0 0;position:relative}
+  .shelf{margin:0 14px 14px;background:var(--shelf);border:1px solid var(--shelf-line);
+    border-radius:11px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px}
+  .shelf .col{flex:1 1 auto;min-width:0}
+  .shelf .cap{font-size:10px;font-weight:700;color:var(--warn);letter-spacing:.04em;margin-bottom:3px}
+  .shelf .t{font-size:13px;font-weight:600;line-height:1.35}
+  .shelf .n{font-size:11px;color:var(--ink3);margin-top:3px}
+  .shelf .btn{flex:0 0 auto;margin-top:12px}
+
+  /* ---- заголовок раздела: один зов к действию, остальное в «ещё» ---- */
+  .sec-hd{display:flex;align-items:center;gap:9px;padding:0 14px 8px}
+  .sec-hd h2{margin:0;font-size:12px;font-weight:700;line-height:1.3;flex:1 1 auto;min-width:0}
+  .btn{height:28px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    font-size:12px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;white-space:nowrap}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* ---- строка: имя, тема, одна строка причины, одна капсула, одно действие ---- */
+  .row{display:flex;gap:10px;padding:10px 14px;align-items:center;border-bottom:1px solid var(--line2)}
+  .chk{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);flex:0 0 18px;background:var(--panel)}
+  .av{width:28px;height:28px;border-radius:50%;flex:0 0 28px;color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:12px;font-weight:700}
+  .rb{flex:1 1 auto;min-width:0}
+  .l1{display:flex;align-items:baseline;gap:7px;min-width:0}
+  .nm{font-size:15px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cnt{font-size:11px;color:var(--ink3);flex:0 0 auto}
+  .why{font-size:12px;color:var(--ink3);line-height:1.35;margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pill{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:999px;
+    font-size:10px;font-weight:700;background:var(--warn-soft);color:var(--warn);flex:0 0 auto}
+  .pill.hot{background:var(--alert-soft);color:var(--alert)}
+  .dots{width:26px;height:26px;display:flex;align-items:center;justify-content:center;gap:3px;
+    color:var(--ink3);flex:0 0 26px}
+  .dots i{width:3px;height:3px;border-radius:50%;background:currentColor;display:block}
+  .tail{padding:10px 14px 0;font-size:12px}
+  .tail a{color:var(--accent);text-decoration:none;font-weight:600}
+
+  /* ---- плашка живёт над полосой, а не под ней ---- */
+  .note{position:absolute;left:0;right:0;bottom:56px;padding:9px 14px 11px;font-size:11px;
+    line-height:1.4;color:var(--ink3);background:linear-gradient(to top,var(--paper) 70%,rgba(251,250,247,0))}
+
+  .bar{position:absolute;left:0;right:0;bottom:0;height:56px;background:var(--paper);
+    border-top:1px solid var(--line);display:flex;align-items:center}
+  .tab{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;
+    font-size:10px;color:var(--ink3)}
+  .tab.on{color:var(--accent)}
+  .icw{position:relative;width:28px;height:22px;display:flex;align-items:center;justify-content:center}
+  .ic{width:20px;height:20px;border-radius:5px;border:1.6px solid currentColor}
+  /* счётчик отходит от значка и обводится бумагой: цифра не ложится на рисунок */
+  .badge{position:absolute;left:15px;top:-3px;height:15px;min-width:15px;padding:0 4px;border-radius:999px;
+    background:var(--alert);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;
+    justify-content:center;box-shadow:0 0 0 2px var(--paper)}
+
+  .ok{position:absolute;z-index:6;background:#2E7D4F;color:#fff;font-size:10px;font-weight:700;
+    border-radius:5px;padding:2px 6px;box-shadow:0 2px 6px rgba(0,0,0,.22);white-space:nowrap}
+  .rule{position:absolute;left:0;right:0;border-top:1.5px dashed #2E7D4F;z-index:5}
+  </style>
+</helmet>
+
+<div class="phone">
+  <div class="rule" style="top:112px"></div>
+  <div class="ok" style="right:8px;top:97px">до первого письма 112 px</div>
+
+  <div class="top">
+    <h1>Почта</h1>
+    <span class="icb"><span class="glass"></span></span>
+    <span class="icb"><span class="dts"><i></i><i></i><i></i></span></span>
+  </div>
+  <div class="sub">сегодня · 4 письма · 3 стоят внимания · me@example.com</div>
+  <div class="segs"><span class="on">сегодня</span><span>с прошлого захода</span><span>неделя</span></div>
+
+  <div class="body">
+    <div class="shelf">
+      <div class="col">
+        <div class="cap">ЖДУТ ВАС</div>
+        <div class="t">Пополнить баланс на 449,00 руб. для продления сервера</div>
+        <div class="n">срок 15 сентября · VPS-Хост</div>
+      </div>
+      <span class="btn pri">Открыть</span>
+    </div>
+
+    <div class="sec-hd">
+      <h2>Похоже на спам · 41 письмо от 10 отправителей</h2>
+      <span class="btn">Разобрать</span>
+    </div>
+
+    <div class="row">
+      <div class="chk"></div>
+      <div class="av" style="background:#9C6100">М</div>
+      <div class="rb">
+        <div class="l1"><span class="nm">Маркет</span><span class="cnt m">11 писем</span></div>
+        <div class="why">«Ваш чек + (1) подарок» · подарок в теме, чужой адрес</div>
+      </div>
+      <span class="pill">85 %</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+
+    <div class="row">
+      <div class="chk"></div>
+      <div class="av" style="background:#6B3FA0">О</div>
+      <div class="rb">
+        <div class="l1"><span class="nm">ООО «ЗАПРАВКИ»</span><span class="cnt m">8 писем</span></div>
+        <div class="why">«Чек + (1) подарок 💌 🎁» · обрезанная ссылка</div>
+      </div>
+      <span class="pill hot">95 %</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+
+    <div class="row">
+      <div class="chk"></div>
+      <div class="av" style="background:#1F4FD8">О</div>
+      <div class="rb">
+        <div class="l1"><span class="nm">Онлайн-школа</span><span class="cnt m">7 писем</span></div>
+        <div class="why">«5 минут, и ты снова в деле» · массовая рассылка</div>
+      </div>
+      <span class="pill hot">95 %</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+
+    <div class="row">
+      <div class="chk"></div>
+      <div class="av" style="background:#1F4FD8">О</div>
+      <div class="rb">
+        <div class="l1"><span class="nm">Обувь</span><span class="cnt m">4 письма</span></div>
+        <div class="why">«С днём рождения 🥳» · скрытые знаки в тексте</div>
+      </div>
+      <span class="pill hot">97 %</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+
+    <div class="row">
+      <div class="chk"></div>
+      <div class="av" style="background:#B33A72">К</div>
+      <div class="rb">
+        <div class="l1"><span class="nm">Книжный</span><span class="cnt m">3 письма</span></div>
+        <div class="why">«Книга дня за 1 ₽» · рассылка без отписки</div>
+      </div>
+      <span class="pill">78 %</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+
+    <div class="tail"><a>Ещё 5 отправителей · 8 писем</a></div>
+  </div>
+
+  <div class="ok" style="left:12px;top:322px">один зов к действию в заголовке</div>
+  <div class="ok" style="left:80px;top:432px">причина одной строкой, полная — в раскрытии</div>
+  <div class="ok" style="left:12px;top:700px">«ещё N» вместо «Показать ещё»: видно, сколько осталось</div>
+
+  <div class="note">Письма уедут в папку спама на почтовом сервере; из архива Сёмы они не пропадут.</div>
+
+  <div class="bar">
+    <div class="tab"><span class="icw"><span class="ic"></span></span>Меню</div>
+    <div class="tab"><span class="icw"><span class="ic"></span><span class="badge">7</span></span>Ждут вас</div>
+    <div class="tab on"><span class="icw"><span class="ic"></span><span class="badge">41</span></span>Почта</div>
+    <div class="tab"><span class="icw"><span class="ic"></span></span>Чаты</div>
+  </div>
+  <div class="ok" style="left:180px;bottom:62px">счётчик рядом со значком, в обводке бумагой</div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,41 @@
+schema: spec-driven
+
+context: |
+  Language: ru
+  All artifacts must be written in ru.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Проект: Сёма — личный ассистент (первая способность: спам-фильтр почты).
+  Архитектура: server/ — Go без cgo (переезд на Raspberry Pi простой
+  кросс-компиляцией), macapp/ — SwiftUI-клиент, рендерящий динамический
+  UI-DSL (JSON-компоненты из server/internal/api/ui.go); клиент не знает
+  предметной области и не пересобирается под новые задачи.
+  Почта: Gmail по IMAP + OAuth (XOAUTH2). LLM-провайдеры подключаемые:
+  anthropic и любой OpenAI-совместимый (LM Studio, Ollama). RAG: эмбеддинги
+  bge-m3, векторы в SQLite, брутфорс-косинус.
+  Политика спама: LLM помечает -> человек подтверждает в UI -> похожие
+  (по отправителю и по векторной близости >= 0.90) уходят в Junk
+  автоматически -> из Junk окончательное удаление через 30 дней.
+  Даты в SQLite — строки RFC3339 UTC. SQLite = modernc.org/sqlite (без cgo).
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

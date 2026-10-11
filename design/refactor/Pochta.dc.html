@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    .win { width: 1160px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 16px 8px; }
+    .tdot { width: 12px; height: 12px; border-radius: 6px; }
+    .sgroup { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.5); padding: 12px 9px 5px; }
+    .sgroup:first-of-type { padding-top: 0; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem.sel { background: rgba(0,0,0,0.07); font-weight: 600; }
+    .navitem svg { flex-shrink: 0; }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 25px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
+    .count { font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .right { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+    .foot { margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; gap: 7px; font-size: 11px; color: rgba(60,60,67,0.6); }
+
+    .body { flex: 1; background: #F5F4F2; padding: 24px; box-sizing: border-box; overflow: hidden; }
+    .col { max-width: 980px; }
+    .read { max-width: 760px; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 4px; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 16px; }
+    .head { display: flex; align-items: flex-start; gap: 14px; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 18px 0 8px; display: flex; align-items: center; gap: 8px; }
+    .grouptitle .sum { text-transform: none; letter-spacing: 0; font-weight: 400; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; margin-top: 5px; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .snd { font-size: 13px; color: #1D1D1F; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .facts { display: flex; flex-wrap: wrap; gap: 3px 18px; margin-top: 3px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .fold { display: flex; align-items: center; gap: 8px; padding: 11px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .fold:last-child { border-bottom: none; }
+    .chev { color: rgba(60,60,67,0.45); font-size: 10px; width: 10px; flex-shrink: 0; }
+    .ava { width: 30px; height: 30px; border-radius: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 12px; font-weight: 700; }
+    .fileico { width: 28px; height: 34px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 3px; box-sizing: border-box; color: #FFF; font-size: 7px; font-weight: 700; letter-spacing: 0.3px; }
+    .chip { font-size: 12px; padding: 3px 10px; border-radius: 12px; color: #1D1D1F; white-space: nowrap; }
+    .chip.on { background: #007AFF; color: #FFF; font-weight: 500; }
+    .chips { display: flex; gap: 3px; padding: 2px; background: rgba(0,0,0,0.05); border-radius: 14px; }
+    .seg { display: flex; padding: 2px; background: rgba(0,0,0,0.05); border-radius: 7px; }
+    .seg span { padding: 3px 12px; font-size: 12px; border-radius: 5px; }
+    .seg span.on { background: #FFF; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
+    .search { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border-radius: 7px; background: rgba(0,0,0,0.05); font-size: 12px; color: rgba(60,60,67,0.55); width: 200px; box-sizing: border-box; }
+    .btn { font-size: 12px; padding: 4px 11px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.15); background: #FFF; white-space: nowrap; }
+    .btn.pri { background: #007AFF; border-color: #007AFF; color: #FFF; font-weight: 500; }
+    .empty { text-align: center; padding: 26px 16px; }
+    .empty .icon { font-size: 26px; color: rgba(60,60,67,0.28); }
+    .empty .t { font-size: 13px; font-weight: 600; margin-top: 8px; }
+    .empty .c { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 3px; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 8px; line-height: 1.5; }
+    .note.bad { color: #9A6B00; }
+    .attach { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 8px; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.07); }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; }
+    .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+
+    .time { font-size: 11px; color: rgba(60,60,67,0.5); white-space: nowrap; margin-top: 2px; }
+    .att { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #0058B0; background: rgba(0,122,255,0.08); border-radius: 6px; padding: 2px 7px; margin-top: 4px; }
+    .tint { background: rgba(255,188,46,0.10); }
+    .sel { width: 15px; height: 15px; border-radius: 8px; border: 1.5px solid rgba(60,60,67,0.35); flex-shrink: 0; margin-top: 8px; box-sizing: border-box; }
+
+    .win { height: 1560px; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic"><div class="tdot" style="background:#FF5F57"></div><div class="tdot" style="background:#FEBC2E"></div><div class="tdot" style="background:#28C840"></div></div>
+    <div class="sgroup">Сегодня</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2a3.5 3.5 0 0 0-3.5 3.5c0 3-1.3 3.9-1.3 3.9h9.6s-1.3-.9-1.3-3.9A3.5 3.5 0 0 0 8 2.2z"/><path d="M6.7 12a1.5 1.5 0 0 0 2.6 0"/></svg>Уведомления<div class="right"><div class="ndot" style="background:#FF3B30"></div><span class="count" style="color:#D70015">3</span></div></div>
+      <div class="navitem sel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>Почта<div class="right"><span class="count">19</span></div></div>
+      <div class="subitem"><div class="ndot" style="background:#D93025"></div>owner@example.org<span class="right count" style="font-size:10px">12</span></div>
+      <div class="subitem"><div class="ndot" style="background:#FC3F1D"></div>me@example.com<span class="right count" style="font-size:10px">7</span></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>Чаты</div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>Файлы<div class="right"><span class="count">131</span></div></div>
+    </div>
+    <div class="sgroup">Сёма сам</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>Задачи<div class="right"><span class="count">22</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 2.6a2 2 0 0 0-2.4 1.7 2 2 0 0 0-1 3.4 2 2 0 0 0 1.2 3.3 2 2 0 0 0 2.2 2z"/><path d="M8.8 2.6a2 2 0 0 1 2.4 1.7 2 2 0 0 1 1 3.4 2 2 0 0 1-1.2 3.3 2 2 0 0 1-2.2 2z"/></svg>Память<div class="right"><span class="count">142</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8h3l1.5-4 3 8 1.5-4h4"/></svg>Здоровье<div class="right"><div class="ndot" style="background:#FEBC2E"></div></div></div>
+    </div>
+    <div class="sgroup">Модули</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M6.4 11.6V5.2h2.1a1.7 1.7 0 0 1 0 3.4H5.6"/><path d="M5.6 10h3"/></svg>Чеки</div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.4v7.2"/><path d="M9.9 6.1c-.5-.5-1.2-.8-1.9-.8-1 0-1.8.5-1.8 1.4 0 2 3.7 1.1 3.7 3 0 1-.9 1.5-1.9 1.5-.8 0-1.5-.3-2-.9"/></svg>Курсы</div>
+    </div>
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08)">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>Настройки</div>
+    </div>
+    <div class="foot"><div class="ndot" style="background:#28C840"></div>Проверено в 07:46 · qwen-4b</div>
+  </div>
+  <div class="body">
+    <div class="col">
+      <div class="head">
+        <div style="flex:1">
+          <div class="h1">Почта</div>
+          <div class="sub">за неделю · 19 писем в разборе · 24 ушло в спам · оба ящика</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px">
+          <div class="search">⌕&nbsp; Поиск по письмам</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; margin:-8px 0 4px">
+        <div class="seg"><span class="on">Письма</span><span>Отправители</span></div>
+        <div class="chips"><span class="chip">сегодня</span><span class="chip">с прошлого захода</span><span class="chip on">неделя</span></div>
+        <div style="margin-left:auto; display:flex; gap:6px"><div class="btn">Проверить сейчас</div><div class="more">⋯</div></div>
+      </div>
+
+      <div class="card tint" style="margin-top:14px; border-color:rgba(255,188,46,0.5)">
+        <div class="row" style="align-items:center">
+          <div class="dot" style="background:#FEBC2E; margin-top:0"></div>
+          <div style="flex:1"><div class="ttl">Три вещи ждут решения</div>
+            <div class="meta">счёт VPS-Хост на 449,00 ₽ — срок 15 сентября · агент «мак» просит разрешить способности · новости по темам за 3 сентября</div></div>
+          <div class="btn pri">Открыть уведомления</div>
+        </div>
+      </div>
+
+      <div class="grouptitle">Счета и чеки <span class="sum">· 6 писем · 51 090,41 ₽ · за неделю</span></div>
+      <div class="card">
+    <div class="row"><div class="ava" style="background:#7952B3">Г</div><div style="flex:1; min-width:0"><div class="ttl">«Горэнерго»</div><div class="snd">Счет от «Горэнерго»</div><div class="facts"><span class="fact">Сумма <b>2 140,50 ₽</b></span><span class="fact">Лицевой счёт <b>100003/1</b></span><span class="fact">Период <b>август 2026</b></span></div><div class="att">📎 Счет по л/с XXXXXX_1 за 2026.08.pdf · 52 КБ</div></div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">счёт</span><div class="time">04.09 00:50</div><div class="more">⋯</div></div>
+    <div class="row"><div class="ava" style="background:#B33A72">Д</div><div style="flex:1; min-width:0"><div class="ttl">Документы Онлайн</div><div class="snd">Чек от ООО «Камень-Мастер» за 31.08.2026</div><div class="facts"><span class="fact">Сумма <b>48 500 ₽</b></span><span class="fact">За что <b>столешница из искусственного камня</b></span></div></div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">чек</span><div class="time">03.09 10:14</div><div class="more">⋯</div></div>
+    <div class="row"><div class="ava" style="background:#2E7DD1">V</div><div style="flex:1; min-width:0"><div class="ttl">VPS-Хост</div><div class="snd">Ваш расчётный период подходит к концу</div><div class="facts"><span class="fact">Сумма <b>449,00 ₽</b></span><span class="fact">Продление <b>VPS-10241, 3 месяца</b></span><span class="fact">Срок <b>15 сентября</b></span></div></div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">срок 15.09</span><div class="time">03.09 10:52</div><div class="more">⋯</div></div>
+    <div class="row"><div class="ava" style="background:#B33A72">Н</div><div style="flex:1; min-width:0"><div class="ttl">no-reply@housing.example</div><div class="snd">Счёт-квитанция на оплату за Август 2026</div><div class="facts"><span class="fact">Лицевой счёт <b>10000000002</b></span></div><div class="att">📎 К10000000002_202608.pdf · 177 КБ</div></div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">счёт</span><div class="time">04.09 08:57</div><div class="more">⋯</div></div>
+    <div class="row"><div class="ava" style="background:#C7532F">Р</div><div style="flex:1; min-width:0"><div class="ttl">utility.example</div><div class="snd">Платежный документ ПАО «Теплосеть» за август 2026 г</div><div class="facts"><span class="fact">Адрес <b>Энск, Садовая, 1</b></span><span class="fact">Сумма <b>не распозналась — PDF без текстового слоя</b></span></div><div class="att">📎 Платёжный документ.pdf · 195 КБ</div></div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">счёт</span><div class="time">04.09 19:48</div><div class="more">⋯</div></div>
+    <div class="row"><div class="ava" style="background:#B33A72">М</div><div style="flex:1; min-width:0"><div class="ttl">Маркет</div><div class="snd">Ваш чек + (1) подарок</div><div class="facts"><span class="fact">Ящик <b>me@example.com</b></span></div></div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">чек</span><div class="time">04.09 12:11</div><div class="more">⋯</div></div>
+      </div>
+      <div class="note">Сумма и файл — факты, а не хвост в общей строке. Отправитель 13 semibold, тема 13 обычным, время справа мелким серым: глаз идёт по левому краю по отправителям, а не спотыкается о каждое слово.</div>
+
+      <div class="grouptitle">Документы <span class="sum">· 1 письмо · 3 файла</span></div>
+      <div class="card">
+    <div class="row"><div class="ava" style="background:#E0B100">С</div><div style="flex:1; min-width:0"><div class="ttl">Страховая</div><div class="snd">Договор страхования 000WS0000000000</div><div class="facts"><span class="fact">Полис <b>000WS0000000000</b></span><span class="fact">Файлов <b>3</b></span></div><div class="att">📎 Страховой полис.pdf · Памятка страхователю.pdf · ещё 1</div></div><span class="tag" style="background:rgba(0,122,255,.14); color:#0058B0">документ</span><div class="time">02.09 08:25</div><div class="more">⋯</div></div>
+      </div>
+
+      <div class="grouptitle">От людей <span class="sum">· 2 письма</span></div>
+      <div class="card">
+    <div class="row"><div class="ava" style="background:#C7532F">P</div><div style="flex:1; min-width:0"><div class="ttl">Perplexity</div><div class="snd">Your API credits are ready to use.</div><div class="facts"><span class="fact">Ящик <b>owner@example.org</b></span></div></div><div class="time">04.09 22:13</div><div class="more">⋯</div></div>
+    <div class="row"><div class="ava" style="background:#C7532F">Y</div><div style="flex:1; min-width:0"><div class="ttl">Yandex Cloud</div><div class="snd">Письмо от CEO</div><div class="facts"><span class="fact">Ящик <b>me@example.com</b></span></div></div><div class="time">03.09 12:31</div><div class="more">⋯</div></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="fold"><span class="chev">▶</span><span style="font-size:13px; font-weight:600">Уведомления</span><span class="meta">10 писем · My Kaspersky ×2 · Обувь · Регистратор доменов · Клуб скидок · ещё 5 отправителей</span><span style="margin-left:auto" class="more">⋯</span></div>
+        <div class="fold"><span class="chev">▶</span><span style="font-size:13px; font-weight:600">Роботы и рассылки</span><span class="meta">свёрнуто · 0 за неделю после включения режима «только разрешённые»</span><span style="margin-left:auto" class="more">⋯</span></div>
+      </div>
+      <div class="note">Группа, в которой нет ничего для человека, приходит свёрнутой и показывает счётчик по отправителям. Развернуть — один клик, и это единственное, что она умеет: действий в заголовке нет.</div>
+
+      <div class="grouptitle">Разбор спама <span class="sum">· 24 письма за неделю, все разобраны сами</span></div>
+      <div class="card">
+        <div class="row" style="align-items:center">
+          <div class="sw sw-on"><div class="knob" style="left:16px"></div></div>
+          <div style="flex:1"><div class="ttl">Только разрешённые отправители</div>
+            <div class="meta">письма от всех, кроме 30 разрешённых адресов, уходят в спам сразу; файлы и чеки Сёма всё равно забирает</div></div>
+          <div class="link">Отправители</div><div class="more">⋯</div>
+        </div>
+    <div class="row" style="opacity:.72"><div class="sel"></div><div class="ava" style="background:#C7532F">P</div><div style="flex:1; min-width:0"><div class="ttl">Perplexity</div><div class="snd">Get started with Perplexity's API platform</div><div class="facts"><span class="fact">Почему <b>отправитель не в списке разрешённых</b></span></div></div><div class="time">22:09</div><div class="more">⋯</div></div>
+    <div class="row" style="opacity:.72"><div class="sel"></div><div class="ava" style="background:#5A6ACF">Р</div><div style="flex:1; min-width:0"><div class="ttl">Рекомендации друзей на Facebook</div><div class="snd">Ольга Петрова: расширьте сеть контактов</div><div class="facts"><span class="fact">Почему <b>отправитель уже подтверждён как спамер</b></span></div></div><div class="time">22:01</div><div class="more">⋯</div></div>
+    <div class="row" style="opacity:.72"><div class="sel"></div><div class="ava" style="background:#E0B100">A</div><div style="flex:1; min-width:0"><div class="ttl">Аптека.Онлайн</div><div class="snd">Новости и акции</div><div class="facts"><span class="fact">Почему <b>отправитель уже подтверждён как спамер</b></span></div></div><div class="time">20:37</div><div class="more">⋯</div></div>
+    <div class="row" style="opacity:.72"><div class="sel"></div><div class="ava" style="background:#2E7DD1">B</div><div style="flex:1; min-width:0"><div class="ttl">ByteByteGo</div><div class="snd">Why Code Verification Matters More Than Ever in the Age of AI</div><div class="facts"><span class="fact">Почему <b>отправитель уже подтверждён как спамер</b></span></div></div><div class="time">19:31</div><div class="more">⋯</div></div>
+    <div class="row" style="opacity:.72"><div class="sel"></div><div class="ava" style="background:#3A8FA3">I</div><div style="flex:1; min-width:0"><div class="ttl">IT-конференция «Код»</div><div class="snd">120+ причин прийти на «Код»</div><div class="facts"><span class="fact">Почему <b>отправитель уже подтверждён как спамер</b></span></div></div><div class="time">18:40</div><div class="more">⋯</div></div>
+        <div class="row" style="justify-content:center; padding:9px">
+          <div class="link">Показать ещё (5 из 24)</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:10px">
+        <div class="meta" style="flex:1">Ни одного «В спам» в строке: решение принимается пачкой. «Выбрать» включает кружки, дальше «Не спам» одной кнопкой на всё выбранное — так это и делают, письмо за письмом никто не размечает.</div>
+        <div class="btn">Выбрать</div>
+        <div class="btn">Не спам (0)</div>
+      </div>
+
+      <div class="note bad" style="margin-top:14px; padding:10px 12px; background:rgba(255,188,46,0.12); border-radius:8px">Плашка «600 писем перенесено в спам автоматически — Сёма удалит их из почты через 30 дн.» сейчас висит внизу постоянно и неотличима от подписи. Ей место здесь, в разделе спама, и только пока срок ближе недели.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

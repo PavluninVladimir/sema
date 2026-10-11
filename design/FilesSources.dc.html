@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 1180px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .subitem .badge-count { font-size: 10px; }
+    .row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .ficon { width: 36px; height: 44px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; box-sizing: border-box; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; color: #FFFFFF; }
+    .rowmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .fname { font-size: 13px; font-weight: 600; color: #1D1D1F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fmeta { font-size: 11px; color: rgba(60,60,67,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sum { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 11px; flex-shrink: 0; background: rgba(40,200,64,0.14); color: #1E7A32; font-variant-numeric: tabular-nums; }
+    .kind { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 10px; flex-shrink: 0; background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.7); }
+    .btn { height: 26px; padding: 0 12px; border-radius: 6px; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }
+    .btn-plain { background: #FFFFFF; color: #1D1D1F; border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 0.5px 1px rgba(0,0,0,0.08); }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px"></span>
+        Все ящики
+        <span class="badge-count">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>
+        owner@example.org
+        <span class="badge-count">38</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FC3F1D; flex-shrink: 0"></span>
+        me@example.com
+        <span class="badge-count">23</span>
+      </div>
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+        <span class="badge-count">12</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 10:46
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid rgba(0,0,0,0.08)">
+      <div style="display: flex; flex-direction: column; gap: 1px">
+        <div style="font-size: 15px; font-weight: 600; color: #1D1D1F">Файлы</div>
+        <div style="font-size: 12px; color: rgba(60,60,67,0.6)">244 файла · 3 источника · локально 1,8 ГБ · перетащите файл в окно, чтобы добавить</div>
+      </div>
+      <div style="margin-left: auto; display: flex; gap: 6px"><div class="btn btn-plain">Чеки</div><div class="btn btn-plain">Хранилища</div></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid rgba(0,0,0,0.08)">
+      <div style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 9px; border-radius: 7px; background: rgba(0,0,0,0.05); width: 220px; box-sizing: border-box">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <span style="font-size: 13px; color: rgba(60,60,67,0.4)">Поиск по файлам</span>
+      </div>
+      <div style="display: flex; height: 24px; border-radius: 7px; background: rgba(0,0,0,0.05); padding: 2px">
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 500; color: #1D1D1F; background: #FFFFFF; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.12)">Все</span>
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Документы</span>
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Из писем</span>
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Загрузки</span>
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Из папки</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex: 1; min-height: 0">
+    <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; min-width: 0">
+      <div style="margin: 10px 16px 0 16px; padding: 12px; border: 1.5px dashed rgba(0,122,255,0.45); border-radius: 8px; background: rgba(0,122,255,0.04); font-size: 12px; color: #0058B0; text-align: center">Перетащите файл сюда — Сёма сохранит его в хранилище, прочитает текст и разбудит модули в ту же секунду</div>
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 12px 16px 6px 16px">Сегодня</div>
+      <div class="row">
+        <div class="ficon" style="background: #D2372B">PDF</div>
+        <div class="rowmain">
+          <div class="fname">Счет по л/с XXXXXX-1 за 2026.08.pdf</div>
+          <div class="fmeta">Горэнерго · no-reply@energy.example · 09:12 · 118 КБ</div>
+          <div class="fmeta">Счёт за электроэнергию, оплатить до 10 сентября</div>
+          <div style="display: flex; gap: 6px; margin-top: 3px"><span class="kind" style="background: rgba(217,48,37,0.12); color: #D93025">письмо · owner@example.org</span><span class="kind" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.7)">локально</span></div>
+        </div>
+        <span class="sum">1 874,30 ₽</span><div class="btn btn-plain">Открыть</div><div class="btn btn-plain">Письмо</div>
+      </div>
+
+      <div class="row">
+        <div class="ficon" style="background: #D2372B">PDF</div>
+        <div class="rowmain">
+          <div class="fname">scan_2026-09-03.pdf</div>
+          <div class="fmeta">перетащили в окно · 08:40 · 2,1 МБ</div>
+          <div class="fmeta">Чек об оплате столешницы — прочитано OCR</div>
+          <div style="display: flex; gap: 6px; margin-top: 3px"><span class="kind" style="background: rgba(0,122,255,0.14); color: #0058B0">загрузка</span><span class="kind" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.7)">локально</span></div>
+        </div>
+        <span class="sum">65 900 ₽</span><div class="btn btn-plain">Открыть</div>
+      </div>
+
+      <div class="row">
+        <div class="ficon" style="background: #D2372B">PDF</div>
+        <div class="rowmain">
+          <div class="fname">Договор аренды 2026-2027.pdf</div>
+          <div class="fmeta">Иванова Мария · 09:20 · 402 КБ · тот же файл пришёл двумя путями</div>
+          <div class="fmeta">Договор аренды на 12 месяцев, 14 страниц</div>
+          <div style="display: flex; gap: 6px; margin-top: 3px"><span class="kind" style="background: rgba(217,48,37,0.12); color: #D93025">письмо · owner@example.org</span><span class="kind" style="background: rgba(0,122,255,0.14); color: #0058B0">загрузка</span><span class="kind" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.7)">локально</span></div>
+        </div>
+        <span class="kind">документ</span><div class="btn btn-plain">Открыть</div><div class="btn btn-plain">Письмо</div>
+      </div>
+
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 12px 16px 6px 16px">Вчера</div>
+      <div class="row">
+        <div class="ficon" style="background: #7952B3">JPG</div>
+        <div class="rowmain">
+          <div class="fname">IMG_4471.jpg</div>
+          <div class="fmeta">из папки ~/Scans · вчера 18:30 · 1,4 МБ</div>
+          <div class="fmeta">Кассовый чек «Гипермаркет», OCR: 3 позиции</div>
+          <div style="display: flex; gap: 6px; margin-top: 3px"><span class="kind" style="background: rgba(121,82,179,0.14); color: #7952B3">папка ~/Scans</span><span class="kind" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.7)">локально</span></div>
+        </div>
+        <span class="sum">4 310 ₽</span><div class="btn btn-plain">Открыть</div>
+      </div>
+
+      <div class="row">
+        <div class="ficon" style="background: #B7791F">TXT</div>
+        <div class="rowmain">
+          <div class="fname">prod-1_certificates.txt</div>
+          <div class="fmeta">модуль «Серверы» · вчера 03:00 · 2 КБ</div>
+          <div class="fmeta">Список сертификатов и сроков, снят задачей «Проверка сертификатов»</div>
+          <div style="display: flex; gap: 6px; margin-top: 3px"><span class="kind" style="background: rgba(255,149,0,0.16); color: #B7791F">модуль «Серверы»</span><span class="kind" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.7)">локально</span></div>
+        </div>
+        <span class="kind">документ</span><div class="btn btn-plain">Открыть</div>
+      </div>
+
+      <div class="row">
+        <div class="ficon" style="background: #2E7DD1">HTML</div>
+        <div class="rowmain">
+          <div class="fname">BR00000_01082026_31082026.HTML</div>
+          <div class="fmeta">Брокер · вчера 06:54 · 65 КБ</div>
+          <div class="fmeta">Отчёт брокера за август — текст извлечён, доступен в поиске</div>
+          <div style="display: flex; gap: 6px; margin-top: 3px"><span class="kind" style="background: rgba(252,63,29,0.12); color: #FC3F1D">письмо · me@example.com</span><span class="kind" style="background: rgba(40,200,64,0.14); color: #1E7A32">S3 · sema-archive</span></div>
+        </div>
+        <span class="kind">документ</span><div class="btn btn-plain">Открыть</div><div class="btn btn-plain">Письмо</div>
+      </div>
+
+      <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #F7F6F4; border-top: 1px solid rgba(0,0,0,0.08)">
+        <span style="font-size: 12px; color: rgba(60,60,67,0.6)">Файл получают только через сервер: клиенту и модулям всё равно, где он лежит — локально у Сёмы или в S3. Одинаковое содержимое из разных источников — один файл.</span>
+      </div>
+    </div>
+
+    <div style="width: 340px; flex-shrink: 0; border-left: 1px solid rgba(0,0,0,0.08); background: #FBFAF9; display: flex; flex-direction: column; gap: 14px; padding: 16px; box-sizing: border-box; overflow: hidden">
+      <div style="display: flex; gap: 10px; align-items: center"><div class="ficon" style="background: #D2372B">PDF</div><div style="min-width: 0"><div class="fname">Договор аренды 2026-2027.pdf</div><div class="fmeta">402 КБ · PDF · 14 страниц · текст извлечён</div></div></div>
+      <div>
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding-bottom: 6px">Источники</div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #1D1D1F">
+          <div style="display: flex; gap: 8px; align-items: center"><span class="kind" style="background: rgba(217,48,37,0.12); color: #D93025">письмо · owner@example.org</span><span class="fmeta">«Договор на подпись» · 2 сен 18:30</span></div>
+          <div style="display: flex; gap: 8px; align-items: center"><span class="kind" style="background: rgba(0,122,255,0.14); color: #0058B0">загрузка</span><span class="fmeta">перетащили в окно · сегодня 09:20</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding-bottom: 6px">Расположение</div>
+        <div style="display: flex; gap: 8px; align-items: center"><span class="kind" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.7)">локально</span><span class="fmeta">files/9f/3a/9f3a…c21e · sha256</span></div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding-bottom: 6px">Что поняли модули</div>
+        <div class="fmeta" style="white-space: normal">«Требует внимания»: ответить Ивановой до пятницы · «Чеки»: не чек</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding-bottom: 6px">Текст</div>
+        <div style="font-size: 11px; color: rgba(60,60,67,0.85); line-height: 1.45; max-height: 150px; overflow: hidden; white-space: normal">ДОГОВОР АРЕНДЫ № 14/26. г. Энск, 2 сентября 2026 г. Иванова Мария Сергеевна, именуемая в дальнейшем «Арендодатель», и Иванов Иван, именуемый «Арендатор», заключили настоящий договор о нижеследующем. 1. Предмет договора. 1.1. Арендодатель передаёт во временное пользование…</div>
+      </div>
+      <div style="margin-top: auto; display: flex; gap: 6px; flex-wrap: wrap"><div class="btn btn-plain">Открыть</div><div class="btn btn-plain">Письмо</div><div class="btn btn-plain" style="color: #C4271C">Удалить</div></div>
+      <div class="fmeta" style="white-space: normal">Удалить — файл целиком, оба источника; письмо и его текст останутся.</div>
+    </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

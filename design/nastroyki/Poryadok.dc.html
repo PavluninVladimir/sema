@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --ok-soft:#E4F1E9; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{padding:30px 32px 36px;display:flex;flex-direction:column;gap:24px;width:1180px}
+  .cap{display:flex;flex-direction:column;gap:6px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em;line-height:1.2}
+  .cap p{margin:0;font-size:13px;line-height:1.5;color:#5B5849;max-width:1000px}
+  .cap b{font-weight:600;color:var(--ink)}
+
+  .hd2{display:flex;align-items:baseline;gap:10px}
+  .hd2 b{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)}
+  .hd2 .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .hd2 span{font-size:11px;color:var(--ink3)}
+
+  .steps{display:flex;flex-direction:column}
+  .step{display:flex;gap:16px;padding:14px 4px;border-bottom:1px solid var(--line2)}
+  .step:last-child{border-bottom:0}
+  .step .no{flex:0 0 34px;height:34px;border-radius:10px;background:var(--ink);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+  .step.later .no{background:var(--sunk);color:var(--ink3)}
+  .step .tx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px}
+  .step .tx b{font-size:15px;font-weight:600;line-height:1.25}
+  .step .tx p{margin:0;font-size:12px;line-height:1.5;color:var(--ink2);max-width:720px}
+  .step .tx .win{font-size:11px;line-height:1.5;color:var(--ok);font-weight:600}
+  .step .side{flex:0 0 250px;display:flex;flex-direction:column;gap:5px;padding-top:2px}
+  .step .side .k{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--ink3);text-transform:uppercase}
+  .step .side .v{font-size:12px;line-height:1.45;color:var(--ink2)}
+  .step .side .v b{font-weight:600;color:var(--ink)}
+
+  .rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .rule-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    display:flex;flex-direction:column;gap:6px;box-shadow:var(--lift)}
+  .rule-card .t{display:flex;align-items:center;gap:8px}
+  .rule-card .t b{font-size:13px;font-weight:700}
+  .rule-card .t i{width:8px;height:8px;border-radius:50%;display:block;background:var(--accent)}
+  .rule-card p{margin:0;font-size:11px;line-height:1.55;color:var(--ink2)}
+  .rule-card .bad{font-size:11px;line-height:1.5;color:var(--alert)}
+  .rule-card .good{font-size:11px;line-height:1.5;color:var(--ok)}
+
+  .last{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:12px;padding:14px 17px;
+    display:flex;gap:16px;align-items:flex-start}
+  .last .no{flex:0 0 34px;height:34px;border-radius:10px;background:var(--warn-soft);color:var(--warn);
+    display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+  .last b{display:block;font-size:15px;font-weight:600;margin-bottom:4px}
+  .last p{margin:0;font-size:12px;line-height:1.5;color:#6B4400;max-width:900px}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">ПОРЯДОК РАБОТ И ТРИ ПРАВИЛА, ОБЩИЕ ДЛЯ ВСЕХ ЭКРАНОВ</div>
+    <h1>Что делать первым, чтобы польза пришла раньше переделки</h1>
+    <p>Переделка настроек — не один выкат. Порядок выбран так, чтобы <b>каждый шаг был полезен сам по себе</b>
+      и его можно было остановить, не оставив интерфейс наполовину переехавшим. Первый шаг снимает самую
+      тяжёлую часть разметки и не трогает ни одного экрана целиком.</p>
+  </div>
+
+  <div class="hd2"><b>Порядок</b><div class="rule"></div><span>шесть шагов, каждый выкатывается отдельно</span></div>
+
+  <div class="steps">
+
+    <div class="step">
+      <span class="no">1</span>
+      <div class="tx">
+        <b>Общий поисковый выбор модели</b>
+        <p>Один popup на все строки: в строке остаётся только выбранная модель, список создаётся в момент
+          открытия и показывает найденное. Ставится под нынешние экраны «Модели и роли» и «Инструменты»
+          без всякой перестройки — просто вместо <span class="m">&lt;select&gt;</span> с полным списком.</p>
+        <div class="win">Сразу: −1 458 элементов &lt;option&gt; на «Моделях», экран с 3 597 узлов худеет вдвое.</div>
+      </div>
+      <div class="side"><span class="k">Трогает</span>
+        <span class="v"><b>Модели и роли</b>, <b>Инструменты</b> — только замена одного компонента</span></div>
+    </div>
+
+    <div class="step">
+      <span class="no">2</span>
+      <div class="tx">
+        <b>Каркас пяти вкладок и мобильная шторка</b>
+        <p>Один пункт «Настройки» в меню, пять постоянных вкладок, левый список разделов, на телефоне —
+          полоса вбок и нижняя шторка. Содержимое разделов пока переезжает как есть, страница за страницей.</p>
+        <div class="win">Сразу: из бокового меню уходят 17 ссылок; адрес начинает хранить вкладку и раздел.</div>
+      </div>
+      <div class="side"><span class="k">Трогает</span>
+        <span class="v">меню, маршрутизацию экранов, сборку <b>всех</b> экранов настроек — но только их обёртку</span></div>
+    </div>
+
+    <div class="step">
+      <span class="no">3</span>
+      <div class="tx">
+        <b>Новая структура «Моделей» и «Почты»</b>
+        <p>Модели: Роли (девять) · Модели со «Служебными» · Провайдеры и цены · Проблемы со счётчиком.
+          Почта: шесть внутренних вкладок, закреплённый ящик, утопленный блок «общее», на «Спаме» —
+          строка области действия вместо ящика.</p>
+        <div class="win">Сразу: два самых тяжёлых экрана (3 597 и 886 узлов) перестают быть портянками.</div>
+      </div>
+      <div class="side"><span class="k">Трогает</span>
+        <span class="v"><b>settings_models.go</b>, <b>settings_mail.go</b>, разметку задач на экране почты</span></div>
+    </div>
+
+    <div class="step">
+      <span class="no">4</span>
+      <div class="tx">
+        <b>Нижняя панель сохранения и защита перехода</b>
+        <p>Изменённое помечается точкой, снизу выезжает «Отменить · Сохранить». Уход на другую вкладку с
+          несохранённым — местная панель «Остаться · Выйти». Ошибка сохранения встаёт у той строки, которая
+          её вызвала, а нижняя панель остаётся открытой.</p>
+        <div class="win">Сразу: правка настроек перестаёт быть необратимой по одному касанию.</div>
+      </div>
+      <div class="side"><span class="k">Трогает</span>
+        <span class="v">словарь UI-DSL (новое состояние формы), клиент <b>app.js</b>, все формы настроек</span></div>
+    </div>
+
+    <div class="step">
+      <span class="no">5</span>
+      <div class="tx">
+        <b>Остальные разделы</b>
+        <p>Уведомления (четыре вкладки, «Работа Сёмы» уезжает в «Систему»), Telegram, MAX, Перевод, Поиск,
+          Скиллы, Развитие, Серверы, Агенты, Интеграции, Хранилища, Инструменты, Безопасность. Ленты
+          журналов выносятся на свои экраны, в разделах остаются итог и ссылка.</p>
+        <div class="win">Сразу: пропадает последнее место, где настройка провода лежит между правилами писем.</div>
+      </div>
+      <div class="side"><span class="k">Трогает</span>
+        <span class="v">остальные <b>settings_*.go</b> и экран <b>sent</b></span></div>
+    </div>
+
+  </div>
+
+  <div class="last">
+    <span class="no">6</span>
+    <div>
+      <b>Настоящий журнал изменений настроек — отдельным этапом, последним</b>
+      <p>Кто, когда, какой параметр, старое и новое значение. Значения секретов в журнал не попадают —
+        только имя секрета и факт замены. До этого этапа блок на «Главном» зовётся «Последняя активность» и
+        честно показывает лишь то, что Сёма и так пишет: журнал доступа, журнал секретов, решения по скиллам.
+        Обещать историю правок раньше нельзя: пустой блок человек прочтёт как «никто ничего не менял».</p>
+    </div>
+  </div>
+
+  <div class="hd2"><b>Три правила, общие для всех экранов настроек</b><div class="rule"></div></div>
+
+  <div class="rules">
+    <div class="rule-card">
+      <div class="t"><i></i><b>У беды всегда есть действие</b></div>
+      <p>Блок «Стоит посмотреть» без кнопки — обои. Кнопка ведёт <b>прямо к настройке</b>, которая беду
+        устраняет, а не в раздел, где её ещё надо найти.</p>
+      <div class="bad">Сейчас: «выберите другую в строке роли ниже» — и ни одной кнопки на четыре замечания.</div>
+      <div class="good">Станет: «Модели → Служебные →» открывает вкладку и подсвечивает строку эмбеддера.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="t"><i></i><b>Ничего не сохраняется на лету</b></div>
+      <p>Тронули — появилась точка и нижняя панель. Уходите с несохранённым — местная панель говорит, что
+        именно потеряется. Не сохранилось — ошибка стоит у своей строки, панель остаётся открытой.</p>
+      <div class="good">Системного диалога браузера нет: он не умеет назвать, что именно пропадёт.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="t"><i></i><b>Общее видно, что оно общее</b></div>
+      <p>Настройка, действующая на все ящики или все серверы, лежит в утопленном блоке с пунктиром и
+        подписью «2 ящика». Вкладка, где общего только и есть, теряет закреплённый объект и получает
+        строку области действия.</p>
+      <div class="good">Перепутать «порог спама для этого ящика» и «для всех» становится нельзя.</div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

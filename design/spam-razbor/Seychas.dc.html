@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --ok-soft:#E4F1E9;
+    --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .main{padding:26px 32px 40px;display:flex;flex-direction:column;gap:20px}
+  .h1{font-size:28px;line-height:1.1;font-weight:700;letter-spacing:-.015em;margin:0}
+  .head-meta{font-size:13px;line-height:1.4;color:var(--ink2);margin:0}
+  .sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:8px}
+  .sec-hd h2{margin:0;font-size:13px;font-weight:700}
+  .sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;align-items:flex-start;gap:12px;padding:11px 8px;border-radius:9px;
+    border-bottom:1px solid var(--line2)}
+  .row:last-child{border-bottom:0}
+  .cb{flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);margin-top:6px}
+  .av{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-top:1px}
+  .body{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:2px}
+  .line1{display:flex;align-items:baseline;gap:8px}
+  .who{font-size:15px;font-weight:600;line-height:1.3}
+  .addr{font-size:11px;color:var(--ink3)}
+  .subj{font-size:15px;line-height:1.35;color:var(--ink2)}
+  .why{font-size:12px;line-height:1.4;color:var(--ink3);margin-top:2px}
+  .why b{font-weight:500;color:var(--ink3)}
+  .act{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-top:1px}
+  .chip{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:5px;
+    font-size:11px;font-weight:600}
+  .chip.warn{color:var(--warn)}
+  .chip.warn::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:6px}
+  .chip.alert{background:var(--alert-soft);color:var(--alert)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 9px;
+    border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);white-space:nowrap}
+  .btn.big{height:32px;padding:0 13px;font-size:13px}
+  .dots{width:28px;height:28px;border-radius:7px;background:transparent;color:var(--ink3);
+    font-size:16px;display:inline-flex;align-items:center;justify-content:center}
+  .day{font-size:12px;font-weight:700;color:var(--ink2);padding:12px 0 4px;display:flex;
+    align-items:center;gap:10px}
+  .day .rule{flex:1;height:1px;background:var(--line2)}
+  .fold{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;padding:6px 0}
+  .fold .rule{flex:1;height:1px;background:var(--line2)}
+  .tri{color:var(--ink3);font-size:10px}
+  /* пометки разбора */
+  .mark{position:relative;outline:2px solid var(--alert);outline-offset:3px;border-radius:6px}
+  .note{background:var(--alert-soft);border-left:3px solid var(--alert);padding:9px 12px;
+    border-radius:0 8px 8px 0;font-size:12px;line-height:1.5;color:var(--ink);margin:6px 0 2px}
+  .note b{font-weight:700}
+  .lead{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:12px;
+    padding:14px 16px;font-size:13px;line-height:1.55;color:var(--ink)}
+  .lead b{font-weight:700}
+  </style>
+</helmet>
+
+<div class="main">
+  <div>
+    <h1 class="h1">Как сейчас</h1>
+    <p class="head-meta">Экран «Почта», ящик me@example.com · 10 сентября 2026, снято с живой Сёмы</p>
+  </div>
+
+  <div class="lead">
+    <b>Восемьдесят девять писем ждут решения — и это тонкая серая линия внизу экрана,
+    под сводкой из четырёх писем.</b> Ниже показано то, что видит человек, когда до неё
+    доберётся и раскроет.
+  </div>
+
+  <!-- свёрнутая секция -->
+  <div>
+    <div class="fold mark"><span class="tri">▸</span>Похоже на спам — подтвердите (89)<span class="rule"></span></div>
+    <div class="note"><b>1.</b> Самое большое дело на экране спрятано в свёртку и стоит последним —
+      после сводки, после «Переносятся в спам», перед подписью «Сёма сделал за окно».</div>
+  </div>
+
+  <!-- раскрытая: сорок одинаковых строк -->
+  <div class="day">пятница<span class="rule"></span></div>
+  <div class="rows">
+    <div class="row">
+      <div class="cb"></div>
+      <div class="av" style="background:#C2185B">О</div>
+      <div class="body">
+        <div class="line1"><span class="who">Обувь</span><span class="addr m">info@shop.example · 16:21</span></div>
+        <div class="subj">Вас ждёт розыгрыш промокода на скидку 99% 😉</div>
+        <div class="why m"><b>Почему</b> Рекламный розыгрыш промокода на огромную скидку от неизвестного отправителя — типичный спам. · разобрано задним числом</div>
+      </div>
+      <div class="act"><span class="chip alert">спам 98%</span><span class="btn">Не спам</span><span class="dots">···</span></div>
+    </div>
+  </div>
+
+  <div class="day">26 августа<span class="rule"></span></div>
+  <div class="rows mark">
+    <div class="row">
+      <div class="cb"></div>
+      <div class="av" style="background:#8E24AA">М</div>
+      <div class="body">
+        <div class="line1"><span class="who">Маркет</span><span class="addr m">noreply@market.example · 20:30</span></div>
+        <div class="subj">Ваш чек + (1) подарок</div>
+        <div class="why m"><b>Почему</b> Подозрительное письмо от noreply с обещанием подарка и чеком — типичная фишинговая приманка. · разобрано задним числом</div>
+      </div>
+      <div class="act"><span class="chip warn">спам 85%</span><span class="btn">Не спам</span><span class="dots">···</span></div>
+    </div>
+    <div class="row">
+      <div class="cb"></div>
+      <div class="av" style="background:#8E24AA">М</div>
+      <div class="body">
+        <div class="line1"><span class="who">Маркет</span><span class="addr m">noreply@market.example · 20:30</span></div>
+        <div class="subj">Ваш чек + (1) подарок</div>
+        <div class="why m"><b>Почему</b> Фишинговое письмо от поддельного адреса Маркет с обещанием подарка и чека для выманивания данных · разобрано задним числом</div>
+      </div>
+      <div class="act"><span class="chip warn">спам 85%</span><span class="btn">Не спам</span><span class="dots">···</span></div>
+    </div>
+  </div>
+  <div class="day">25 августа<span class="rule"></span></div>
+  <div class="rows">
+    <div class="row">
+      <div class="cb"></div>
+      <div class="av" style="background:#8E24AA">М</div>
+      <div class="body">
+        <div class="line1"><span class="who">Маркет</span><span class="addr m">noreply@market.example · 13:47</span></div>
+        <div class="subj">Ваш чек + (1) подарок</div>
+        <div class="why m"><b>Почему</b> Подозрительная тема с обещанием подарка и адрес отправителя, имитирующий Маркет · разобрано задним числом</div>
+      </div>
+      <div class="act"><span class="chip warn">спам 85%</span><span class="btn">Не спам</span><span class="dots">···</span></div>
+    </div>
+    <div class="row">
+      <div class="cb"></div>
+      <div class="av" style="background:#8E24AA">М</div>
+      <div class="body">
+        <div class="line1"><span class="who">Маркет</span><span class="addr m">noreply@market.example · 10:56</span></div>
+        <div class="subj">Ваш чек + (1) подарок</div>
+        <div class="why m"><b>Почему</b> Подозрительная тема с обещанием подарка и адрес отправителя, имитирующий Маркет · разобрано задним числом</div>
+      </div>
+      <div class="act"><span class="chip warn">спам 85%</span><span class="btn">Не спам</span><span class="dots">···</span></div>
+    </div>
+  </div>
+
+  <div class="note"><b>2.</b> Сорок строк — одно письмо, повторённое сорок раз: тот же отправитель,
+    та же тема, та же уверенность. <b>3.</b> «Почему» у каждой почти теми же словами: восемьдесят
+    строк текста ради одной мысли. <b>4.</b> Решать надо по одной — сорок нажатий «Не спам».
+    <b>5.</b> Разделители по дням дробят однородный список на кучки по одной-две строки.</div>
+
+  <div style="height:8px"></div>
+  <div class="mark" style="display:inline-block"><span class="btn big">Показать ещё (50 из 89)</span></div>
+  <div class="note"><b>6.</b> Кнопка стоит <b>снаружи</b> свёрнутой секции. Пока список закрыт — а закрыт
+    он по умолчанию, — она висит над пустым местом и обещает «50 из 89», когда показано ноль.
+    Само число читается как «покажу ещё 50», хотя добавится 39.</div>
+
+  <div class="sec-hd" style="margin-top:6px"><h2>Сёма сделал за окно</h2><span class="rule"></span></div>
+  <div class="subj" style="padding:0 8px">разобрано из папок 4 письма · память: 36 фактов, 11 уроков</div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+:root{
+  --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+  --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+  --line:#E3E0D8; --line2:#EFECE4;
+  --accent:#1F4FD8; --accent-soft:#E8EDFC;
+  --ok:#2E7D4F; --info:#2A5FCC; --warn:#9C6100; --warn-soft:#FBF0DC;
+  --alert:#BE3320; --alert-soft:#FBE7E3;
+  --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+  --lift:0 1px 2px rgba(24,20,12,.07);
+  --pop:0 8px 26px rgba(24,20,12,.13), 0 1px 3px rgba(24,20,12,.10);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--ink)}
+.m{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+
+.wrap{padding:44px 44px 52px;display:flex;flex-direction:column;gap:34px;background:var(--paper);min-height:100%}
+.kicker{font-size:11px;letter-spacing:.08em;color:var(--ink3)}
+.h1{margin:0;font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1.05}
+.lead{margin:0;font-size:16px;line-height:1.55;color:var(--ink2);max-width:760px}
+.lead b{color:var(--ink);font-weight:600}
+.quiet{font-size:13px;line-height:1.55;color:var(--ink3)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.panel-pad{padding:15px 17px}
+.sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:10px}
+.sec-hd h2{margin:0;font-size:15px;font-weight:700}
+.sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+.sec-hd .n{font-size:12px;color:var(--ink3)}
+.cost{display:flex;flex-direction:column;gap:7px}
+.cost .t{font-size:13px;font-weight:700}
+.cost ul{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:5px}
+.cost li{font-size:13px;line-height:1.5;color:var(--ink2)}
+.cost li b{color:var(--ink);font-weight:600}
+.cols{display:flex;gap:44px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:9px;flex:0 0 auto}
+.col .cap{font-size:13px;font-weight:700}
+.col>.rail,.col>.phone{flex:0 0 auto}
+.col .sz{font-size:11px;color:var(--ink3)}
+
+/* ——— рельс ——— */
+.rail{width:248px;flex:0 0 248px;background:var(--rail);border:1px solid var(--line);border-radius:12px;
+  display:flex;flex-direction:column;gap:15px;padding:15px 10px 12px}
+.mark{display:flex;align-items:center;gap:8px;padding:1px 8px 0}
+.mark b{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.mark span{font-size:11px;color:var(--ink3)}
+.mark i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:block}
+
+.pinned{display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;border-radius:10px;
+  background:var(--alert-soft)}
+.pinned svg{color:var(--alert);flex:0 0 16px}
+.pinned .lbl{font-size:15px;font-weight:600;color:var(--alert)}
+.pinned .cnt{margin-left:auto;font-size:15px;font-weight:700;color:var(--alert)}
+
+.grp{display:flex;flex-direction:column;gap:1px}
+.grp>.cap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.04em;padding:0 10px 7px}
+
+.nav{display:flex;align-items:center;gap:10px;height:36px;padding:0 8px 0 10px;border-radius:9px;
+  font-size:15px;font-weight:500;color:var(--ink2);position:relative}
+.nav>svg:first-child{flex:0 0 16px;color:var(--ink3)}
+.nav .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav .b{font-size:11px;font-weight:600;color:var(--ink3);margin-left:auto}
+.nav .b.alert{color:var(--alert)}
+.nav .ldot{width:7px;height:7px;border-radius:50%;display:block;margin-left:auto}
+.nav .b+.ldot,.nav .ldot+.b{margin-left:6px}
+.nav .chev{flex:0 0 12px;color:var(--ink3);margin-left:5px}
+.nav .chev.open{transform:rotate(90deg)}
+.nav.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.nav.here{color:var(--ink);font-weight:600}
+.nav.here>svg:first-child{color:var(--accent)}
+.gnode.here{color:var(--ink)}
+.nav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.nav.on>svg:first-child{color:var(--accent)}
+
+.kids{margin:3px 0 7px 20px;padding-left:15px;border-left:1px solid var(--line);
+  display:flex;flex-direction:column;gap:1px}
+.kids .kcap,.flyout .kcap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.04em;padding:9px 10px 4px}
+.kids .kcap:first-child{padding-top:2px}
+.sub{display:flex;align-items:center;gap:9px;height:32px;padding:0 8px 0 10px;border-radius:8px;
+  font-size:15px;font-weight:400;color:var(--ink2);position:relative}
+.sub .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub .b{font-size:11px;font-weight:600;color:var(--ink3);margin-left:auto}
+.sub .idot{width:7px;height:7px;border-radius:50%;flex:0 0 7px;display:block}
+.sub .idot.no{visibility:hidden}
+.sub .ldot{width:7px;height:7px;border-radius:50%;display:block;margin-left:auto}
+.sub.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.sub.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.sub.on::before{content:"";position:absolute;left:-16px;top:5px;bottom:5px;width:2px;
+  border-radius:1px;background:var(--accent)}
+
+/* ——— третий уровень: узел-группа и карман ——— */
+.gnode{display:flex;align-items:center;gap:9px;height:32px;padding:0 8px;border-radius:8px;
+  font-size:15px;font-weight:600;color:var(--ink2);position:relative}
+.gnode>.chev{flex:0 0 12px;color:var(--ink3)}
+.gnode>.chev.open{transform:rotate(90deg)}
+.gnode .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gnode .b{font-size:11px;font-weight:600;color:var(--ink3);margin-left:auto}
+.gnode .ldot{width:7px;height:7px;border-radius:50%;display:block;margin-left:auto}
+.gnode .b+.ldot{margin-left:6px}
+.gnode.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.pocket{background:var(--sunk);border-radius:9px;padding:3px;margin:1px 0 6px;
+  display:flex;flex-direction:column;gap:1px}
+.pocket .sub{height:30px;padding:0 8px 0 26px;font-weight:400}
+.pocket .sub.on::before{display:none}
+.flyout .sub.on::before{display:none}
+.edge{position:absolute;top:0;bottom:0;width:1px;background:var(--alert);opacity:.5}
+.edgelab{position:absolute;font-size:10px;color:var(--alert);white-space:nowrap}
+.pgroup{display:flex;align-items:center;gap:11px;height:48px;padding:0 12px;border-radius:10px;
+  font-size:16px;font-weight:600;color:var(--ink2)}
+.pgroup>.chev{flex:0 0 14px;color:var(--ink3)}
+.pgroup>.chev.open{transform:rotate(90deg)}
+.pgroup .t{flex:1 1 auto;min-width:0}
+.pgroup .b{font-size:12px;font-weight:600;color:var(--ink3);margin-left:auto}
+.pgroup .ldot{width:8px;height:8px;border-radius:50%;display:block;margin-left:auto}
+.ppocket{background:var(--sunk);border-radius:11px;padding:4px;margin:2px 0 8px;
+  display:flex;flex-direction:column;gap:1px}
+.ppocket .psub{height:46px;padding:0 10px 0 34px}
+.foot{margin-top:auto;padding:11px 10px 0;border-top:1px solid var(--line);
+  display:flex;flex-direction:column;gap:6px}
+.foot .l1{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2)}
+.foot .l1 i{width:6px;height:6px;border-radius:50%;background:var(--ok);display:block;flex:0 0 6px}
+.foot .l2{font-size:11px;color:var(--ink3);line-height:1.45}
+.foot .work{display:flex;flex-direction:column;gap:5px;padding-top:2px}
+.foot .work .wl{display:flex;align-items:baseline;gap:6px;font-size:11px;color:var(--ink3)}
+.foot .work .wl b{color:var(--ink2);font-weight:600}
+.bar{height:4px;border-radius:2px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:2px;background:var(--info)}
+
+/* ——— узкий рельс (решение В) ——— */
+.slim{width:60px;flex:0 0 60px;background:var(--rail);border:1px solid var(--line);border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 0 10px}
+.slim .ic{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  color:var(--ink3);position:relative}
+.slim .ic.on{background:var(--panel);color:var(--accent);box-shadow:var(--lift)}
+.slim .ic.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.slim .ic .n{position:absolute;top:3px;right:3px;min-width:17px;height:17px;border-radius:9px;
+  background:var(--alert);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;padding:0 4px}
+.slim .ic .d{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%}
+.slim .sp{height:1px;width:26px;background:var(--line);margin:6px 0}
+.flyout{width:250px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--pop);padding:11px 9px 12px;display:flex;flex-direction:column;gap:1px}
+.flyout .fh{display:flex;align-items:center;gap:9px;padding:0 8px 9px;margin-bottom:4px;
+  border-bottom:1px solid var(--line2)}
+.flyout .fh b{font-size:15px;font-weight:700}
+.flyout .fh svg{color:var(--ink3)}
+.ghost{flex:1 1 auto;min-width:0;border:1px dashed var(--line);border-radius:12px;background:var(--panel);
+  padding:16px 18px;display:flex;flex-direction:column;gap:11px;opacity:.55}
+.ghost .g1{height:22px;width:38%;border-radius:5px;background:var(--sunk)}
+.ghost .g2{height:11px;width:64%;border-radius:4px;background:var(--line2)}
+.ghost .g3{height:11px;width:52%;border-radius:4px;background:var(--line2)}
+.ghost .g4{height:11px;width:70%;border-radius:4px;background:var(--line2)}
+
+/* ——— состояния ——— */
+.stlist{display:flex;flex-direction:column;gap:0}
+.strow{display:flex;align-items:center;gap:26px;padding:13px 0;border-bottom:1px solid var(--line2)}
+.strow:last-child{border-bottom:0}
+.strow .demo{flex:0 0 248px;background:var(--rail);border-radius:10px;padding:5px 8px}
+.strow .demo.k{padding-left:8px}
+.strow .txt{min-width:0;display:flex;flex-direction:column;gap:3px}
+.strow .txt b{font-size:14px;font-weight:600}
+.strow .txt span{font-size:13px;color:var(--ink2);line-height:1.45}
+.badnum{color:var(--alert);font-weight:600}
+
+/* ——— телефон ——— */
+.phones{display:flex;gap:46px;align-items:flex-start}
+.phone{width:390px;flex:0 0 390px;height:844px;background:var(--paper);border:1px solid var(--line);
+  border-radius:22px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.pbar{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;border-bottom:1px solid var(--line2);
+  background:var(--paper)}
+.pbar .tap{width:44px;height:44px;border-radius:11px;border:1px solid var(--line);background:var(--panel);
+  display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:0 0 44px}
+.pbar h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.015em}
+.pbar .cnt{margin-left:auto;display:flex;align-items:center;gap:7px;height:44px;padding:0 14px;
+  border-radius:11px;background:var(--alert-soft);color:var(--alert);font-size:13px;font-weight:700}
+.pbody{padding:14px 16px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.prow{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line2);align-items:flex-start}
+.prow .av{width:34px;height:34px;border-radius:9px;flex:0 0 34px;display:flex;align-items:center;
+  justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.prow .pb{min-width:0;display:flex;flex-direction:column;gap:3px}
+.prow .pb b{font-size:15px;font-weight:600}
+.prow .pb span{font-size:12px;color:var(--ink3)}
+.scrim{position:absolute;inset:0;background:rgba(23,24,28,.34)}
+.sheet{position:absolute;left:0;top:0;bottom:0;width:326px;background:var(--rail);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px 12px;gap:14px;
+  box-shadow:var(--pop)}
+.sheet .mark{padding:1px 10px 0}
+.sheet .pinned{height:52px;font-size:16px}
+.sheet .pinned .lbl{font-size:16px}
+.sheet .pinned .cnt{font-size:17px}
+.pnav{display:flex;align-items:center;gap:12px;height:48px;padding:0 10px 0 12px;border-radius:10px;
+  font-size:16px;font-weight:500;color:var(--ink2)}
+.pnav>svg:first-child{flex:0 0 18px;color:var(--ink3)}
+.pnav .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pnav .b{font-size:12px;font-weight:600;color:var(--ink3);margin-left:auto}
+.pnav .ldot{width:8px;height:8px;border-radius:50%;display:block;margin-left:auto}
+.pnav .b+.ldot{margin-left:7px}
+.pnav .chev{flex:0 0 13px;color:var(--ink3);margin-left:6px}
+.pnav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.pnav.on>svg:first-child{color:var(--accent)}
+.psub{display:flex;align-items:center;gap:10px;height:46px;padding:0 10px 0 12px;border-radius:10px;
+  font-size:16px;font-weight:400;color:var(--ink2);position:relative}
+.psub .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.psub .b{font-size:12px;font-weight:600;color:var(--ink3);margin-left:auto}
+.psub .idot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;display:block}
+.psub .idot.no{visibility:hidden}
+.psub.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.pcap{font-size:12px;font-weight:600;color:var(--ink3);letter-spacing:.04em;padding:2px 12px 6px}
+.pback{display:flex;align-items:center;gap:10px;height:48px;padding:0 10px;border-radius:10px;
+  font-size:17px;font-weight:700;color:var(--ink)}
+.pback svg{color:var(--ink3)}
+.pscroll{display:flex;flex-direction:column;gap:0;overflow:hidden;flex:1 1 auto}
+.fade{position:absolute;left:0;right:0;bottom:0;height:56px;
+  background:linear-gradient(to bottom,rgba(244,242,236,0),rgba(244,242,236,1))}
+.note{font-size:12px;line-height:1.5;color:var(--ink3);max-width:390px}
+</style>
+</helmet>
+<div class="wrap"><header style="display:flex;flex-direction:column;gap:12px"><div class="kicker m">ПЕРЕНОС В КОД</div><h1 class="h1">Что для этого нужно от сервера</h1><p class="lead">Макет без этого списка перенести нельзя: меню собирает сервер (<span class="m">buildScreen</span> и поле <span class="m">screens</span> в документе), клиент рисует то, что приехало. Ниже — всё, чего в нынешнем документе нет.</p></header><section><div class="sec-hd"><h2>Нужно любому решению</h2><div class="rule"></div></div><div class="stlist"><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">1</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Счётчик и уровень родителя — сумма по детям</b><span>Сейчас у «Почты» стоит <span class="m">badge: 1</span>, и это совпадение: у ящика Яндекса тоже единица. Правило должно быть явным — <b>пока раздел свёрнут, он показывает сумму счётчиков детей и худший их уровень; раскрыт — молчит, метки уходят вниз</b>. Иначе свёрнутый раздел прячет тревогу.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">поле <span class='m'>badge</span>/<span class='m'>level</span> у родителя, считается при сборке меню</div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">2</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Развести фирменную точку и точку уровня</b><span>У ящиков сейчас приезжает <span class="m">dot: "#D93025"</span> — это красный Gmail, то есть <b>опознание, а не состояние</b>. Стоит он справа, ровно там, где по языку живёт уровень «тревога». Человек читает исправный ящик как сломанный. Нужны два разных поля: цвет опознания (слева от имени) и <span class="m">level</span> (справа).</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">новое поле у пункта; <span class='m'>dot</span> переезжает влево</div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">3</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Группа у модульных разделов</b><span>«Курсы» и «Чеки» приезжают без <span class="m">group</span> и прилипают к безымянной группе настроек. Модульный экран должен объявлять группу (или получать «Своё» по умолчанию), а «Настройки» — стоять последними, отдельно от всего.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">поле <span class='m'>group</span> у экранов модуля; порядок в <span class='m'>screens</span></div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">4</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Убрать группу-пробел</b><span>Сейчас разрыв перед «Настройками» сделан группой с именем из одного пробела (<span class="m">group: " "</span>). Это работает, но не читается и ломается от любой сортировки. Нужен либо честный признак «дальше отдельный блок», либо имя группы.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">признак у пункта вместо пробела в имени</div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">5</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Подвал — не одна строка</b><span>Приезжает <span class="m">footer: "Ещё не проверял почту"</span> — строка. Нужны три вещи: состояние (норма / работает / связь оборвалась), что именно делает сейчас и доля сделанного, машинный факт (когда проверял, какая модель). Полоса хода рисуется <b>только пока идёт разбор</b>, а не всегда.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">подвал становится объектом; словарь UI поднимается на версию</div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">6</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Кегль вложенного пункта</b><span>Правка на стороне клиента (<span class="m">web/static</span>), не сервера: вложенный пункт с 12 на 15, счётчик с 10 на 11, высота строки с 26 на 32. Данные те же — меняется только разметка.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">клиент; сервер не трогаем</div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">7</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Группа настроек — узел, а не подпись</b><span>Сейчас группа живёт строкой в поле <span class="m">group</span> у пункта, и клиент рисует её заголовком между строками. Чтобы группа сворачивалась, она должна стать <b>сущностью документа</b>: своё имя, свой счётчик и уровень (сумма по пунктам), признак «раскрыта». Это самая крупная правка из всего списка — меняется форма поля <span class="m">children</span>, а значит поднимается версия словаря UI.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px"><span class='m'>UIDictVersion</span> вверх; старый клиент нарисует прежние подписи</div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">8</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Счётчик поднимается на два этажа</b><span>Правило из пункта 1 применяется дважды: свёрнутый пункт отдаёт метку группе, свёрнутая группа — «Настройкам». Считать это должен сервер при сборке меню — клиент не знает, что важнее, «тревога» или «внимание».</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">то же место, где считается пункт 1</div></div></div></section><section><div class="sec-hd"><h2>Нужно только решению А (аккордеон)</h2><div class="rule"></div></div><div class="stlist"><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">9</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Помнить, какой раздел раскрыт</b><span>htmx перерисовывает меню целиком после каждого действия (<span class="m">hx-select-oob="#меню"</span>), поэтому раскрытие, которое живёт только в разметке, схлопнется на первом же нажатии. Раскрытый раздел должен приезжать в документе — настройкой (<span class="m">ui.menu_open</span>) или параметром запроса.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">хранение состояния UI на сервере — сущность, которой сейчас нет</div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">10</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Действие «раскрыть» без перехода</b><span>Нажатие на стрелку не должно менять экран. Значит нужно действие, которое меняет только меню, а не <span class="m">screen</span>, — и клиент, который умеет перерисовать один рельс.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">новое действие в диспетчере</div></div></div></section><section><div class="sec-hd"><h2>Нужно только решению В (полка)</h2><div class="rule"></div></div><div class="stlist"><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">11</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Слой поверх содержимого</b><span>Полки второго уровня у клиента нет вовсе: нужен всплывающий слой с закрытием по щелчку мимо, по <span class="m">Esc</span> и при уходе указателя, плюс поведение при узком окне.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">новый узел в <span class='m'>web/static/app.js</span></div></div><div class="strow" style="align-items:flex-start;gap:18px"><div class="m" style="flex:0 0 26px;font-size:13px;font-weight:600;color:var(--ink3);padding-top:2px">12</div><div class="txt" style="flex:1 1 auto"><b style="font-size:15px">Отдельное меню для телефона</b><span>На телефоне В вырождается в Б — значит в продукте живут два меню сразу, и любую правку состава придётся делать дважды.</span></div><div style="flex:0 0 150px;font-size:12px;color:var(--ink3);line-height:1.45;padding-top:3px">две ветки сборки меню</div></div></div></section><div class="panel panel-pad" style="display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:700">Что предлагается переименовать</div><div class="quiet"><b style="color:var(--ink)">«Сегодня» → «Переписка».</b> Сейчас группа называется «Сегодня», но в ней лежат «Почта», «Чаты» и «Файлы» — файлы не про сегодня, а про всегда. Слово «Сегодня» к тому же спорит с закреплённым «Ждут вас», который и отвечает за «прямо сейчас».<br><b style="color:var(--ink)">Безымянная группа → «Своё».</b> «Курсы» и «Чеки» — это то, что Сёма сделал по просьбе хозяина; у них должно быть имя, иначе новый модуль каждый раз приклеивается к настройкам.<br><b style="color:var(--ink)">Остальные названия оставлены как есть.</b> «Сёма сам» — хорошее имя: оно отвечает на вопрос «что он делает без меня». Шестнадцать подпунктов настроек тоже названы верно, их беда была не в словах, а в кегле и в том, что они всегда на виду.</div></div></div></x-dc>
+</body>
+</html>

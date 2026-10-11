@@ -1,0 +1,230 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    .win { width: 1160px; height: 900px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 200px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 16px 8px; }
+    .tdot { width: 12px; height: 12px; border-radius: 6px; }
+    .brand { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 29px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem.sel { background: rgba(0,0,0,0.07); font-weight: 600; }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px 0 30px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
+    .count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .body { flex: 1; background: #F5F4F2; padding: 22px 24px; box-sizing: border-box; overflow: hidden; display: flex; gap: 18px; }
+    .tabs { width: 146px; flex-shrink: 0; display: flex; flex-direction: column; gap: 1px; }
+    .tabs .cap { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px; }
+    .tab { font-size: 12px; color: #1D1D1F; padding: 5px 9px; border-radius: 6px; }
+    .tab.sel { background: rgba(0,122,255,0.12); color: #0058B0; font-weight: 600; }
+    .col { flex: 1; min-width: 0; max-width: 980px; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 3px; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 14px; line-height: 1.45; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 16px 0 7px; display: flex; align-items: center; gap: 8px; }
+    .grouptitle .sum { text-transform: none; letter-spacing: 0; font-weight: 400; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+    .ttl { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .facts { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 3px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .ok { background: rgba(40,200,64,.15); color: #1E7A32; }
+    .info { background: rgba(0,122,255,.14); color: #0058B0; }
+    .warn { background: rgba(255,188,46,.22); color: #9A6B00; }
+    .alert { background: rgba(255,59,48,.14); color: #D70015; }
+    .neu { background: rgba(0,0,0,.06); color: #6E6E73; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .fold { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .fold:last-child { border-bottom: none; }
+    .chev { color: rgba(60,60,67,0.45); font-size: 9px; width: 9px; }
+    .sw { width: 32px; height: 19px; border-radius: 10px; position: relative; flex-shrink: 0; margin-top: 1px; }
+    .sw-on { background: #28C840; } .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 15px; height: 15px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 7px; line-height: 1.45; }
+    .chip { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; background: rgba(0,0,0,0.045); border: 1px solid rgba(0,0,0,0.07); border-radius: 5px; padding: 1px 6px; color: #3C3C43; }
+    .chip.no { background: rgba(255,59,48,0.07); border-color: rgba(255,59,48,0.18); color: #A62018; }
+    .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .empty { padding: 26px 16px 24px; text-align: center; }
+    .empty .t { font-size: 13px; font-weight: 600; margin-top: 8px; }
+    .empty .p { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 3px; line-height: 1.5; }
+    .empty .a { font-size: 12px; color: #007AFF; margin-top: 10px; }
+      .win { width: 1160px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 16px 8px; }
+    .tdot { width: 12px; height: 12px; border-radius: 6px; }
+    .sgroup { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.5); padding: 12px 9px 5px; }
+    .sgroup:first-of-type { padding-top: 0; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem.sel { background: rgba(0,0,0,0.07); font-weight: 600; }
+    .navitem svg { flex-shrink: 0; }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 25px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
+    .count { font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .right { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+    .foot { margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; gap: 7px; font-size: 11px; color: rgba(60,60,67,0.6); }
+    .body { flex: 1; background: #F5F4F2; padding: 24px; box-sizing: border-box; overflow: hidden; }
+    .win { height: 1000px; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic"><div class="tdot" style="background:#FF5F57"></div><div class="tdot" style="background:#FEBC2E"></div><div class="tdot" style="background:#28C840"></div></div>
+    <div class="sgroup">Сегодня</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2a3.5 3.5 0 0 0-3.5 3.5c0 3-1.3 3.9-1.3 3.9h9.6s-1.3-.9-1.3-3.9A3.5 3.5 0 0 0 8 2.2z"/><path d="M6.7 12a1.5 1.5 0 0 0 2.6 0"/></svg>Уведомления<div class="right"><div class="ndot" style="background:#FF3B30"></div><span class="count" style="color:#D70015">3</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>Почта<div class="right"><span class="count">19</span></div></div>
+      <div class="subitem"><div class="ndot" style="background:#D93025"></div>owner@example.org<span class="right count" style="font-size:10px">12</span></div>
+      <div class="subitem"><div class="ndot" style="background:#FC3F1D"></div>me@example.com<span class="right count" style="font-size:10px">7</span></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>Чаты</div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>Файлы<div class="right"><span class="count">131</span></div></div>
+    </div>
+    <div class="sgroup">Сёма сам</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>Задачи<div class="right"><span class="count">22</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 2.6a2 2 0 0 0-2.4 1.7 2 2 0 0 0-1 3.4 2 2 0 0 0 1.2 3.3 2 2 0 0 0 2.2 2z"/><path d="M8.8 2.6a2 2 0 0 1 2.4 1.7 2 2 0 0 1 1 3.4 2 2 0 0 1-1.2 3.3 2 2 0 0 1-2.2 2z"/></svg>Память<div class="right"><span class="count">142</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8h3l1.5-4 3 8 1.5-4h4"/></svg>Здоровье<div class="right"><div class="ndot" style="background:#FEBC2E"></div></div></div>
+    </div>
+    <div class="sgroup">Модули</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M6.4 11.6V5.2h2.1a1.7 1.7 0 0 1 0 3.4H5.6"/><path d="M5.6 10h3"/></svg>Чеки</div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.4v7.2"/><path d="M9.9 6.1c-.5-.5-1.2-.8-1.9-.8-1 0-1.8.5-1.8 1.4 0 2 3.7 1.1 3.7 3 0 1-.9 1.5-1.9 1.5-.8 0-1.5-.3-2-.9"/></svg>Курсы</div>
+    </div>
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08)">
+      <div class="navitem sel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>Настройки</div>
+    </div>
+    <div class="foot"><div class="ndot" style="background:#28C840"></div>Проверено в 07:46 · qwen-4b</div>
+  </div>
+
+  <div class="body">
+    <div class="tabs">
+      <div class="cap">Настройки</div>
+      <div class="tab">Почта</div>
+      <div class="tab">Модели</div>
+      <div class="tab">Инструменты</div>
+      <div class="tab">Ключи и секреты</div>
+      <div class="tab">Серверы</div>
+      <div class="tab">Скиллы</div>
+      <div class="tab">Поиск</div>
+      <div class="tab">Развитие</div>
+      <div class="tab sel">Интеграции</div>
+      <div class="tab">Telegram</div>
+      <div class="tab">Агенты</div>
+      <div class="tab">Уведомления</div>
+      <div class="tab">Хранилища</div>
+      <div class="tab">Доступ</div>
+    </div>
+
+    <div class="col">
+      <div class="h1">Интеграции</div>
+      <div class="sub">Сервер MCP — чужой сервис, к которому Сёма ходит его протоколом. Ключ подставляет ядро по имени секрета, в текст модели он не попадает.</div>
+
+      <div class="grouptitle">Серверы MCP <span class="sum">· 2 · оба включены и проверены</span></div>
+      <div class="card">
+        <div class="row">
+          <div class="sw sw-on"><div class="knob" style="left:15px"></div></div>
+          <div style="flex:1; min-width:0">
+            <div class="ttl">
+              <svg width="12" height="13" viewBox="0 0 12 13" fill="none"><rect x="1" y="5.5" width="10" height="7" rx="1.6" fill="#1E7A32"/><path d="M3.4 5.5V3.6a2.6 2.6 0 1 1 5.2 0v1.9" stroke="#1E7A32" stroke-width="1.4"/></svg>
+              агент
+            </div>
+            <div class="meta">инструменты Сёмы-агента: символы, контекст, влияние, диагностика — адреса у сервера нет вовсе</div>
+            <div class="facts">
+              <span class="fact">Через <b>агента «мак»</b></span>
+              <span class="fact">Способность <b>«код»</b></span>
+              <span class="fact">Инструментов <b>7</b></span>
+              <span class="fact">Проверен <b>вчера 21:37</b></span>
+            </div>
+          </div>
+          <div class="tag ok">канал агентов · TLS с обеих сторон</div>
+          <div class="link">Проверить</div>
+          <div class="more">⋯</div>
+        </div>
+        <div class="row">
+          <div class="sw sw-on"><div class="knob" style="left:15px"></div></div>
+          <div style="flex:1; min-width:0">
+            <div class="ttl">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.6" stroke="#8E8E93" stroke-width="1.3"/><ellipse cx="6.5" cy="6.5" rx="2.6" ry="5.6" stroke="#8E8E93" stroke-width="1.1"/><path d="M1.1 6.5h10.8" stroke="#8E8E93" stroke-width="1.1"/></svg>
+              память
+            </div>
+            <div class="meta">sema-memory — та же память Сёмы, но снаружи и по обычному HTTP</div>
+            <div class="facts">
+              <span class="fact">Адрес <b class="mono">http://127.0.0.1:8765/mcp</b></span>
+              <span class="fact">Ключ <b>token:память</b> — значение закрыто</span>
+              <span class="fact">Проверен <b>вчера 13:46</b></span>
+            </div>
+          </div>
+          <div class="tag neu">HTTP · ключ в заголовке</div>
+          <div class="link">Проверить</div>
+          <div class="more">⋯</div>
+        </div>
+      </div>
+      <div class="note">Разница видна сразу: у «агента» замок, зелёная капсула «канал агентов» и в фактах не адрес, а имя агента — HTTP запасным путём ему не служит, иначе шифрование и разрешения обходились бы стороной. У «памяти» глобус, серая капсула и адрес с именем ключа.</div>
+
+      <div class="grouptitle">Круги вызовов <span class="sum">· что идёт сразу, что ждёт вашей кнопки</span></div>
+      <div class="card">
+        <div class="row">
+          <div style="flex:1; min-width:0">
+            <div class="ttl">агент</div>
+            <div class="meta">круг чтения засеян объявленными умениями: способность «код» вы уже разрешили целиком</div>
+            <div class="chips">
+              <span class="chip">symbols</span><span class="chip">context</span><span class="chip">impact</span><span class="chip">definition</span><span class="chip">diagnostics</span><span class="chip">search</span><span class="chip">agent_status</span>
+            </div>
+          </div>
+          <div class="tag neu">7 читают · 0 запрещено</div>
+          <div class="link">Изменить</div>
+          <div class="more">⋯</div>
+        </div>
+        <div class="row">
+          <div style="flex:1; min-width:0">
+            <div class="ttl">память</div>
+            <div class="meta">образцы со звёздочкой: всё, что читает, — сразу; всё, что удаляет, — никогда</div>
+            <div class="chips">
+              <span class="chip">*_list</span><span class="chip">*_get</span><span class="chip">*list*</span><span class="chip">*get*</span><span class="chip">*search*</span><span class="chip">*context*</span>
+              <span class="chip no">*_archive</span><span class="chip no">*_delete</span><span class="chip no">*delete*</span><span class="chip no">*remove*</span><span class="chip no">*destroy*</span>
+            </div>
+          </div>
+          <div class="tag neu">6 читают · 5 запрещено</div>
+          <div class="link">Изменить</div>
+          <div class="more">⋯</div>
+        </div>
+        <div class="row" style="align-items:center">
+          <div style="flex:1"><div class="ttl">Всё остальное</div><div class="meta">ложится в очередь и ждёт кнопки в «Уведомлениях»; каждый вызов — строка в журнале</div></div>
+          <div class="tag warn">подтверждение</div>
+        </div>
+      </div>
+
+      <div class="grouptitle">Трекеры задач <span class="sum">· 0</span></div>
+      <div class="card">
+        <div class="empty">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style="opacity:.35"><rect x="3.5" y="5.5" width="23" height="19" rx="3" stroke="#3C3C43" stroke-width="1.6"/><path d="M9 11h12M9 15h12M9 19h7" stroke="#3C3C43" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <div class="t">Трекеров пока нет</div>
+          <div class="p">Контракт у ядра, диалект — у модуля-переходника с пятью функциями: dictionary, tasks, comment, move, create.<br>Такой модуль пишет сам Сёма — попросите его в чате, руками его собирать не нужно.</div>
+          <div class="a">Попросить Сёму в чате</div>
+        </div>
+      </div>
+      <div class="note">Задача из трекера — работа, а не полномочия: по ней Сёма делает только читающее. Изменяющее он предложит карточкой в «Уведомлениях», и карточка подписана «задача из трекера, полномочий не даёт».</div>
+
+      <div class="grouptitle">Добавить</div>
+      <div class="card">
+        <div class="fold"><span class="chev">▶</span><span class="ttl">Сервер MCP</span><span class="meta">имя, адрес или агент со способностью, имя секрета с токеном, заголовок и приставка</span></div>
+        <div class="fold"><span class="chev">▶</span><span class="ttl">Трекер</span><span class="meta">название, модуль-переходник, правило отбора, что делать в начале и в конце, частота опроса</span></div>
+      </div>
+      <div class="note">Две формы висели на экране раскрытыми и занимали больше места, чем сами интеграции. Свёрнутые, они не мешают читать то, что уже настроено.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

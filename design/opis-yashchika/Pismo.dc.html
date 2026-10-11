@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#6E717A;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .page{width:760px;padding:0 0 26px}
+  .head{padding:14px 18px 12px;border-bottom:1px solid var(--line)}
+  .head .path{font-size:12px;color:var(--ink3);margin-bottom:5px}
+  .head h1{margin:0;font-size:20px;font-weight:700;line-height:1.25;letter-spacing:-.01em}
+  .head .who{font-size:12px;color:var(--ink2);margin-top:6px}
+  .head .who b{font-weight:600;color:var(--ink)}
+  .tools{display:flex;gap:8px;margin-top:11px;align-items:center}
+  .btn{height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    font-size:12px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;white-space:nowrap}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .pill{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;
+    font-size:10px;font-weight:700;background:var(--warn-soft);color:var(--warn)}
+  .col{padding:16px 18px 0}
+  .empty{background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:var(--lift);
+    padding:22px 20px;text-align:center}
+  .empty .t{font-size:15px;font-weight:600}
+  .empty .n{font-size:13px;color:var(--ink2);line-height:1.55;margin:8px auto 0;max-width:470px}
+  .empty .acts{display:flex;gap:8px;justify-content:center;margin-top:14px}
+  .facts{background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:var(--lift);
+    padding:4px 14px;margin-top:14px}
+  .f{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;padding:9px 0;
+    border-bottom:1px solid var(--line2);font-size:13px}
+  .f:last-child{border-bottom:0}
+  .f .k{color:var(--ink3)}
+  .f .v{min-width:0;overflow-wrap:anywhere}
+  .f .v.m{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+  .note{font-size:11px;color:var(--ink3);line-height:1.5;padding:10px 2px 0}
+  .flag{display:inline-block;background:var(--ok);color:#fff;font-size:10px;font-weight:700;
+    border-radius:5px;padding:2px 6px;margin-left:8px;vertical-align:1px}
+  </style>
+</helmet>
+
+<div class="page">
+  <div class="head">
+    <div class="path">‹ Почта · поиск</div>
+    <h1>[Ticket#2026091000000001] Ограничение исходящей скорости на VPS 203.0.113.11 (vps-hub)</h1>
+    <div class="who"><b>support@hosting.example</b> · сегодня 18:12 · owner@example.org</div>
+    <div class="tools">
+      <span class="pill">в спаме у провайдера</span>
+      <span class="btn pri">Забрать письмо</span>
+      <span class="btn">Вернуть во «Входящие»</span>
+      <span class="btn">Это не спам — и впредь</span>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="empty">
+      <div class="t">Текста письма у Сёмы нет</div>
+      <div class="n">Оно лежит в папке «Спам» на почтовом сервере, а оттуда Сёма ничего не забирает сам:
+        иначе чужой спам занимал бы место в архиве, из которого письма не удаляются никогда.
+        Сёма помнит только конверт — по нему письмо и нашлось.</div>
+      <div class="acts">
+        <span class="btn pri">Забрать письмо</span>
+        <span class="btn">Открыть в почте</span>
+      </div>
+    </div>
+
+    <div class="facts">
+      <div class="f"><span class="k">Ящик</span><span class="v">owner@example.org</span></div>
+      <div class="f"><span class="k">Папка на сервере</span><span class="v">[Gmail]/Спам</span></div>
+      <div class="f"><span class="k">Кому</span><span class="v">owner@example.org</span></div>
+      <div class="f"><span class="k">Номер письма</span><span class="v m">&lt;otrs-2026091000000001@hosting.example&gt;</span></div>
+      <div class="f"><span class="k">Замечено в описи</span><span class="v">сегодня 18:41 · задача «Опись ящиков»</span></div>
+      <div class="f"><span class="k">Разбор</span><span class="v">не проводился: Сёма писем из чужого спама не судит</span></div>
+    </div>
+
+    <div class="note">
+      «Забрать письмо» скачивает текст и вложения этого одного письма и заводит его у Сёмы как обычное —
+      с разбором, поиском по тексту и памятью. Отдельно от этого «Вернуть во „Входящие“» переносит письмо
+      на почтовом сервере: это действие в чужом ящике, поэтому только по кнопке человека.<span class="flag">необратимое — только руками</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

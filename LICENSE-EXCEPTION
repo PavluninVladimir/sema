@@ -1,0 +1,29 @@
+Sema — personal assistant server
+Copyright (C) 2026 Vladimir Pavlunin
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3 only (AGPL-3.0-only). See LICENSE.
+
+Additional permission under GNU AGPL version 3 section 7
+
+Modules (JavaScript run by Sema through its `sema.*` interface) and skills
+(Markdown instructions loaded by Sema), whoever wrote them, are not covered
+works or modifications of Sema and may be distributed under any terms.
+
+The built-in skills in `server/internal/engine/builtin/skills/` are
+additionally released under CC0 1.0 Universal
+(https://creativecommons.org/publicdomain/zero/1.0/), so that copies and
+edits of them may be used under any terms.
+
+---
+
+Дополнительное разрешение по разделу 7 GNU AGPL версии 3
+
+Модули (JavaScript, который Сёма выполняет через интерфейс `sema.*`) и скиллы
+(инструкции в Markdown, которые Сёма загружает), кто бы их ни написал, не
+являются охватываемыми произведениями или изменениями Сёмы и могут
+распространяться на любых условиях.
+
+Встроенные скиллы в `server/internal/engine/builtin/skills/` дополнительно
+отдаются под CC0 1.0: их копии и правки можно использовать на любых условиях.

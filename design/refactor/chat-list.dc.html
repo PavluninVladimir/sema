@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; background: #F5F4F2; }
+    .sheet { width: 1160px; min-height: 1120px; box-sizing: border-box; padding: 28px 32px; background: #F5F4F2; color: #1D1D1F; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 4px 0; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 22px 0; line-height: 1.55; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 24px 0 8px 0; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); line-height: 1.5; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 8px; line-height: 1.55; }
+    .note b { color: #1D1D1F; }
+    .bad { color: #C93400; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .cols { display: grid; grid-template-columns: 280px 280px 1fr; gap: 26px; align-items: start; }
+    .panel { width: 280px; background: #FAFAF9; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 10px; box-sizing: border-box; }
+    .ptitle { display: flex; align-items: center; margin-bottom: 4px; }
+    .pgroup { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.5); padding: 11px 9px 4px; }
+    .pgroup:first-of-type { padding-top: 4px; }
+    .pitem { padding: 8px 10px; border-radius: 7px; display: flex; gap: 8px; align-items: flex-start; }
+    .pitem.on { background: rgba(0,122,255,0.11); }
+    .pitem .t { font-size: 12px; font-weight: 600; }
+    .pitem .s { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 1px; overflow: hidden; }
+    .pitem .when { font-size: 10px; color: rgba(60,60,67,0.45); margin-left: auto; white-space: nowrap; }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; margin-top: 4px; }
+    .cnt { font-size: 10px; font-weight: 700; color: #FFF; background: #FF3B30; border-radius: 8px; padding: 1px 6px; margin-left: auto; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .search { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border-radius: 7px; background: rgba(0,0,0,0.05); font-size: 12px; color: rgba(60,60,67,0.55); margin: 4px 2px 6px; }
+    .empty { text-align: center; padding: 20px 12px; }
+    .empty .icon { font-size: 24px; color: rgba(60,60,67,0.28); }
+    .empty .t { font-size: 12px; font-weight: 600; margin-top: 7px; }
+    .empty .c { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 3px; line-height: 1.5; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .badpanel { border-color: rgba(201,52,0,0.35); }
+  </style>
+</helmet>
+<div class="sheet">
+  <div class="h1">Список чатов</div>
+  <div class="sub">
+    Панель слева — единственный вход во все разговоры: с Сёмой, с людьми в Telegram, с задачами и
+    уведомлениями. Живой снимок <span class="mono">GET /api/ui?screen=ask</span> — шесть чатов.
+  </div>
+
+  <div class="cols">
+    <div>
+      <div class="grouptitle" style="margin-top:0">Было</div>
+      <div class="panel badpanel">
+        <div class="ptitle"><div class="pgroup" style="padding:0">Чаты</div><div style="margin-left:auto" class="link">Новый чат</div></div>
+        <div class="pgroup">Telegram</div>
+        <div class="pitem on"><div style="flex:1"><div class="t">Мила Соколова</div><div class="s">Привет!</div></div></div>
+        <div class="pitem"><div style="flex:1"><div class="t">Telegram</div><div class="s">Код для входа в Telegram: 12345. Не давайте код никому, даже…</div></div></div>
+        <div class="pitem"><div style="flex:1"><div class="t">Анна Смирнова</div><div class="s">https://t.me/+Ab0Cd1Ef2Gh3Ij4K</div></div></div>
+        <div class="pitem"><div style="flex:1"><div class="t">Иван</div><div class="s">Привет</div></div></div>
+        <div class="pgroup">Разбор уведомлений</div>
+        <div class="pitem"><div style="flex:1"><div class="t">Уведомление · srv-vpn · Сервер srv-vpn работает стабильно, о</div><div class="s" style="font-family:ui-monospace,Menlo,monospace">{"title":"srv-vpn · sudo DEBIAN_FRONTEND=noninteractive NEEDRES…</div></div></div>
+        <div class="pgroup">Задачи</div>
+        <div class="pitem"><div style="flex:1"><div class="t">Задача: Собери новости и важное из писем за сутки, коротко по пункта…</div><div class="s" style="font-family:ui-monospace,Menlo,monospace">{"title":"Письма за сутки","code":"const since = Date.now() …</div></div></div>
+      </div>
+      <div class="note bad">
+        Слово в слово из живого ответа. Порядок — по номеру чата (<span class="mono">ORDER BY c.id DESC</span>),
+        поэтому «Иван» с сообщением в <b>11:51</b> стоит четвёртым, ниже «Милы» с <b>11:41</b>.
+        Времени нет, непрочитанных нет, состояния нет. Превью — последнее сообщение как есть, вместе с
+        JSON карточки. Заголовок чата уведомления обрезан на полуслове: «…работает стабильно, о».
+      </div>
+    </div>
+
+    <div>
+      <div class="grouptitle" style="margin-top:0">Стало</div>
+      <div class="panel">
+        <div class="ptitle"><div class="pgroup" style="padding:0">Чаты</div><div style="margin-left:auto" class="link">+ Новый</div></div>
+        <div class="search">🔍 Поиск по чатам</div>
+        <div class="pgroup">Telegram · 2 новых</div>
+        <div class="pitem"><div class="ndot" style="background:#FEBC2E"></div><div style="flex:1"><div class="t">Иван</div><div class="s">Иван: Как дела?</div></div><div class="when">11:51</div></div>
+        <div class="pitem on"><div style="flex:1"><div class="t">Мила Соколова</div><div class="s">Вы: Привет</div></div><div class="when">11:41</div></div>
+        <div class="pitem"><div class="ndot" style="background:#FEBC2E"></div><div style="flex:1"><div class="t">Анна Смирнова</div><div class="s">Сёма: черновик ждёт кнопки</div></div><div class="when">11:12</div></div>
+        <div class="pitem"><div style="flex:1"><div class="t">Telegram</div><div class="s">Код для входа: 12345</div></div><div class="when">вчера</div></div>
+        <div class="pgroup">Разбор уведомлений</div>
+        <div class="pitem"><div style="flex:1"><div class="t">srv-vpn · обновления доступны</div><div class="s">Вопрос закрыт</div></div><div class="when">08:03</div></div>
+        <div class="pgroup">Задачи</div>
+        <div class="pitem"><div style="flex:1"><div class="t">Новости и важное за сутки</div><div class="s">Писем за сутки нет</div></div><div class="when">09:00</div></div>
+      </div>
+      <div class="note">
+        Порядок — по последнему сообщению внутри группы. Время справа. Точка уровня — только когда есть
+        что-то, чего человек не видел или что ждёт его решения. Превью — человеческим языком: «Вы: …»,
+        «Сёма: …», имя собеседника, а у служебного чата — итог, а не JSON.
+      </div>
+    </div>
+
+    <div>
+      <div class="grouptitle" style="margin-top:0">Правила списка</div>
+      <div class="card">
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Группы — как сейчас, порядок — по свежести</div>
+            <div class="meta">Telegram, Разбор уведомлений, Задачи, Мои чаты — деление уже есть и оно
+            верное. Меняется только сортировка внутри группы и заголовок группы: у Telegram — счётчик
+            новых.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Кто сказал последнее слово</div>
+            <div class="meta">Три приставки: <b>Вы:</b>, <b>Сёма:</b> и имя собеседника без приставки —
+            в телеграм-чате это три разных голоса, и в списке видно, чья очередь. Приставки нет только у
+            чата с самим Сёмой.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Уровень строки, а не украшение</div>
+            <div class="meta"><b>warn</b> — ждёт вашего решения (черновик, команда) или есть непрочитанное;
+            <b>alert</b> — отказ, ошибка отправки; ничего — обычный чат. Поле <span class="mono">Level</span>
+            у <span class="mono">PanelItem</span> в словаре уже есть и не используется ни разу.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Имя чата — имя, а не начало фразы</div>
+            <div class="meta">«srv-vpn · обновления доступны» вместо «Уведомление · srv-vpn · Сервер srv-vpn
+            работает стабильно, о». Приставку вида («Уведомление ·», «Задача:») несёт группа, повторять её
+            в каждой строке незачем. Предел длины — настройка, а не 54 знака в коде.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Поиск по чатам</div>
+            <div class="meta">Шесть чатов ищутся глазами, шестьдесят — нет. Поиск в панели, а не общий
+            поиск экрана: он фильтрует строки списка, а не переписку.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Чат живёт сутки — и это видно</div>
+            <div class="meta">Чаты команд и уведомлений удаляются через <span class="mono">chats.command_ttl_h</span>
+            (24 ч), но сначала уходят сводкой в память. В группе это одна строка пояснения, а не сюрприз.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grouptitle">Когда чатов нет</div>
+      <div class="panel" style="width:auto">
+        <div class="empty">
+          <div class="icon">◌</div>
+          <div class="t">Чатов пока нет</div>
+          <div class="c">Здесь появятся разговоры с Сёмой, переписки Telegram и разборы уведомлений.
+          Начните с вопроса — например, «что сегодня пришло по почте».</div>
+          <div class="link" style="display:inline-block; margin-top:9px">Новый чат</div>
+        </div>
+      </div>
+      <div class="note">
+        Сейчас пусто выглядит так: серая строка «Чатов пока нет — начните первый» в области содержимого и
+        пустая панель слева. Блок пустого состояния в клиенте уже есть
+        (<span class="mono">Style: "empty"</span>) — он просто не применён здесь.
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,10 @@
+sema-server
+sema.db
+sema.db-*
+files/
+*.log
+.git
+.env
+.env.*
+config.yaml
+data/

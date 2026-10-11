@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; background: #F5F4F2; }
+    .sheet { width: 1120px; min-height: 900px; box-sizing: border-box; padding: 28px 32px; background: #F5F4F2; color: #1D1D1F; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 4px 0; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 24px 0; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 24px 0 8px 0; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; margin-top: 6px; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .snd { font-size: 13px; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .facts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 4px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; font-variant-numeric: tabular-nums; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .scale td { padding: 6px 14px 6px 0; vertical-align: baseline; }
+    .swatch { width: 14px; height: 14px; border-radius: 7px; display: inline-block; vertical-align: -2px; margin-right: 8px; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 6px; }
+    .bad { color: #C93400; }
+    .good { color: #1E7A32; }
+    .col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; } .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+  </style>
+</helmet>
+<div class="sheet">
+  <div class="h1">Система интерфейса</div>
+  <div class="sub">Четыре размера, четыре уровня, одно действие в строке. Всё остальное — из этих правил.</div>
+
+  <div class="grouptitle">Анатомия строки</div>
+  <div class="card">
+    <div class="row">
+      <div class="dot" style="background:#28C840"></div>
+      <div style="flex:1; min-width:0">
+        <div class="ttl">qwen-4b</div>
+        <div class="meta">локально — письма не покидают эту машину</div>
+        <div class="facts">
+          <span class="fact">Адрес <b>127.0.0.1:1234</b></span>
+          <span class="fact">Модель <b>qwen/qwen3-4b</b></span>
+          <span class="fact">Картинки <b>да</b></span>
+          <span class="fact">Ключ <b>не нужен</b></span>
+        </div>
+      </div>
+      <div class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">активная</div>
+      <div class="link">Проверить</div>
+      <div class="more">⋯</div>
+    </div>
+  </div>
+  <div class="note">Точка — уровень. Заголовок 13 semibold. Одна фраза человеческим языком 11 pt. Факты парами «подпись — значение», моноширинные значения выровнены. Одна капсула, одно действие ссылкой, остальное под «⋯».</div>
+
+  <div class="grouptitle">Было — та же строка сегодня</div>
+  <div class="card">
+    <div class="row" style="align-items:center">
+      <div style="flex:1; min-width:0">
+        <div class="ttl">qwen-4b</div>
+        <div class="meta" style="line-height:1.45">OpenAI-совместимая · http://127.0.0.1:1234/v1 · qwen/qwen3-4b · видит картинки · локально, письма не покидают эту машину · ключ не задан</div>
+      </div>
+      <div class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">активная</div>
+      <div class="tag" style="background:rgba(0,0,0,.06); color:#6E6E73">локально</div>
+      <div class="tag" style="background:rgba(0,122,255,.14); color:#0058B0">своя</div>
+      <div style="display:flex; gap:6px">
+        <div class="link" style="border:1px solid rgba(0,0,0,.15); border-radius:6px; padding:3px 9px; color:#1D1D1F">Проверить</div>
+        <div class="link" style="border:1px solid rgba(0,0,0,.15); border-radius:6px; padding:3px 9px; color:#1D1D1F">Ключ</div>
+        <div class="link" style="border:1px solid rgba(0,0,0,.15); border-radius:6px; padding:3px 9px; color:#1D1D1F">Не умеет искать</div>
+        <div class="link" style="border:1px solid rgba(0,0,0,.15); border-radius:6px; padding:3px 9px; color:#D70015">Удалить</div>
+      </div>
+    </div>
+  </div>
+  <div class="note bad">Семь фактов через «·» в три строки с обрезкой, три капсулы подряд у всех строк, четыре обведённые кнопки — и так 52 раза. «Не умеет искать» читается как состояние, а это переключатель.</div>
+
+  <div class="col2" style="margin-top:28px">
+    <div>
+      <div class="grouptitle">Шкала — ровно четыре размера</div>
+      <div class="card" style="padding:14px 16px">
+        <table class="scale" style="border-collapse:collapse; width:100%">
+          <tr><td style="font-size:20px; font-weight:700; letter-spacing:-0.01em">Здоровье</td><td class="meta">20 bold — заголовок экрана и значения карточек</td></tr>
+          <tr><td class="ttl">Строка списка</td><td class="meta">13 semibold — заголовок строки</td></tr>
+          <tr><td class="snd">Второй уровень</td><td class="meta">13 regular — тема письма, значение настройки</td></tr>
+          <tr><td class="meta">Мета и факты</td><td class="meta">11 secondary — пояснение, подписи фактов</td></tr>
+          <tr><td><span class="tag" style="background:rgba(0,0,0,.06); color:#6E6E73">капсула</span></td><td class="meta">10 semibold — только состояние или род</td></tr>
+        </table>
+      </div>
+      <div class="note">Сейчас на macOS .caption, .footnote и .caption2 дают одинаковые 10 pt — уровни ими не различить. Различаем весом и цветом.</div>
+    </div>
+    <div>
+      <div class="grouptitle">Уровень — один смысл, один цвет</div>
+      <div class="card" style="padding:14px 16px">
+        <table class="scale" style="border-collapse:collapse; width:100%">
+          <tr><td><span class="swatch" style="background:#28C840"></span><b style="font-size:13px">ok</b></td><td class="meta">работает, ничего не требуется</td></tr>
+          <tr><td><span class="swatch" style="background:#007AFF"></span><b style="font-size:13px">info</b></td><td class="meta">к сведению, можно посмотреть</td></tr>
+          <tr><td><span class="swatch" style="background:#FEBC2E"></span><b style="font-size:13px">warn</b></td><td class="meta">стоит посмотреть сегодня, само не сломается</td></tr>
+          <tr><td><span class="swatch" style="background:#FF3B30"></span><b style="font-size:13px">alert</b></td><td class="meta">ждёт человека или уже сломано</td></tr>
+          <tr><td><span class="swatch" style="background:#8E8E93"></span><b style="font-size:13px">нейтраль</b></td><td class="meta">факт без оценки: счётчики, размеры, сроки</td></tr>
+        </table>
+      </div>
+      <div class="note">Сегодня в ходу 17 разных цветов на эти пять смыслов — три синих, пять красных, три зелёных. Сервер перестаёт присылать hex и присылает уровень; палитру держит клиент.</div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Переключаемое — тумблером, а не кнопкой с меняющейся надписью</div>
+  <div class="card">
+    <div class="row" style="align-items:center">
+      <div class="sw sw-on"><div class="knob" style="left:16px"></div></div>
+      <div style="flex:1"><div class="ttl">Ищет в интернете</div><div class="meta">модель сама ходит в сеть и приносит ссылки</div></div>
+      <div class="more">⋯</div>
+    </div>
+    <div class="row" style="align-items:center">
+      <div class="sw sw-off"><div class="knob" style="left:2px"></div></div>
+      <div style="flex:1"><div class="ttl">Сёма управляет сам</div><div class="meta">изменения в окне 02:00–06:00 идут на суд двух моделей</div></div>
+      <div class="more">⋯</div>
+    </div>
+  </div>
+  <div class="note">Сейчас это 96 кнопок «Не умеет искать» и «Управлять сам»: надпись описывает состояние, а нажатие его меняет — человек не знает, что получит.</div>
+</div>
+</x-dc>
+</body>
+</html>

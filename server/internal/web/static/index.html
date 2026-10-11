@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131417" media="(prefers-color-scheme: dark)">
+<title>Сёма</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Сёма">
+<!-- Заставка рисуется с первого кадра: её цвета и знак живут прямо здесь,
+     а не в style.css — до прихода стилей страница была белой даже в тёмной
+     теме. Цвета — те же --bg и --text-faint, что в style.css. Подписи
+     появляются сами по времени, без скрипта: app.js тоже может ехать по
+     медленной сети. Убирает заставку app.js, когда пришёл первый экран -->
+<style>
+html, body { background: #FBFAF7; }
+#splash { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center;
+  background: #FBFAF7; color: #686B74; transition: opacity .15s ease-out; }
+#splash.gone { opacity: 0; pointer-events: none; }
+#splash svg { width: 96px; height: 96px; animation: splash-breath 1.6s ease-in-out infinite; }
+#splash-status { position: absolute; left: 16px; right: 16px; bottom: calc(14% + env(safe-area-inset-bottom, 0px));
+  text-align: center; font: 14px/1.4 -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 1.4em; }
+#splash-status span { position: absolute; left: 0; right: 0; opacity: 0; }
+#splash-status .wait { animation: splash-blink 6.5s linear 1.5s forwards; }
+#splash-status .slow { animation: splash-show .3s linear 8s forwards; }
+#splash-status .said { opacity: 1; }
+#splash.told .wait, #splash.told .slow { display: none; }
+@keyframes splash-breath { 0%, 100% { transform: scale(.96); opacity: .6; } 50% { transform: scale(1); opacity: 1; } }
+@keyframes splash-blink { 0% { opacity: 0; } 4%, 95% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes splash-show { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-color-scheme: dark) {
+  html, body, #splash { background: #131417; }
+  #splash { color: #878A93; }
+}
+@media (prefers-reduced-motion: reduce) { #splash svg { animation: none; } }
+</style>
+<script>
+/* Первый экран просится сразу, вместе со скриптами, а не после них
+   (perf-pass 6.4): адрес экрана живёт после «#», и сервер его не видит.
+   app.js забирает этот ответ вместо второго такого же запроса. Адрес и
+   заголовки — те же, что поставил бы сам клиент (screenFromHash, phone). */
+(function () {
+  try {
+    var screen = new URLSearchParams(location.hash.replace(/^#/, '')).get('screen') || '';
+    var url = screen ? '/ui?screen=' + encodeURIComponent(screen) : '/ui';
+    var headers = { 'HX-Request': 'true', 'HX-Request-Type': 'partial' };
+    if (window.matchMedia('(max-width: 720px)').matches) headers['X-Sema-Phone'] = '1';
+    window.semaFirstScreen = { url: url, resp: fetch(url, { headers: headers, credentials: 'same-origin' }) };
+    window.semaFirstScreen.resp.catch(function () {});
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="/fonts.css?v=__СБОРКА__">
+<link rel="stylesheet" href="/style.css?v=__СБОРКА__">
+<script src="/htmx.js?v=__СБОРКА__" defer></script>
+<script src="/app.js?v=__СБОРКА__" defer></script>
+</head>
+<body>
+<!-- всё, что ниже, приходит с сервера: htmx подменяет содержимое окна
+     готовой разметкой, а клиент занимается только мелочами вроде высоты
+     поля ввода и прокрутки переписки -->
+<div id="splash" role="status" aria-label="Сёма загружается">
+  <svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#0071e3"/><path d="M150 330c22 20 55 32 92 32 54 0 92-26 92-66 0-38-30-56-84-68-40-9-54-17-54-33 0-17 17-28 44-28 26 0 50 9 68 24l26-40c-24-19-57-30-93-30-53 0-90 27-90 66 0 40 31 57 84 69 40 9 54 16 54 33 0 18-18 29-47 29-30 0-58-12-77-30z" fill="#fff"/></svg>
+  <div id="splash-status"><span class="wait">Подключаюсь к Сёме…</span><span class="slow">Связь медленная, жду ответа</span><span class="said"></span></div>
+</div>
+<div id="window"></div>
+</body>
+</html>

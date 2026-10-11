@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #1F4FD8; } a:hover { color: #17389B; }
+    .э { font-family: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .м { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+</helmet>
+
+<div class="э" style="width: 390px; height: 844px; background: #FBFAF7; color: #17181C; display: flex; flex-direction: column; overflow: hidden; font-size: 15px; line-height: 1.45;">
+
+  <!-- лента экрана -->
+  <div style="flex: 1; overflow: hidden; padding: 14px 14px 0; display: flex; flex-direction: column; gap: 14px;">
+
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em;">Задачи</div>
+      <div style="font-size: 13px; color: #585B64; line-height: 1.35;">по расписанию и друг за другом; сердцебиение не выключается</div>
+    </div>
+
+    <div style="display: flex; gap: 8px;">
+      <button style="flex: 1; height: 40px; border: 1px solid #E3E0D8; border-radius: 10px; background: #FFFFFF; color: #17181C; font: 600 14px/1 'Golos Text', sans-serif; cursor: pointer;">Вернуть по умолчанию</button>
+      <button style="flex: 0 0 auto; height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: #1F4FD8; color: #FFFFFF; font: 600 14px/1 'Golos Text', sans-serif; cursor: pointer;">Новая задача</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+      <div style="background: #FFFFFF; border: 1px solid #EFECE4; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 12px; font-weight: 600; color: #585B64;">Работают</div>
+        <div class="м" style="font-size: 32px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums;">21</div>
+        <div style="font-size: 12px; color: #8B8E97;">по расписанию</div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #EFECE4; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 12px; font-weight: 600; color: #585B64;">Выключены</div>
+        <div class="м" style="font-size: 32px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums;">5</div>
+        <div style="font-size: 12px; color: #8B8E97;">только по кнопке</div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.03em; color: #8B8E97; padding: 0 2px;">Корень</div>
+      <div style="background: #FFFFFF; border: 1px solid #EFECE4; border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start;">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#2E7D4F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 18px; margin-top: 2px;"><path d="M1.5 8.5h3l1.5-4 2.5 8 1.5-4h4.5"/></svg>
+        <div style="min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 15px; font-weight: 600;">Сердцебиение</div>
+          <div style="font-size: 13px; color: #585B64; line-height: 1.4;">Пульс Сёмы: каждую секунду будит остальные задачи и решает, чья очередь</div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 2px;">
+            <span class="м" style="font-size: 11px; font-weight: 600; color: #2E7D4F; background: #E4F1E9; border-radius: 6px; padding: 3px 7px;">каждую секунду</span>
+            <span style="font-size: 12px; color: #8B8E97;">не выключается</span>
+          </div>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #EFECE4; border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start;">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#8B8E97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 18px; margin-top: 2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        <div style="min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 15px; font-weight: 600;">Очередь</div>
+          <div style="font-size: 13px; color: #585B64; line-height: 1.4;">Фоновая работа по одной: разбор памяти и прочее</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- нижняя полоса: всегда видна -->
+  <div style="flex: 0 0 auto; background: #FFFFFF; border-top: 1px solid #E3E0D8; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding-bottom: 22px;">
+
+    <button style="height: 56px; border: 0; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0;">
+      <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg>
+      <span style="font-size: 11px; font-weight: 600; color: #17181C;">Меню</span>
+    </button>
+
+    <button style="height: 56px; border: 0; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0; position: relative;">
+      <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#8B8E97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 4.5h13v8h-13z"/><path d="M1.5 5l6.5 4.5L14.5 5"/></svg>
+      <span style="font-size: 11px; font-weight: 500; color: #585B64;">Почта</span>
+      <span class="м" style="position: absolute; top: 6px; left: 50%; margin-left: 6px; min-width: 17px; height: 17px; border-radius: 9px; background: #1F4FD8; color: #FFFFFF; font-size: 10px; font-weight: 600; line-height: 17px; text-align: center; padding: 0 4px;">3</span>
+    </button>
+
+    <button style="height: 56px; border: 0; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0;">
+      <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#8B8E97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+      <span style="font-size: 11px; font-weight: 500; color: #585B64;">Чаты</span>
+    </button>
+
+    <button style="height: 56px; border: 0; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0; position: relative;">
+      <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#8B8E97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2a4 4 0 0 0-4 4v2.6L2.8 11h10.4L12 8.8V6.2a4 4 0 0 0-4-4z"/><path d="M6.6 12.6a1.5 1.5 0 0 0 2.8 0"/></svg>
+      <span style="font-size: 11px; font-weight: 500; color: #585B64;">Ждут вас</span>
+      <span style="position: absolute; top: 8px; left: 50%; margin-left: 7px; width: 8px; height: 8px; border-radius: 50%; background: #BE3320;"></span>
+    </button>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

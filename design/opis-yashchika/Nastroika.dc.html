@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#6E717A;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+    --off:#CFCBC1;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .page{width:980px;padding:0 0 28px}
+  .head{padding:14px 18px 12px;border-bottom:1px solid var(--line)}
+  .head .path{font-size:12px;color:var(--ink3);margin-bottom:4px}
+  .head h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.015em;line-height:1.1}
+  .head .sub{font-size:13px;color:var(--ink2);margin-top:4px}
+  .col{padding:16px 18px 0}
+  .sec-hd{display:flex;align-items:center;gap:9px;margin:20px 0 8px}
+  .sec-hd:first-child{margin-top:0}
+  .sec-hd h2{margin:0;font-size:13px;font-weight:700}
+  .sec-hd .n{font-size:12px;color:var(--ink3)}
+  .sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:var(--lift);overflow:hidden}
+  .row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line2)}
+  .row:last-child{border-bottom:0}
+  .body{flex:1 1 auto;min-width:0}
+  .nm{font-size:14px;font-weight:600}
+  .why{font-size:12px;color:var(--ink3);margin-top:2px}
+  .cnt{font-size:12px;color:var(--ink3);flex:0 0 auto;font-family:'IBM Plex Mono',monospace;
+    font-variant-numeric:tabular-nums}
+  .btn{height:28px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    font-size:12px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;white-space:nowrap}
+  .sw{width:44px;height:26px;border-radius:13px;background:var(--off);position:relative;flex:0 0 44px}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .sw.on{background:var(--accent)}
+  .sw.on::after{left:20px}
+  .form{background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:var(--lift);
+    padding:4px 14px}
+  .f{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;
+    padding:11px 0;border-bottom:1px solid var(--line2)}
+  .f:last-child{border-bottom:0}
+  .f .lbl{font-size:14px;font-weight:600}
+  .f .hint{font-size:12px;color:var(--ink3);margin-top:2px;line-height:1.45}
+  .pick{height:30px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    font-size:13px;display:inline-flex;align-items:center;gap:8px}
+  .shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:11px;padding:11px 14px}
+  .shelf .cap{font-size:10px;font-weight:700;color:var(--warn);letter-spacing:.04em;margin-bottom:4px}
+  .shelf .t{font-size:14px;font-weight:600;line-height:1.35}
+  .shelf .n{font-size:12px;color:var(--ink3);margin-top:3px;line-height:1.45}
+  .flag{display:inline-block;background:var(--ok);color:#fff;font-size:10px;font-weight:700;
+    border-radius:5px;padding:2px 6px;margin-left:8px;vertical-align:1px}
+  .note{font-size:11px;color:var(--ink3);line-height:1.5;padding:8px 2px 0}
+  </style>
+</helmet>
+
+<div class="page">
+  <div class="head">
+    <div class="path">‹ Настройки · Почта</div>
+    <h1>owner@example.org</h1>
+    <div class="sub">личный ящик · Gmail · Сёма читает его, раскладывает спам и уносит разобранное в архив</div>
+  </div>
+
+  <div class="col">
+    <div class="shelf">
+      <div class="cap">СТОИТ ПОСМОТРЕТЬ</div>
+      <div class="t">В спаме у провайдера 41 письмо, которое Сёма не видел</div>
+      <div class="n">Среди них 3 от тех, с кем вы переписываетесь: support@hosting.example, noreply@id.example, info@delivery.example</div>
+    </div>
+
+    <div class="sec-hd"><h2>Что Сёма делает с папками</h2><span class="n">8 папок</span><span class="rule"></span></div>
+    <div class="card">
+      <div class="row">
+        <div class="body"><div class="nm">INBOX</div>
+          <div class="why">разбирает: судит, помечает прочитанным и уносит в архив</div></div>
+        <span class="cnt">952</span>
+      </div>
+      <div class="row">
+        <div class="body"><div class="nm">Archive</div>
+          <div class="why">разбирает</div></div>
+        <span class="cnt">318</span>
+      </div>
+      <div class="row">
+        <div class="body"><div class="nm">[Gmail]/Отправленные</div>
+          <div class="why">читает на месте: ваши письма, ничего не переносит</div></div>
+        <span class="cnt">204</span>
+      </div>
+      <div class="row">
+        <div class="body"><div class="nm">[Gmail]/Спам</div>
+          <div class="why"><b>только помнит конверт</b> — кто, тема, дата. Текст забирается по кнопке</div></div>
+        <span class="cnt">41</span>
+      </div>
+      <div class="row">
+        <div class="body"><div class="nm">[Gmail]/Вся почта</div>
+          <div class="why"><b>только помнит конверт</b> — сюда Gmail кладёт письма, помеченные «Пропустить входящие»</div></div>
+        <span class="cnt">2 984</span>
+      </div>
+      <div class="row">
+        <div class="body"><div class="nm">[Gmail]/Корзина</div>
+          <div class="why">не смотрит: удалённое человеком — его решение</div></div>
+        <span class="cnt">—</span>
+      </div>
+    </div>
+    <div class="note">
+      Раньше здесь было четыре разряда — «разбирает», «читает на месте», «куда складывает» и
+      «разбирает, хотя не стоило бы». Пятый разряд, «только помнит», и есть вся правка: папка перестаёт
+      быть невидимой, не становясь при этом работой.<span class="flag">суть предложения</span>
+    </div>
+
+    <div class="sec-hd"><h2>Опись ящика</h2><span class="rule"></span></div>
+    <div class="form">
+      <div class="f">
+        <div>
+          <div class="lbl">Помнить письма из папок, с которыми не работаю</div>
+          <div class="hint">Сёма запоминает отправителя, тему, дату и номер письма. Текст, вложения и
+            картинки не качаются, модели такое письмо не видят, в счёт расхода не идёт. Выключите —
+            и «не нашлось» снова будет значить «не знаю».</div>
+        </div>
+        <span class="sw on"></span>
+      </div>
+      <div class="f">
+        <div><div class="lbl">За какой срок</div>
+          <div class="hint">Спам у провайдера всё равно чистится сам; глубже смотреть незачем</div></div>
+        <span class="pick">90 дней ⌄</span>
+      </div>
+      <div class="f">
+        <div><div class="lbl">Какие папки помнить</div>
+          <div class="hint">Корзина по умолчанию не входит: удалённое человеком — его решение</div></div>
+        <span class="pick">спам и архив ⌄</span>
+      </div>
+      <div class="f">
+        <div><div class="lbl">Сейчас в описи</div>
+          <div class="hint">Обновляет задача «Опись ящиков», раз в час</div></div>
+        <span class="m" style="font-size:14px;font-weight:600">3 412 писем · 1,1 МБ</span>
+      </div>
+      <div class="f">
+        <div><div class="lbl">Забрать всё из описи к себе</div>
+          <div class="hint">Скачает тексты и вложения 3 412 писем. Из архива Сёмы письма не удаляются
+            никогда — это решение не отменить.</div></div>
+        <span class="btn">Забрать всё</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

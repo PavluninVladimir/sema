@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+  <style>
+:root{
+  --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+  --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+  --line:#E3E0D8; --line2:#EFECE4;
+  --accent:#1F4FD8; --accent-soft:#E8EDFC;
+  --ok:#2E7D4F; --info:#2A5FCC; --warn:#9C6100; --warn-soft:#FBF0DC;
+  --alert:#BE3320; --alert-soft:#FBE7E3;
+  --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+  --lift:0 1px 2px rgba(24,20,12,.07);
+  --pop:0 8px 26px rgba(24,20,12,.13), 0 1px 3px rgba(24,20,12,.10);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--ink)}
+.m{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+
+.wrap{padding:44px 44px 52px;display:flex;flex-direction:column;gap:34px;background:var(--paper);min-height:100%}
+.kicker{font-size:11px;letter-spacing:.08em;color:var(--ink3)}
+.h1{margin:0;font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1.05}
+.lead{margin:0;font-size:16px;line-height:1.55;color:var(--ink2);max-width:760px}
+.lead b{color:var(--ink);font-weight:600}
+.quiet{font-size:13px;line-height:1.55;color:var(--ink3)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.panel-pad{padding:15px 17px}
+.sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:10px}
+.sec-hd h2{margin:0;font-size:15px;font-weight:700}
+.sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+.sec-hd .n{font-size:12px;color:var(--ink3)}
+.cost{display:flex;flex-direction:column;gap:7px}
+.cost .t{font-size:13px;font-weight:700}
+.cost ul{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:5px}
+.cost li{font-size:13px;line-height:1.5;color:var(--ink2)}
+.cost li b{color:var(--ink);font-weight:600}
+.cols{display:flex;gap:44px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:9px;flex:0 0 auto}
+.col .cap{font-size:13px;font-weight:700}
+.col>.rail,.col>.phone{flex:0 0 auto}
+.col .sz{font-size:11px;color:var(--ink3)}
+
+/* ——— рельс ——— */
+.rail{width:248px;flex:0 0 248px;background:var(--rail);border:1px solid var(--line);border-radius:12px;
+  display:flex;flex-direction:column;gap:15px;padding:15px 10px 12px}
+.mark{display:flex;align-items:center;gap:8px;padding:1px 8px 0}
+.mark b{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.mark span{font-size:11px;color:var(--ink3)}
+.mark i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:block}
+
+.pinned{display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;border-radius:10px;
+  background:var(--alert-soft)}
+.pinned svg{color:var(--alert);flex:0 0 16px}
+.pinned .lbl{font-size:15px;font-weight:600;color:var(--alert)}
+.pinned .cnt{margin-left:auto;font-size:15px;font-weight:700;color:var(--alert)}
+
+.grp{display:flex;flex-direction:column;gap:1px}
+.grp>.cap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.04em;padding:0 10px 7px}
+
+.nav{display:flex;align-items:center;gap:10px;height:36px;padding:0 8px 0 10px;border-radius:9px;
+  font-size:15px;font-weight:500;color:var(--ink2);position:relative}
+.nav>svg:first-child{flex:0 0 16px;color:var(--ink3)}
+.nav .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav .b{font-size:11px;font-weight:600;color:var(--ink3);margin-left:auto}
+.nav .b.alert{color:var(--alert)}
+.nav .ldot{width:7px;height:7px;border-radius:50%;display:block;margin-left:auto}
+.nav .b+.ldot,.nav .ldot+.b{margin-left:6px}
+.nav .chev{flex:0 0 12px;color:var(--ink3);margin-left:5px}
+.nav .chev.open{transform:rotate(90deg)}
+.nav.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.nav.here{color:var(--ink);font-weight:600}
+.nav.here>svg:first-child{color:var(--accent)}
+.gnode.here{color:var(--ink)}
+.nav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.nav.on>svg:first-child{color:var(--accent)}
+
+.kids{margin:3px 0 7px 20px;padding-left:15px;border-left:1px solid var(--line);
+  display:flex;flex-direction:column;gap:1px}
+.kids .kcap,.flyout .kcap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.04em;padding:9px 10px 4px}
+.kids .kcap:first-child{padding-top:2px}
+.sub{display:flex;align-items:center;gap:9px;height:32px;padding:0 8px 0 10px;border-radius:8px;
+  font-size:15px;font-weight:400;color:var(--ink2);position:relative}
+.sub .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub .b{font-size:11px;font-weight:600;color:var(--ink3);margin-left:auto}
+.sub .idot{width:7px;height:7px;border-radius:50%;flex:0 0 7px;display:block}
+.sub .idot.no{visibility:hidden}
+.sub .ldot{width:7px;height:7px;border-radius:50%;display:block;margin-left:auto}
+.sub.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.sub.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.sub.on::before{content:"";position:absolute;left:-16px;top:5px;bottom:5px;width:2px;
+  border-radius:1px;background:var(--accent)}
+
+/* ——— третий уровень: узел-группа и карман ——— */
+.gnode{display:flex;align-items:center;gap:9px;height:32px;padding:0 8px;border-radius:8px;
+  font-size:15px;font-weight:600;color:var(--ink2);position:relative}
+.gnode>.chev{flex:0 0 12px;color:var(--ink3)}
+.gnode>.chev.open{transform:rotate(90deg)}
+.gnode .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gnode .b{font-size:11px;font-weight:600;color:var(--ink3);margin-left:auto}
+.gnode .ldot{width:7px;height:7px;border-radius:50%;display:block;margin-left:auto}
+.gnode .b+.ldot{margin-left:6px}
+.gnode.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.pocket{background:var(--sunk);border-radius:9px;padding:3px;margin:1px 0 6px;
+  display:flex;flex-direction:column;gap:1px}
+.pocket .sub{height:30px;padding:0 8px 0 26px;font-weight:400}
+.pocket .sub.on::before{display:none}
+.flyout .sub.on::before{display:none}
+.edge{position:absolute;top:0;bottom:0;width:1px;background:var(--alert);opacity:.5}
+.edgelab{position:absolute;font-size:10px;color:var(--alert);white-space:nowrap}
+.pgroup{display:flex;align-items:center;gap:11px;height:48px;padding:0 12px;border-radius:10px;
+  font-size:16px;font-weight:600;color:var(--ink2)}
+.pgroup>.chev{flex:0 0 14px;color:var(--ink3)}
+.pgroup>.chev.open{transform:rotate(90deg)}
+.pgroup .t{flex:1 1 auto;min-width:0}
+.pgroup .b{font-size:12px;font-weight:600;color:var(--ink3);margin-left:auto}
+.pgroup .ldot{width:8px;height:8px;border-radius:50%;display:block;margin-left:auto}
+.ppocket{background:var(--sunk);border-radius:11px;padding:4px;margin:2px 0 8px;
+  display:flex;flex-direction:column;gap:1px}
+.ppocket .psub{height:46px;padding:0 10px 0 34px}
+.foot{margin-top:auto;padding:11px 10px 0;border-top:1px solid var(--line);
+  display:flex;flex-direction:column;gap:6px}
+.foot .l1{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2)}
+.foot .l1 i{width:6px;height:6px;border-radius:50%;background:var(--ok);display:block;flex:0 0 6px}
+.foot .l2{font-size:11px;color:var(--ink3);line-height:1.45}
+.foot .work{display:flex;flex-direction:column;gap:5px;padding-top:2px}
+.foot .work .wl{display:flex;align-items:baseline;gap:6px;font-size:11px;color:var(--ink3)}
+.foot .work .wl b{color:var(--ink2);font-weight:600}
+.bar{height:4px;border-radius:2px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:2px;background:var(--info)}
+
+/* ——— узкий рельс (решение В) ——— */
+.slim{width:60px;flex:0 0 60px;background:var(--rail);border:1px solid var(--line);border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 0 10px}
+.slim .ic{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  color:var(--ink3);position:relative}
+.slim .ic.on{background:var(--panel);color:var(--accent);box-shadow:var(--lift)}
+.slim .ic.hov{background:rgba(120,116,105,.10);color:var(--ink)}
+.slim .ic .n{position:absolute;top:3px;right:3px;min-width:17px;height:17px;border-radius:9px;
+  background:var(--alert);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;padding:0 4px}
+.slim .ic .d{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%}
+.slim .sp{height:1px;width:26px;background:var(--line);margin:6px 0}
+.flyout{width:250px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--pop);padding:11px 9px 12px;display:flex;flex-direction:column;gap:1px}
+.flyout .fh{display:flex;align-items:center;gap:9px;padding:0 8px 9px;margin-bottom:4px;
+  border-bottom:1px solid var(--line2)}
+.flyout .fh b{font-size:15px;font-weight:700}
+.flyout .fh svg{color:var(--ink3)}
+.ghost{flex:1 1 auto;min-width:0;border:1px dashed var(--line);border-radius:12px;background:var(--panel);
+  padding:16px 18px;display:flex;flex-direction:column;gap:11px;opacity:.55}
+.ghost .g1{height:22px;width:38%;border-radius:5px;background:var(--sunk)}
+.ghost .g2{height:11px;width:64%;border-radius:4px;background:var(--line2)}
+.ghost .g3{height:11px;width:52%;border-radius:4px;background:var(--line2)}
+.ghost .g4{height:11px;width:70%;border-radius:4px;background:var(--line2)}
+
+/* ——— состояния ——— */
+.stlist{display:flex;flex-direction:column;gap:0}
+.strow{display:flex;align-items:center;gap:26px;padding:13px 0;border-bottom:1px solid var(--line2)}
+.strow:last-child{border-bottom:0}
+.strow .demo{flex:0 0 248px;background:var(--rail);border-radius:10px;padding:5px 8px}
+.strow .demo.k{padding-left:8px}
+.strow .txt{min-width:0;display:flex;flex-direction:column;gap:3px}
+.strow .txt b{font-size:14px;font-weight:600}
+.strow .txt span{font-size:13px;color:var(--ink2);line-height:1.45}
+.badnum{color:var(--alert);font-weight:600}
+
+/* ——— телефон ——— */
+.phones{display:flex;gap:46px;align-items:flex-start}
+.phone{width:390px;flex:0 0 390px;height:844px;background:var(--paper);border:1px solid var(--line);
+  border-radius:22px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.pbar{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;border-bottom:1px solid var(--line2);
+  background:var(--paper)}
+.pbar .tap{width:44px;height:44px;border-radius:11px;border:1px solid var(--line);background:var(--panel);
+  display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:0 0 44px}
+.pbar h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.015em}
+.pbar .cnt{margin-left:auto;display:flex;align-items:center;gap:7px;height:44px;padding:0 14px;
+  border-radius:11px;background:var(--alert-soft);color:var(--alert);font-size:13px;font-weight:700}
+.pbody{padding:14px 16px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.prow{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line2);align-items:flex-start}
+.prow .av{width:34px;height:34px;border-radius:9px;flex:0 0 34px;display:flex;align-items:center;
+  justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.prow .pb{min-width:0;display:flex;flex-direction:column;gap:3px}
+.prow .pb b{font-size:15px;font-weight:600}
+.prow .pb span{font-size:12px;color:var(--ink3)}
+.scrim{position:absolute;inset:0;background:rgba(23,24,28,.34)}
+.sheet{position:absolute;left:0;top:0;bottom:0;width:326px;background:var(--rail);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px 12px;gap:14px;
+  box-shadow:var(--pop)}
+.sheet .mark{padding:1px 10px 0}
+.sheet .pinned{height:52px;font-size:16px}
+.sheet .pinned .lbl{font-size:16px}
+.sheet .pinned .cnt{font-size:17px}
+.pnav{display:flex;align-items:center;gap:12px;height:48px;padding:0 10px 0 12px;border-radius:10px;
+  font-size:16px;font-weight:500;color:var(--ink2)}
+.pnav>svg:first-child{flex:0 0 18px;color:var(--ink3)}
+.pnav .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pnav .b{font-size:12px;font-weight:600;color:var(--ink3);margin-left:auto}
+.pnav .ldot{width:8px;height:8px;border-radius:50%;display:block;margin-left:auto}
+.pnav .b+.ldot{margin-left:7px}
+.pnav .chev{flex:0 0 13px;color:var(--ink3);margin-left:6px}
+.pnav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.pnav.on>svg:first-child{color:var(--accent)}
+.psub{display:flex;align-items:center;gap:10px;height:46px;padding:0 10px 0 12px;border-radius:10px;
+  font-size:16px;font-weight:400;color:var(--ink2);position:relative}
+.psub .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.psub .b{font-size:12px;font-weight:600;color:var(--ink3);margin-left:auto}
+.psub .idot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;display:block}
+.psub .idot.no{visibility:hidden}
+.psub.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.pcap{font-size:12px;font-weight:600;color:var(--ink3);letter-spacing:.04em;padding:2px 12px 6px}
+.pback{display:flex;align-items:center;gap:10px;height:48px;padding:0 10px;border-radius:10px;
+  font-size:17px;font-weight:700;color:var(--ink)}
+.pback svg{color:var(--ink3)}
+.pscroll{display:flex;flex-direction:column;gap:0;overflow:hidden;flex:1 1 auto}
+.fade{position:absolute;left:0;right:0;bottom:0;height:56px;
+  background:linear-gradient(to bottom,rgba(244,242,236,0),rgba(244,242,236,1))}
+.note{font-size:12px;line-height:1.5;color:var(--ink3);max-width:390px}
+</style>
+</helmet>
+<div class="wrap"><header style="display:flex;flex-direction:column;gap:12px"><div class="kicker m">РЕШЕНИЕ В</div><h1 class="h1">Узкий рельс и полка</h1><p class="lead">Первый уровень сжимается до <b>ленты значков в 60 точек</b> и перестаёт быть списком: он всегда целиком на экране, без прокрутки и без групп. Второй уровень выезжает полкой поверх содержимого — по наведению на столе, по нажатию на телефоне.</p></header><div style="display:flex;flex-direction:column;gap:30px"><div class="col" style="width:100%"><div class="cap">Ничего не открыто · рельс 60 px, содержимому остаётся на 188 px больше</div><div style="display:flex;gap:14px;align-items:stretch;min-height:560px"><div class="slim"><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a4.2 4.2 0 0 0-4.2 4.2c0 3.4-1.1 4.3-1.1 4.3h10.6s-1.1-.9-1.1-4.3A4.2 4.2 0 0 0 8 2.6Z"/><path d="M6.7 13.4a1.5 1.5 0 0 0 2.6 0"/></svg><span class="n m">13</span></div><div class="sp"></div><div class="ic on"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.6h3.1l.9 1.7h4l.9-1.7H14"/><path d="M3.6 3h8.8l1.6 6.6v3.1a.7.7 0 0 1-.7.7H2.7a.7.7 0 0 1-.7-.7V9.6L3.6 3Z"/></svg><span class="n m">1</span></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 9.6a1.4 1.4 0 0 1-1.4 1.4H4.6L2 13.4V3.9a1.4 1.4 0 0 1 1.4-1.4h8.8a1.4 1.4 0 0 1 1.4 1.4v5.7Z"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 1.9H4.6a1.2 1.2 0 0 0-1.2 1.2v9.8a1.2 1.2 0 0 0 1.2 1.2h6.8a1.2 1.2 0 0 0 1.2-1.2V5.1L9.2 1.9Z"/><path d="M9.2 1.9v3.2h3.4"/></svg></div><div class="sp"></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 1.4"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.6 11.6 2.4 8l3.2-3.6"/><path d="M10.4 4.4 13.6 8l-3.2 3.6"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 2.4h3v1.5a1.2 1.2 0 0 0 2.4 0V2.4h1.7v11.2H2.4V9.5h1.4a1.2 1.2 0 0 0 0-2.4H2.4V2.4h4.1Z"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.2v9.6"/><path d="M8 4.3a2 2 0 0 0-3.9.5A1.8 1.8 0 0 0 3 6.6c0 .7.4 1.3 1 1.6a1.9 1.9 0 0 0 1.2 3.3A1.9 1.9 0 0 0 8 12.5"/><path d="M8 4.3a2 2 0 0 1 3.9.5A1.8 1.8 0 0 1 13 6.6c0 .7-.4 1.3-1 1.6a1.9 1.9 0 0 1-1.2 3.3A1.9 1.9 0 0 1 8 12.5"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.8 8h2.9l1.6-4.3L9 12.4l1.5-4.4h2.7"/></svg><i class="d" style="background:var(--warn)"></i></div><div class="sp"></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.6v6.8"/><path d="M9.7 6.2a1.9 1.9 0 0 0-1.7-.8c-1 0-1.8.6-1.8 1.4s.8 1.3 1.8 1.4 1.8.6 1.8 1.4-.8 1.4-1.8 1.4a1.9 1.9 0 0 1-1.7-.8"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6.4 11V5h2.1a1.7 1.7 0 0 1 0 3.4H5.4"/><path d="M5.4 9.9h3.1"/></svg></div><div style="margin-top:auto"><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.1"/><path d="M12.6 9.9a1.1 1.1 0 0 0 .2 1.2l.1.1a1.3 1.3 0 1 1-1.9 1.9l-.1-.1a1.1 1.1 0 0 0-1.2-.2 1.1 1.1 0 0 0-.7 1v.2a1.3 1.3 0 1 1-2.6 0v-.1a1.1 1.1 0 0 0-.7-1 1.1 1.1 0 0 0-1.2.2l-.1.1a1.3 1.3 0 1 1-1.9-1.9l.1-.1a1.1 1.1 0 0 0 .2-1.2 1.1 1.1 0 0 0-1-.7h-.2a1.3 1.3 0 0 1 0-2.6h.1a1.1 1.1 0 0 0 1-.7 1.1 1.1 0 0 0-.2-1.2l-.1-.1a1.3 1.3 0 1 1 1.9-1.9l.1.1a1.1 1.1 0 0 0 1.2.2h.1a1.1 1.1 0 0 0 .7-1v-.2a1.3 1.3 0 1 1 2.6 0v.1a1.1 1.1 0 0 0 .7 1 1.1 1.1 0 0 0 1.2-.2l.1-.1a1.3 1.3 0 1 1 1.9 1.9l-.1.1a1.1 1.1 0 0 0-.2 1.2v.1a1.1 1.1 0 0 0 1 .7h.2a1.3 1.3 0 0 1 0 2.6h-.1a1.1 1.1 0 0 0-1 .7Z"/></svg><i class="d" style="background:var(--warn)"></i></div></div></div><div class="ghost"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div><div class="g2"></div><div class="g3"></div></div></div></div><div class="col" style="width:100%"><div class="cap">Полка «Настройки» · шестнадцать пунктов в четырёх группах, поверх содержимого</div><div style="display:flex;gap:14px;align-items:flex-start;min-height:660px"><div class="slim"><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a4.2 4.2 0 0 0-4.2 4.2c0 3.4-1.1 4.3-1.1 4.3h10.6s-1.1-.9-1.1-4.3A4.2 4.2 0 0 0 8 2.6Z"/><path d="M6.7 13.4a1.5 1.5 0 0 0 2.6 0"/></svg><span class="n m">13</span></div><div class="sp"></div><div class="ic on"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.6h3.1l.9 1.7h4l.9-1.7H14"/><path d="M3.6 3h8.8l1.6 6.6v3.1a.7.7 0 0 1-.7.7H2.7a.7.7 0 0 1-.7-.7V9.6L3.6 3Z"/></svg><span class="n m">1</span></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 9.6a1.4 1.4 0 0 1-1.4 1.4H4.6L2 13.4V3.9a1.4 1.4 0 0 1 1.4-1.4h8.8a1.4 1.4 0 0 1 1.4 1.4v5.7Z"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 1.9H4.6a1.2 1.2 0 0 0-1.2 1.2v9.8a1.2 1.2 0 0 0 1.2 1.2h6.8a1.2 1.2 0 0 0 1.2-1.2V5.1L9.2 1.9Z"/><path d="M9.2 1.9v3.2h3.4"/></svg></div><div class="sp"></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 1.4"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.6 11.6 2.4 8l3.2-3.6"/><path d="M10.4 4.4 13.6 8l-3.2 3.6"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 2.4h3v1.5a1.2 1.2 0 0 0 2.4 0V2.4h1.7v11.2H2.4V9.5h1.4a1.2 1.2 0 0 0 0-2.4H2.4V2.4h4.1Z"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.2v9.6"/><path d="M8 4.3a2 2 0 0 0-3.9.5A1.8 1.8 0 0 0 3 6.6c0 .7.4 1.3 1 1.6a1.9 1.9 0 0 0 1.2 3.3A1.9 1.9 0 0 0 8 12.5"/><path d="M8 4.3a2 2 0 0 1 3.9.5A1.8 1.8 0 0 1 13 6.6c0 .7-.4 1.3-1 1.6a1.9 1.9 0 0 1-1.2 3.3A1.9 1.9 0 0 1 8 12.5"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.8 8h2.9l1.6-4.3L9 12.4l1.5-4.4h2.7"/></svg><i class="d" style="background:var(--warn)"></i></div><div class="sp"></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.6v6.8"/><path d="M9.7 6.2a1.9 1.9 0 0 0-1.7-.8c-1 0-1.8.6-1.8 1.4s.8 1.3 1.8 1.4 1.8.6 1.8 1.4-.8 1.4-1.8 1.4a1.9 1.9 0 0 1-1.7-.8"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6.4 11V5h2.1a1.7 1.7 0 0 1 0 3.4H5.4"/><path d="M5.4 9.9h3.1"/></svg></div><div style="margin-top:auto"><div class="ic hov"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.1"/><path d="M12.6 9.9a1.1 1.1 0 0 0 .2 1.2l.1.1a1.3 1.3 0 1 1-1.9 1.9l-.1-.1a1.1 1.1 0 0 0-1.2-.2 1.1 1.1 0 0 0-.7 1v.2a1.3 1.3 0 1 1-2.6 0v-.1a1.1 1.1 0 0 0-.7-1 1.1 1.1 0 0 0-1.2.2l-.1.1a1.3 1.3 0 1 1-1.9-1.9l.1-.1a1.1 1.1 0 0 0 .2-1.2 1.1 1.1 0 0 0-1-.7h-.2a1.3 1.3 0 0 1 0-2.6h.1a1.1 1.1 0 0 0 1-.7 1.1 1.1 0 0 0-.2-1.2l-.1-.1a1.3 1.3 0 1 1 1.9-1.9l.1.1a1.1 1.1 0 0 0 1.2.2h.1a1.1 1.1 0 0 0 .7-1v-.2a1.3 1.3 0 1 1 2.6 0v.1a1.1 1.1 0 0 0 .7 1 1.1 1.1 0 0 0 1.2-.2l.1-.1a1.3 1.3 0 1 1 1.9 1.9l-.1.1a1.1 1.1 0 0 0-.2 1.2v.1a1.1 1.1 0 0 0 1 .7h.2a1.3 1.3 0 0 1 0 2.6h-.1a1.1 1.1 0 0 0-1 .7Z"/></svg><i class="d" style="background:var(--warn)"></i></div></div></div><div class="flyout"><div class="fh"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.1"/><path d="M12.6 9.9a1.1 1.1 0 0 0 .2 1.2l.1.1a1.3 1.3 0 1 1-1.9 1.9l-.1-.1a1.1 1.1 0 0 0-1.2-.2 1.1 1.1 0 0 0-.7 1v.2a1.3 1.3 0 1 1-2.6 0v-.1a1.1 1.1 0 0 0-.7-1 1.1 1.1 0 0 0-1.2.2l-.1.1a1.3 1.3 0 1 1-1.9-1.9l.1-.1a1.1 1.1 0 0 0 .2-1.2 1.1 1.1 0 0 0-1-.7h-.2a1.3 1.3 0 0 1 0-2.6h.1a1.1 1.1 0 0 0 1-.7 1.1 1.1 0 0 0-.2-1.2l-.1-.1a1.3 1.3 0 1 1 1.9-1.9l.1.1a1.1 1.1 0 0 0 1.2.2h.1a1.1 1.1 0 0 0 .7-1v-.2a1.3 1.3 0 1 1 2.6 0v.1a1.1 1.1 0 0 0 .7 1 1.1 1.1 0 0 0 1.2-.2l.1-.1a1.3 1.3 0 1 1 1.9 1.9l-.1.1a1.1 1.1 0 0 0-.2 1.2v.1a1.1 1.1 0 0 0 1 .7h.2a1.3 1.3 0 0 1 0 2.6h-.1a1.1 1.1 0 0 0-1 .7Z"/></svg><b>Настройки</b></div><div class="kcap">Каналы</div><div class="sub"><span class="t">Почта</span></div><div class="sub"><span class="t">Telegram</span></div><div class="sub"><span class="t">MAX</span></div><div class="sub"><span class="t">Уведомления</span></div><div class="kcap">Что Сёма умеет</div><div class="sub on"><span class="t">Модели и роли</span></div><div class="sub"><span class="t">Поиск</span></div><div class="sub"><span class="t">Скиллы</span></div><div class="sub"><span class="t">Развитие</span></div><div class="sub"><span class="t">Инструменты</span></div><div class="kcap">Где Сёма работает</div><div class="sub"><span class="t">Серверы</span></div><div class="sub"><span class="t">Агенты</span></div><div class="sub"><span class="t">Интеграции</span></div><div class="sub"><span class="t">Хранилища</span></div><div class="kcap">Кто что видит</div><div class="sub"><span class="t">Доступ</span></div><div class="sub"><span class="t">Ключи и секреты</span></div><div class="sub"><span class="t">Что ушло</span><i class="ldot" style="background:var(--warn)"></i></div></div><div class="ghost"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div><div class="g2"></div><div class="g3"></div></div></div></div><div class="col" style="width:100%"><div class="cap">Полка «Почта» · три ящика</div><div style="display:flex;gap:14px;align-items:flex-start;min-height:260px"><div class="slim"><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6a4.2 4.2 0 0 0-4.2 4.2c0 3.4-1.1 4.3-1.1 4.3h10.6s-1.1-.9-1.1-4.3A4.2 4.2 0 0 0 8 2.6Z"/><path d="M6.7 13.4a1.5 1.5 0 0 0 2.6 0"/></svg><span class="n m">13</span></div><div class="sp"></div><div class="ic on"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.6h3.1l.9 1.7h4l.9-1.7H14"/><path d="M3.6 3h8.8l1.6 6.6v3.1a.7.7 0 0 1-.7.7H2.7a.7.7 0 0 1-.7-.7V9.6L3.6 3Z"/></svg><span class="n m">1</span></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 9.6a1.4 1.4 0 0 1-1.4 1.4H4.6L2 13.4V3.9a1.4 1.4 0 0 1 1.4-1.4h8.8a1.4 1.4 0 0 1 1.4 1.4v5.7Z"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 1.9H4.6a1.2 1.2 0 0 0-1.2 1.2v9.8a1.2 1.2 0 0 0 1.2 1.2h6.8a1.2 1.2 0 0 0 1.2-1.2V5.1L9.2 1.9Z"/><path d="M9.2 1.9v3.2h3.4"/></svg></div><div class="sp"></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.3 1.4"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.6 11.6 2.4 8l3.2-3.6"/><path d="M10.4 4.4 13.6 8l-3.2 3.6"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 2.4h3v1.5a1.2 1.2 0 0 0 2.4 0V2.4h1.7v11.2H2.4V9.5h1.4a1.2 1.2 0 0 0 0-2.4H2.4V2.4h4.1Z"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.2v9.6"/><path d="M8 4.3a2 2 0 0 0-3.9.5A1.8 1.8 0 0 0 3 6.6c0 .7.4 1.3 1 1.6a1.9 1.9 0 0 0 1.2 3.3A1.9 1.9 0 0 0 8 12.5"/><path d="M8 4.3a2 2 0 0 1 3.9.5A1.8 1.8 0 0 1 13 6.6c0 .7-.4 1.3-1 1.6a1.9 1.9 0 0 1-1.2 3.3A1.9 1.9 0 0 1 8 12.5"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.8 8h2.9l1.6-4.3L9 12.4l1.5-4.4h2.7"/></svg><i class="d" style="background:var(--warn)"></i></div><div class="sp"></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.6v6.8"/><path d="M9.7 6.2a1.9 1.9 0 0 0-1.7-.8c-1 0-1.8.6-1.8 1.4s.8 1.3 1.8 1.4 1.8.6 1.8 1.4-.8 1.4-1.8 1.4a1.9 1.9 0 0 1-1.7-.8"/></svg></div><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6.4 11V5h2.1a1.7 1.7 0 0 1 0 3.4H5.4"/><path d="M5.4 9.9h3.1"/></svg></div><div style="margin-top:auto"><div class="ic"><svg width="19" height="19" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.1"/><path d="M12.6 9.9a1.1 1.1 0 0 0 .2 1.2l.1.1a1.3 1.3 0 1 1-1.9 1.9l-.1-.1a1.1 1.1 0 0 0-1.2-.2 1.1 1.1 0 0 0-.7 1v.2a1.3 1.3 0 1 1-2.6 0v-.1a1.1 1.1 0 0 0-.7-1 1.1 1.1 0 0 0-1.2.2l-.1.1a1.3 1.3 0 1 1-1.9-1.9l.1-.1a1.1 1.1 0 0 0 .2-1.2 1.1 1.1 0 0 0-1-.7h-.2a1.3 1.3 0 0 1 0-2.6h.1a1.1 1.1 0 0 0 1-.7 1.1 1.1 0 0 0-.2-1.2l-.1-.1a1.3 1.3 0 1 1 1.9-1.9l.1.1a1.1 1.1 0 0 0 1.2.2h.1a1.1 1.1 0 0 0 .7-1v-.2a1.3 1.3 0 1 1 2.6 0v.1a1.1 1.1 0 0 0 .7 1 1.1 1.1 0 0 0 1.2-.2l.1-.1a1.3 1.3 0 1 1 1.9 1.9l-.1.1a1.1 1.1 0 0 0-.2 1.2v.1a1.1 1.1 0 0 0 1 .7h.2a1.3 1.3 0 0 1 0 2.6h-.1a1.1 1.1 0 0 0-1 .7Z"/></svg><i class="d" style="background:var(--warn)"></i></div></div></div><div class="flyout"><div class="fh"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.6h3.1l.9 1.7h4l.9-1.7H14"/><path d="M3.6 3h8.8l1.6 6.6v3.1a.7.7 0 0 1-.7.7H2.7a.7.7 0 0 1-.7-.7V9.6L3.6 3Z"/></svg><b>Почта</b></div><div class="sub"><i class="idot no" style="background:transparent"></i><span class="t">Все ящики</span><span class="b m">1</span></div><div class="sub"><i class="idot" style="background:#D93025"></i><span class="t">owner@example.org</span></div><div class="sub on"><i class="idot" style="background:#FC3F1D"></i><span class="t">me@example.com</span><span class="b m">1</span></div></div><div class="ghost"><div class="g1"></div><div class="g2"></div><div class="g3"></div><div class="g4"></div><div class="g2"></div><div class="g3"></div></div></div></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px"><div class="panel panel-pad cost"><div class="t">Чем платим</div><ul><li><b>Двенадцать значков без подписей.</b> «Скрипты», «Модули», «Задачи» и «Память» — четыре абстракции подряд, и различать их надо по картинке. Подпись возвращается только всплывающей — то есть спустя секунду.</li><li><b>Наведения на телефоне нет.</b> Там решение вырождается в выдвижное меню, то есть в решение Б, — и это уже два разных меню в одном продукте.</li><li>Группы («Переписка», «Сёма сам», «Своё») исчезают: остаются разделители-волосы без имён.</li><li>Полка поверх содержимого — новый слой, которого у клиента сейчас нет: перекрытие, закрытие по щелчку мимо, поведение при узком окне.</li></ul></div><div class="panel panel-pad cost"><div class="t">Что взамен</div><ul><li>Первый уровень <b>никогда не прокручивается</b> — сколько бы модулей ни добавилось, лента значков остаётся на экране целиком.</li><li>Второй уровень не двигает первый: список настроек открывается и закрывается, а «Почта» под пальцем не уезжает.</li><li>Содержимому достаётся на 188 точек больше — на телефоне в альбомной и на узком окне это заметно.</li></ul></div></div></div></x-dc>
+</body>
+</html>

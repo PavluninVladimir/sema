@@ -1,0 +1,242 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 780px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .subitem .badge-count { font-size: 10px; }
+    .row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .avatar { width: 36px; height: 36px; border-radius: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #FFFFFF; }
+    .rowmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .from { font-size: 13px; font-weight: 600; color: #1D1D1F; }
+    .subj { font-size: 13px; color: #1D1D1F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .why { font-size: 11px; color: rgba(60,60,67,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conf { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 10px; flex-shrink: 0; }
+    .btn { height: 28px; padding: 0 12px; border-radius: 6px; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }
+    .btn-plain { background: #FFFFFF; color: #1D1D1F; border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 0.5px 1px rgba(0,0,0,0.08); }
+    .btn-danger { background: #FFFFFF; color: #D70015; border: 1px solid rgba(215,0,21,0.35); box-shadow: 0 0.5px 1px rgba(0,0,0,0.08); }
+    .btn-primary { background: #007AFF; color: #FFFFFF; border: 1px solid rgba(0,0,0,0.05); font-weight: 500; }
+    .check { width: 18px; height: 18px; border-radius: 9px; flex-shrink: 0; box-sizing: border-box; }
+    .check-off { border: 1.5px solid rgba(0,0,0,0.25); background: #FFFFFF; }
+    .check-on { background: #007AFF; display: flex; align-items: center; justify-content: center; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">61</span>
+      </div>
+      <div class="subitem" style="background: rgba(0,0,0,0.06); font-weight: 600; color: #1D1D1F"><span style="width: 7px"></span>
+        Все ящики
+        <span class="badge-count">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>
+        owner@example.org
+        <span class="badge-count">38</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FC3F1D; flex-shrink: 0"></span>
+        me@example.com
+        <span class="badge-count">23</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 10:46
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid rgba(0,0,0,0.08)">
+      <div style="display: flex; flex-direction: column; gap: 1px">
+        <div style="font-size: 15px; font-weight: 600; color: #1D1D1F">Почта</div>
+        <div style="font-size: 12px; color: rgba(60,60,67,0.6)">61 письмо ждёт подтверждения · owner@example.org</div>
+      </div>
+      <div style="margin-left: auto; display: flex; height: 26px; border-radius: 7px; background: rgba(0,0,0,0.06); padding: 2px; flex-shrink: 0">
+        <span style="display: flex; align-items: center; padding: 0 14px; font-size: 12px; font-weight: 500; color: #1D1D1F; background: #FFFFFF; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.12)">Письма</span>
+        <span style="display: flex; align-items: center; padding: 0 14px; font-size: 12px; color: #1D1D1F">Отправители</span>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <div class="btn btn-plain">Проверить сейчас</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid rgba(0,0,0,0.08)">
+      <div style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 9px; border-radius: 7px; background: rgba(0,0,0,0.05); width: 220px; box-sizing: border-box">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <span style="font-size: 13px; color: rgba(60,60,67,0.4)">Поиск по письмам</span>
+      </div>
+      <div style="display: flex; height: 24px; border-radius: 7px; background: rgba(0,0,0,0.05); padding: 2px">
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 500; color: #1D1D1F; background: #FFFFFF; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.12)">Все</span>
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Уверенный спам</span>
+        <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Сомнительные</span>
+      </div>
+      <div class="btn btn-primary" style="margin-left: auto; height: 26px">Готово</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(0,122,255,0.06); border-bottom: 1px solid rgba(0,0,0,0.08)">
+      <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Выбрано 3</span>
+      <div class="btn btn-plain" style="height: 26px">Выбрать все</div>
+      <div style="margin-left: auto; display: flex; gap: 8px">
+        <div class="btn" style="height: 26px; background: #FF3B30; color: #FFFFFF; font-weight: 500">В спам выбранные (3)</div>
+        <div class="btn btn-plain" style="height: 26px">Не спам</div>
+      </div>
+    </div>
+    <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column">
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 12px 16px 6px 16px">Сегодня</div>
+
+      <div class="row" style="background: rgba(0,122,255,0.05)">
+        <div class="check check-on"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3.5"/></svg></div>
+        <div class="avatar" style="background: #C7532F">А</div>
+        <div class="rowmain">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span class="from">Аптека Плюс</span>
+            <span class="why" style="flex-shrink: 0">info@pharmacy.example · 10:32</span>
+          </div>
+          <div class="subj">Иван, ваш баланс баллов пополнен</div>
+          <div class="why">Рекламная рассылка с баллами и промокодами, письмо не адресовано лично вам</div>
+        </div>
+        <span class="conf" style="background: rgba(255,59,48,0.12); color: #D70015">спам 95%</span>
+      </div>
+
+      <div class="row" style="background: rgba(0,122,255,0.05)">
+        <div class="check check-on"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3.5"/></svg></div>
+        <div class="avatar" style="background: #E0B100">Б</div>
+        <div class="rowmain">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span class="from">Банк «Пример»</span>
+            <span class="why" style="flex-shrink: 0">inform@bank.example · 10:32</span>
+          </div>
+          <div class="subj">Кэшбэк 45% в Поездах</div>
+          <div class="why">Маркетинговое предложение кэшбэка, типовая промо-рассылка банка</div>
+        </div>
+        <span class="conf" style="background: rgba(255,59,48,0.12); color: #D70015">спам 95%</span>
+      </div>
+
+      <div class="row">
+        <div class="check check-off"></div>
+        <div class="avatar" style="background: #7952B3">М</div>
+        <div class="rowmain">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span class="from">Маркет</span>
+            <span class="why" style="flex-shrink: 0">info@market.example · 09:58</span>
+          </div>
+          <div class="subj">Скидки до 70% только сегодня</div>
+          <div class="why">Типовая распродажа: массовая рассылка с кричащими скидками</div>
+        </div>
+        <span class="conf" style="background: rgba(255,59,48,0.12); color: #D70015">спам 93%</span>
+      </div>
+
+      <div class="row">
+        <div class="check check-off"></div>
+        <div class="avatar" style="background: #2E7DD1">Д</div>
+        <div class="rowmain">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span class="from">Документы Онлайн</span>
+            <span class="why" style="flex-shrink: 0">noreply@docs.example · 09:14</span>
+          </div>
+          <div class="subj">Ваш чек и подарок к заказу</div>
+          <div class="why">Есть чек по реальному заказу, но письмо содержит промо-блок</div>
+        </div>
+        <span class="conf" style="background: rgba(255,149,0,0.16); color: #C93400">спам 72%</span>
+      </div>
+
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 16px 16px 6px 16px">Вчера</div>
+
+      <div class="row">
+        <div class="check check-off"></div>
+        <div class="avatar" style="background: #4E9A51">И</div>
+        <div class="rowmain">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span class="from">Ипотека Онлайн</span>
+            <span class="why" style="flex-shrink: 0">news@realty.example · вчера, 18:40</span>
+          </div>
+          <div class="subj">Ставки по ипотеке снова изменились</div>
+          <div class="why">Новостная рассылка без действия, адресат в общем списке</div>
+        </div>
+        <span class="conf" style="background: rgba(255,149,0,0.16); color: #C93400">спам 81%</span>
+      </div>
+
+      <div class="row" style="background: rgba(0,122,255,0.05)">
+        <div class="check check-on"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3.5"/></svg></div>
+        <div class="avatar" style="background: #B33A72">Б</div>
+        <div class="rowmain">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span class="from">Бонусы+</span>
+            <span class="why" style="flex-shrink: 0">info@bonus.example · вчера, 15:02</span>
+          </div>
+          <div class="subj">Ваши бонусы сгорают через 3 дня</div>
+          <div class="why">Давление срочностью и сгорающими бонусами — типовой приём рассылок</div>
+        </div>
+        <span class="conf" style="background: rgba(255,59,48,0.12); color: #D70015">спам 91%</span>
+      </div>
+
+      <div class="row">
+        <div class="check check-off"></div>
+        <div class="avatar" style="background: #5A6ACF">А</div>
+        <div class="rowmain">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span class="from">Авиабилеты</span>
+            <span class="why" style="flex-shrink: 0">mail@travel.example · вчера, 12:27</span>
+          </div>
+          <div class="subj">Цены на осень упали — успейте до конца недели</div>
+          <div class="why">Промо-подборка направлений, но вы летали их рейсами — возможна подписка</div>
+        </div>
+        <span class="conf" style="background: rgba(255,149,0,0.16); color: #C93400">спам 76%</span>
+      </div>
+
+      <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #F7F6F4; border-top: 1px solid rgba(0,0,0,0.08)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4.5h11M6.5 4.5V3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1.5M4 4.5l.7 8.6a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9l.7-8.6"/></svg>
+        <span style="font-size: 12px; color: rgba(60,60,67,0.6)">3 письма перенесены в спам автоматически — Сёма удалит их через 30 дней</span>
+        <a href="#" style="font-size: 12px; margin-left: auto">Показать</a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

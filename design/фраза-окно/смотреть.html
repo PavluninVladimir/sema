@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Фраза входа · окно</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap">
+<style>
+  :root { --фон: #F4F2EC; --текст: #17181C; --тихий: #585B64; --едва: #686B74; --линия: #E3E0D8; }
+  body { margin: 0; background: var(--фон); color: var(--текст);
+         font-family: "Golos Text", system-ui, sans-serif; padding: 28px 32px 60px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .подпись { font-size: 13px; color: var(--тихий); margin-bottom: 26px; }
+  .ряд { display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+  .доска { }
+  .имя { font-size: 11px; color: var(--едва); font-weight: 600; letter-spacing: .03em;
+         text-transform: uppercase; margin-bottom: 8px; }
+  iframe { width: 760px; height: 520px; border: 1px solid var(--линия); border-radius: 12px;
+           background: #FBFAF7; display: block; }
+  .заметки { margin-top: 34px; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+             gap: 18px; max-width: 1580px; }
+  .з { background: #FBFAF7; border: 1px solid var(--линия); border-radius: 12px; padding: 16px 18px; }
+  .з h2 { font-size: 13px; margin: 0 0 6px; }
+  .з p { font-size: 13px; color: var(--тихий); margin: 0; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h1>Фраза входа — показ в окне</h1>
+  <div class="подпись">макет к правке интерфейса · 28 сентября 2026</div>
+
+  <div class="ряд">
+    <div class="доска">
+      <div class="имя">Окно открылось</div>
+      <iframe src="./Pokaz.dc.html"></iframe>
+    </div>
+    <div class="доска">
+      <div class="имя">После «Скопировать»</div>
+      <iframe src="./Skopirovano.dc.html"></iframe>
+    </div>
+  </div>
+
+  <div class="заметки" id="заметки"></div>
+
+<script>
+fetch('./canvas.json').then(r => r.json()).then(d => {
+  document.getElementById('заметки').innerHTML = d.annotations
+    .map(a => `<div class="з"><h2>${a.title}</h2><p>${a.text}</p></div>`).join('');
+});
+</script>
+</body>
+</html>

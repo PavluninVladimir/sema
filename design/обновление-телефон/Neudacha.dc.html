@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .э { font-family: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .м { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+</helmet>
+
+<div class="э" style="width: 390px; height: 844px; background: #FBFAF7; color: #17181C; display: flex; flex-direction: column; overflow: hidden; font-size: 15px; line-height: 1.45;">
+
+  <div style="flex: 0 0 auto; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 14px 10px;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 20px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em;">Почта</div>
+      <div style="font-size: 11px; color: #8B8E97;">сегодня · 3 новых</div>
+    </div>
+    <button style="width: 32px; height: 32px; flex: 0 0 32px; border: 0; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="#585B64"><circle cx="3.5" cy="8" r="1.4"/><circle cx="8" cy="8" r="1.4"/><circle cx="12.5" cy="8" r="1.4"/></svg>
+    </button>
+  </div>
+
+  <div style="flex: 1; overflow: hidden; padding: 0 14px 14px; display: flex; flex-direction: column;">
+
+    <!-- запрос не дошёл или сервер не ответил: та же форма, что у успеха
+         (иконка + короткая строка на месте индикатора), но цвет и текст
+         говорят прямо, что не получилось. Держится дольше галочки (1200 мс
+         вместо 600) — фразу с причиной нужно успеть прочитать. Список
+         внизу остаётся прежним: нового письма не появилось, это тоже
+         честный сигнал неудачи, а не только строка сверху. -->
+    <div style="flex: 0 0 auto; height: 40px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #FBE7E3; border-radius: 10px; margin-bottom: 4px;">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#BE3320" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 5.2v3.6"/><circle cx="8" cy="10.8" r="0.3" fill="#BE3320" stroke="none"/></svg>
+      <span style="font-size: 12px; color: #BE3320; font-weight: 600;">Не получилось: нет связи</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
+      <div style="background: #FFFFFF; border: 1px solid #EFECE4; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px;">
+        <div style="display: flex; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 15px; font-weight: 600;">Маркет</span>
+          <span class="м" style="font-size: 12px; color: #8B8E97;">10:41</span>
+        </div>
+        <div style="font-size: 13px; color: #585B64; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Ваш заказ передан в доставку — трек-номер внутри</div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #EFECE4; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px;">
+        <div style="display: flex; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 15px; font-weight: 600;">Мария Кузнецова</span>
+          <span class="м" style="font-size: 12px; color: #8B8E97;">09:15</span>
+        </div>
+        <div style="font-size: 13px; color: #585B64; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">По вторнику всё в силе? Тогда жду в 15:00</div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #EFECE4; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px;">
+        <div style="display: flex; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 15px; font-weight: 600;">Банк «Пример»</span>
+          <span class="м" style="font-size: 12px; color: #8B8E97;">вчера</span>
+        </div>
+        <div style="font-size: 13px; color: #585B64; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Выписка по счёту за август готова</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex: 0 0 auto; background: #FFFFFF; border-top: 1px solid #E3E0D8; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding-bottom: 22px;">
+    <button style="height: 56px; border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0;">
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#8B8E97" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg>
+      <span style="font-size: 11px; font-weight: 500; color: #585B64;">Меню</span>
+    </button>
+    <button style="height: 56px; border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0;">
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 4.5h13v8h-13z"/><path d="M1.5 5l6.5 4.5L14.5 5"/></svg>
+      <span style="font-size: 11px; font-weight: 600; color: #17181C;">Почта</span>
+    </button>
+    <button style="height: 56px; border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0;">
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#8B8E97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+      <span style="font-size: 11px; font-weight: 500; color: #585B64;">Чаты</span>
+    </button>
+    <button style="height: 56px; border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0;">
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#8B8E97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2a4 4 0 0 0-4 4v2.6L2.8 11h10.4L12 8.8V6.2a4 4 0 0 0-4-4z"/></svg>
+      <span style="font-size: 11px; font-weight: 500; color: #585B64;">Ждут вас</span>
+    </button>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: "Golos Text", system-ui, -apple-system, sans-serif; }
+    a { color: #1F4FD8; } a:hover { color: #173FA8; }
+  </style>
+</helmet>
+
+<div style="width: 760px; height: 560px; background: #FBFAF7; color: #17181C; padding: 22px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+
+  <div>
+    <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Карточка в ленте</div>
+    <div style="font-size: 11px; color: #686B74; margin-top: 3px">уровень — полоской слева, одно действие кнопкой, остальное в «···»</div>
+  </div>
+
+  <!-- анатомия -->
+  <div style="display: flex; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(24, 20, 12, 0.07); overflow: hidden">
+    <div style="width: 3px; background: #9C6100; flex: 0 0 3px"></div>
+    <div style="flex: 1; padding: 12px 14px">
+      <div style="display: flex; align-items: baseline; gap: 8px">
+        <div style="font-size: 13px; font-weight: 600">Заголовок — что случилось</div>
+        <div style="margin-left: auto; font-size: 11px; color: #686B74">источник · время</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 10px">
+        <div style="display: flex; gap: 10px; font-size: 13px">
+          <span style="flex: 0 0 96px; font-size: 11px; color: #686B74; padding-top: 2px">подпись</span>
+          <span>значение факта</span>
+        </div>
+        <div style="display: flex; gap: 10px; font-size: 13px">
+          <span style="flex: 0 0 96px; font-size: 11px; color: #686B74; padding-top: 2px">подпись</span>
+          <span>значение факта</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px">
+        <button style="font: 600 13px/1 inherit; height: 28px; padding: 0 12px; border-radius: 8px; border: 1px solid #1F4FD8; background: #1F4FD8; color: #FFFFFF; cursor: pointer">Главное действие</button>
+        <div style="width: 28px; height: 28px; border-radius: 8px; border: 1px solid #E3E0D8; background: #FFFFFF; display: flex; align-items: center; justify-content: center">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="#585B64"><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="11" cy="7" r="1.2"/></svg>
+        </div>
+        <span style="font-size: 11px; color: #686B74">остальное — «Отложить», «Прочитано», разрушительное</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size: 11px; color: #686B74; padding-top: 4px">Четыре уровня</div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; overflow: hidden">
+      <div style="width: 3px; background: #2E7D4F; flex: 0 0 3px"></div>
+      <div style="flex: 1; padding: 9px 14px; display: flex; align-items: center; gap: 10px">
+        <span style="font-size: 13px; font-weight: 600">ok</span>
+        <span style="font-size: 13px; color: #585B64">сделано, беспокоить не о чем — сворачивается в строку</span>
+        <span style="margin-left: auto; font: 500 10px/1 'IBM Plex Mono', monospace; color: #2E7D4F; background: #E4F1E9; padding: 4px 7px; border-radius: 6px">#2E7D4F</span>
+      </div>
+    </div>
+    <div style="display: flex; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; overflow: hidden">
+      <div style="width: 3px; background: #2A5FCC; flex: 0 0 3px"></div>
+      <div style="flex: 1; padding: 9px 14px; display: flex; align-items: center; gap: 10px">
+        <span style="font-size: 13px; font-weight: 600">info</span>
+        <span style="font-size: 13px; color: #585B64">к сведению: решать ничего не нужно</span>
+        <span style="margin-left: auto; font: 500 10px/1 'IBM Plex Mono', monospace; color: #2A5FCC; background: #E7EDFB; padding: 4px 7px; border-radius: 6px">#2A5FCC</span>
+      </div>
+    </div>
+    <div style="display: flex; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; overflow: hidden">
+      <div style="width: 3px; background: #9C6100; flex: 0 0 3px"></div>
+      <div style="flex: 1; padding: 9px 14px; display: flex; align-items: center; gap: 10px">
+        <span style="font-size: 13px; font-weight: 600">warn</span>
+        <span style="font-size: 13px; color: #585B64">ждёт вашего решения</span>
+        <span style="margin-left: auto; font: 500 10px/1 'IBM Plex Mono', monospace; color: #9C6100; background: #FBF0DC; padding: 4px 7px; border-radius: 6px">#9C6100</span>
+      </div>
+    </div>
+    <div style="display: flex; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; overflow: hidden">
+      <div style="width: 3px; background: #BE3320; flex: 0 0 3px"></div>
+      <div style="flex: 1; padding: 9px 14px; display: flex; align-items: center; gap: 10px">
+        <span style="font-size: 13px; font-weight: 600">alert</span>
+        <span style="font-size: 13px; color: #585B64">беда: срок вышел, сервер остановлен</span>
+        <span style="margin-left: auto; font: 500 10px/1 'IBM Plex Mono', monospace; color: #BE3320; background: #FBE7E3; padding: 4px 7px; border-radius: 6px">#BE3320</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: auto; font-size: 11px; color: #686B74; line-height: 1.6">
+    Свёрнутая строка — для ok: четыре ночные смены занимают одну строку, а не четыре карточки.<br>
+    Карточка заменяется по ключу: вчерашняя сводка не копится рядом с сегодняшней.
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

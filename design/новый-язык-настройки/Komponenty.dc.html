@@ -1,0 +1,443 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+
+  :root{
+  --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+  --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+  --line:#E3E0D8; --line2:#EFECE4;
+  --accent:#1F4FD8; --accent-soft:#E8EDFC;
+  --ok:#2E7D4F; --ok-soft:#E4F1E9;
+  --info:#2A5FCC; --info-soft:#E7EDFB;
+  --warn:#9C6100; --warn-soft:#FBF0DC;
+  --alert:#BE3320; --alert-soft:#FBE7E3;
+  --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+  --lift:0 1px 2px rgba(24,20,12,.07);
+}
+  
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--ink)}
+.m{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* ——— каркас ——— */
+.app{display:flex;min-height:100%;background:var(--paper)}
+.rail{width:240px;flex:0 0 240px;background:var(--rail);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:18px;padding:18px 12px 14px}
+.main{flex:1 1 auto;min-width:0;padding:26px 32px 40px;display:flex;flex-direction:column;gap:22px}
+
+/* ——— шапка экрана ——— */
+.head{display:flex;flex-direction:column;gap:7px}
+.head-top{display:flex;align-items:flex-end;gap:16px}
+.h1{font-size:28px;line-height:1.1;font-weight:700;letter-spacing:-.015em;margin:0}
+.head-meta{font-size:13px;line-height:1.4;color:var(--ink2);margin:0}
+.head-tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ——— меню ——— */
+.mark{display:flex;align-items:center;gap:8px;padding:2px 6px 0}
+.mark b{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.mark span{font-size:11px;color:var(--ink3)}
+.pinned{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px;
+  background:var(--alert-soft);border:1px solid transparent;cursor:pointer}
+.pinned .cnt{margin-left:auto;font-size:15px;font-weight:700;color:var(--alert)}
+.pinned .lbl{font-size:14px;font-weight:600;color:var(--alert)}
+.grp{display:flex;flex-direction:column;gap:1px}
+.grp>.cap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;padding:0 10px 6px}
+.nav{display:flex;align-items:center;gap:9px;height:34px;padding:0 10px;border-radius:8px;
+  font-size:14px;font-weight:500;color:var(--ink2);cursor:pointer}
+.nav:hover{background:rgba(120,116,105,.10);color:var(--ink)}
+.nav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.nav svg{flex:0 0 16px;color:var(--ink3)}
+.nav.on svg{color:var(--accent)}
+.nav .b{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink3)}
+.nav .b.alert{color:var(--alert)}
+.sub{display:flex;align-items:center;gap:8px;height:28px;padding:0 10px 0 35px;border-radius:8px;
+  font-size:13px;color:var(--ink2);cursor:pointer}
+.sub:hover{background:rgba(120,116,105,.10)}
+.sub .b{margin-left:auto;font-size:11px;color:var(--ink3)}
+.rail-foot{margin-top:auto;padding:10px 10px 0;border-top:1px solid var(--line);
+  font-size:11px;line-height:1.5;color:var(--ink3)}
+
+/* ——— полка «ждут вас» ——— */
+.shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:12px;overflow:hidden}
+.shelf-hd{display:flex;align-items:center;gap:8px;padding:11px 16px 10px}
+.shelf-hd .t{font-size:13px;font-weight:700;color:var(--warn)}
+.shelf-hd .n{font-size:11px;color:var(--ink3)}
+.shelf-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-top:1px solid var(--shelf-line)}
+.shelf-item .txt{min-width:0;display:flex;flex-direction:column;gap:3px}
+.shelf-item .txt b{font-size:15px;font-weight:600;line-height:1.35}
+.shelf-item .txt span{font-size:12px;color:var(--ink2)}
+.shelf-item .act{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+
+/* ——— тревога ——— */
+.alarm{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;
+  background:var(--alert-soft);border:1px solid transparent}
+.alarm .t{font-size:15px;font-weight:600;color:var(--alert)}
+.alarm .s{font-size:12px;color:var(--ink2)}
+
+/* ——— раздел ——— */
+.sec{display:flex;flex-direction:column;gap:2px}
+.sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:8px}
+.sec-hd h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.005em}
+.sec-hd .n{font-size:12px;color:var(--ink3)}
+.sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+.sec-hd .act{display:flex;gap:8px}
+
+/* ——— строка списка ——— */
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:flex-start;gap:12px;padding:11px 8px;border-radius:9px;
+  border-bottom:1px solid var(--line2)}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--panel)}
+.mono-av{flex:0 0 30px;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.row .body{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:2px}
+.line1{display:flex;align-items:baseline;gap:8px}
+.who{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.when{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--ink3)}
+.subj{font-size:15px;font-weight:400;line-height:1.35;color:var(--ink2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note{font-size:12px;line-height:1.4;color:var(--ink3)}
+.row .act{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-top:1px}
+
+/* ——— капсулы ——— */
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:5px;
+  font-size:11px;font-weight:600;letter-spacing:.01em}
+.dotmark{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+.dotmark i{width:7px;height:7px;border-radius:50%;display:block}
+
+/* ——— кнопки ——— */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 13px;
+  border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--ink3)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn.dang{background:transparent;border-color:transparent;color:var(--alert)}
+.btn.dang:hover{background:var(--alert-soft)}
+.btn.sm{height:26px;padding:0 9px;font-size:12px}
+.dots{width:28px;height:28px;border-radius:7px;border:0;background:transparent;color:var(--ink3);
+  font-size:16px;line-height:1;cursor:pointer}
+.dots:hover{background:var(--sunk);color:var(--ink)}
+
+/* ——— сегмент ——— */
+.seg{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk)}
+.seg button{height:26px;padding:0 11px;border:0;border-radius:7px;background:transparent;
+  font-family:inherit;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+
+/* ——— поле ——— */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:600;color:var(--ink2)}
+.inp{height:36px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+  font-family:inherit;font-size:14px;color:var(--ink)}
+.inp.ph{color:var(--ink3)}
+.inp.focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sel{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 8px 0 10px;border-radius:7px;
+  border:1px solid var(--line);background:var(--panel);font-size:12px;font-weight:500;color:var(--ink)}
+.sel svg{color:var(--ink3)}
+
+/* ——— тумблер ——— */
+.tog{width:36px;height:20px;border-radius:10px;background:#CFCBC1;position:relative;flex:0 0 36px;display:block}
+.tog i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;
+  display:block;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tog.on{background:var(--accent)}
+.tog.on i{left:18px}
+
+/* ——— плитка-показатель ——— */
+.tiles{display:grid;gap:12px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 15px 13px;
+  display:flex;flex-direction:column;gap:7px;position:relative;overflow:hidden}
+.tile .cap{font-size:12px;font-weight:600;color:var(--ink2)}
+.tile .val{display:flex;align-items:baseline;gap:6px}
+.tile .val b{font-size:32px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.tile .val span{font-size:14px;font-weight:400;color:var(--ink3)}
+.tile .ctx{font-size:12px;line-height:1.45;color:var(--ink3)}
+.tile.small .val b{font-size:21px}
+.tile.small{gap:5px;padding:12px 13px}
+.tile .rule{position:absolute;left:0;top:0;bottom:0;width:3px}
+
+/* ——— панель ——— */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.panel-pad{padding:16px 18px}
+
+/* ——— таблица ——— */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:11px;font-weight:600;color:var(--ink3);text-align:left;padding:0 10px 8px;
+  letter-spacing:.02em;white-space:nowrap}
+.tbl td{padding:9px 10px;border-top:1px solid var(--line2);font-size:14px;vertical-align:middle}
+.tbl tr:hover td{background:var(--panel)}
+.tbl .num{text-align:right}
+
+/* ——— матрица выдачи ——— */
+.mx{border-collapse:separate;border-spacing:0}
+.mx th.area{font-size:11px;font-weight:600;color:var(--ink2);text-align:center;padding:0 4px 9px;width:72px}
+.mx td.cell{text-align:center;padding:5px 0;border-top:1px solid var(--line2)}
+.mx td.who{padding:5px 12px 5px 2px;border-top:1px solid var(--line2);font-size:13px;white-space:nowrap}
+.mx td.who small{display:block;font-size:11px;color:var(--ink3)}
+.cellbox{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;
+  justify-content:center;border:1px solid var(--line);background:transparent}
+.cellbox.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.cellbox.out{background:var(--warn-soft);border-color:var(--shelf-line);color:var(--warn)}
+
+/* ——— полоса доли ——— */
+.bar{height:5px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px}
+
+/* ——— сводка-числа ——— */
+.figs{display:flex;gap:0;align-items:stretch}
+.fig{flex:1 1 0;padding:0 18px;display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--line2)}
+.fig:first-child{padding-left:0;border-left:0}
+.fig b{font-size:22px;font-weight:600;line-height:1;letter-spacing:-.015em}
+.fig span{font-size:12px;color:var(--ink3)}
+
+/* ——— пустое место ——— */
+.empty{display:flex;flex-direction:column;gap:9px;align-items:flex-start;padding:26px 0 22px}
+.empty b{font-size:15px;font-weight:600}
+.empty p{margin:0;font-size:13px;color:var(--ink2);max-width:420px;line-height:1.5}
+
+.quiet{font-size:12px;line-height:1.55;color:var(--ink3)}
+.hr{height:1px;background:var(--line2)}
+
+  
+
+/* ——— добавлено на экранах настроек ——— */
+.grp2{display:flex;flex-direction:column}
+.gh{display:flex;align-items:center;gap:10px;padding:9px 8px;border-bottom:1px solid var(--line2);cursor:pointer}
+.gh .nm{font-size:13px;font-weight:600;color:var(--ink2)}
+.gh .n{font-size:11px;color:var(--ink3)}
+.gh .ch{margin-left:auto;color:var(--ink3)}
+.kv{display:grid;grid-template-columns:210px 1fr;gap:12px 18px;align-items:start}
+.kv .k{font-size:12px;font-weight:600;color:var(--ink2);padding-top:8px}
+.step{display:flex;gap:16px}
+.step .no{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:700;background:var(--sunk);color:var(--ink2)}
+.step .no.on{background:var(--accent);color:#fff}
+.step .no.done{background:var(--ok-soft);color:var(--ok)}
+.crumb{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3)}
+  </style>
+</helmet>
+<main style="max-width:1000px;margin:0;padding:44px 48px 56px;display:flex;
+  flex-direction:column;gap:32px;background:var(--paper)">
+
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <div class="m" style="font-size:12px;color:var(--ink3);letter-spacing:.06em">
+      ЧТО НУЖНО ДОБАВИТЬ НА СЕРВЕРЕ · 9 сентября 2026</div>
+    <h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1.05">
+      Новые компоненты</h1>
+    <p style="margin:0;font-size:15px;line-height:1.55;color:var(--ink2);max-width:720px">
+      Экран собирает сервер, поэтому всё нарисованное должно выражаться компонентами.
+      Восемь уже назвал первый дизайнер — я их взял как есть и пользуюсь ими на всех
+      двенадцати экранах. Ниже — шесть новых и три требования к тому, что уже есть.
+    </p>
+  </header>
+
+  <section class="sec">
+    <div class="sec-hd"><h2 style="font-size:15px">Взято как есть</h2><div class="rule"></div></div>
+    <div class="panel" style="padding:14px 18px 8px">
+      <table class="tbl">
+        <thead><tr><th style="width:20%">Тип</th><th style="width:34%">Что делает</th><th>Где у меня</th></tr></thead>
+        <tbody>
+          <tr><td class="m" style="font-weight:600;font-size:13px">shelf</td>
+            <td class="note">полка «ждут вас» под шапкой</td>
+            <td class="note">на всех восьми экранах настроек и в мастере</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">table</td>
+            <td class="note">таблица с подписями колонок</td>
+            <td class="note">роли, модели, серверы, токены, правила почты, журнал команд</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">rowgroup</td>
+            <td class="note">свёрнутая группа строк со счётчиком</td>
+            <td class="note">папки, задачи ящика, секреты по назначению, журнал сервера</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">figs</td>
+            <td class="note">строка чисел без карточек</td>
+            <td class="note">агент, доверие моделей, граф</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">metric</td>
+            <td class="note">плитка-показатель</td>
+            <td class="note">не понадобилась: в настройках нет метрик, есть состояния</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">alarm</td>
+            <td class="note">плашка поломки</td>
+            <td class="note">не понадобилась: всё ждущее ушло в полку</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">matrix</td>
+            <td class="note">матрица выдачи «кто × что»</td>
+            <td class="note">пригодится на «Агентах» со второго агента; с одним — строки честнее</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">мета моноширинным</td>
+            <td class="note">признак «это Сёма померил»</td>
+            <td class="note">адреса, времена, команды, имена секретов, цены</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-hd"><h2 style="font-size:15px">Новые</h2><span class="n">шесть</span><div class="rule"></div></div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;padding-top:4px">
+
+      <div class="panel panel-pad">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">
+          <span class="m" style="font-size:15px;font-weight:700">search</span>
+          <span class="quiet">поле поиска в шапке экрана</span>
+          <span class="chip" style="background:var(--info-soft);color:var(--info);margin-left:auto">нужен индекс на сервере</span>
+        </div>
+        <div class="quiet" style="max-width:700px;margin-bottom:12px">Шестнадцать разделов —
+          это уже не список, а справочник. Компонент ищет по названиям настроек и подсказкам
+          к ним (не по значениям: значение секрета не показывается нигде) и отдаёт адрес
+          экрана плюс якорь. Серверу нужен плоский список «название → экран → подсказка»,
+          собираемый при сборке экранов, а не руками.</div>
+        <div class="inp ph" style="max-width:520px;display:flex;align-items:center;gap:9px">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink3)"><circle cx="7.2" cy="7.2" r="4.4"/><path d="m10.5 10.5 3 3"/></svg>
+          Часовой пояс, порт входа, пауза очереди…</div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">
+          <span class="m" style="font-size:15px;font-weight:700">switcher</span>
+          <span class="quiet">переключатель сущностей карточками</span>
+        </div>
+        <div class="quiet" style="max-width:700px;margin-bottom:12px">Сейчас ящики живут
+          в боковой панели, которой на телефоне нет вовсе. Карточка несёт имя, вид связи,
+          состояние и капсулы режима — по ней видно, какой ящик выбран и чем он отличается
+          от соседнего. Годится и для провайдеров, и для агентов.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px">
+          <div class="panel" style="padding:12px 14px;box-shadow:var(--lift);position:relative;overflow:hidden">
+            <span style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)"></span>
+            <div style="font-size:15px;font-weight:600">owner@example.org</div>
+            <div class="note m" style="margin-top:5px">Google OAuth · 15 папок</div>
+          </div>
+          <div class="panel" style="padding:12px 14px">
+            <div style="font-size:15px;font-weight:600;color:var(--ink2)">me@example.com</div>
+            <div class="note m" style="margin-top:5px">Пароль приложения · 9 папок</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">
+          <span class="m" style="font-size:15px;font-weight:700">kv</span>
+          <span class="quiet">подпись слева, управление справа, объяснение под ним</span>
+        </div>
+        <div class="quiet" style="max-width:700px;margin-bottom:12px">Форма из двенадцати полей
+          подряд — это свалка. Пара «подпись — значение» с колонкой подписей в 210 точек
+          читается сверху вниз, а объяснение пишется один раз под своим полем,
+          а не в каждой строке.</div>
+        <div class="kv" style="max-width:640px">
+          <div class="k" style="padding-top:6px">Смотреть «Входящие» за</div>
+          <div><span class="sel" style="height:32px">7 дней<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.2 8 10l4-3.8"/></svg></span>
+            <div class="quiet" style="margin-top:5px">Всё, что старше, разбирает отдельная задача.</div></div>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">
+          <span class="m" style="font-size:15px;font-weight:700">step</span>
+          <span class="quiet">шаг мастера: сделан, сейчас, впереди</span>
+        </div>
+        <div class="quiet" style="max-width:700px;margin-bottom:12px">Сейчас шаги первого запуска —
+          строки с капсулой «готово» или «сейчас», и всё содержимое шага висит под списком
+          отдельно. Шаг должен раскрываться на месте: сделанный сворачивается в одну строку
+          с тем, что выбрано, будущий — в серую строку с обещанием.</div>
+        <div class="panel" style="padding:0;overflow:hidden;max-width:640px">
+          <div style="padding:13px 16px;display:flex;gap:14px;align-items:center">
+            <span style="flex:0 0 24px;width:24px;height:24px;border-radius:50%;display:flex;
+              align-items:center;justify-content:center;background:var(--ok-soft);color:var(--ok)">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8.4 6.3 11.4 12.8 4.9"/></svg></span>
+            <div style="font-size:15px;font-weight:600">Почта</div>
+            <span class="note m">owner@example.org</span>
+          </div>
+          <div style="height:1px;background:var(--line2)"></div>
+          <div style="padding:13px 16px;display:flex;gap:14px;align-items:center;background:var(--panel)">
+            <span style="flex:0 0 24px;width:24px;height:24px;border-radius:50%;display:flex;
+              align-items:center;justify-content:center;font-size:11px;font-weight:700;
+              background:var(--accent);color:#fff">2</span>
+            <div style="font-size:15px;font-weight:600">Модель</div>
+            <span class="note">раскрыт</span>
+          </div>
+          <div style="height:1px;background:var(--line2)"></div>
+          <div style="padding:13px 16px;display:flex;gap:14px;align-items:center">
+            <span style="flex:0 0 24px;width:24px;height:24px;border-radius:50%;display:flex;
+              align-items:center;justify-content:center;font-size:11px;font-weight:700;
+              background:var(--sunk);color:var(--ink2)">3</span>
+            <div style="font-size:15px;font-weight:600;color:var(--ink2)">Ключ, которым всё закрыто</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">
+          <span class="m" style="font-size:15px;font-weight:700">chipset</span>
+          <span class="quiet">длинный ряд капсул с хвостом «ещё N»</span>
+        </div>
+        <div class="quiet" style="max-width:700px;margin-bottom:12px">Восемьдесят образцов круга
+          чтения и сорок девять одиночек графа — это не строки списка и не факты. Ряд капсул
+          показывает столько, сколько влезает в две строки, и честно говорит, сколько осталось.</div>
+        <div class="chips" style="max-width:660px">
+          <span class="chip m" style="background:var(--sunk);color:var(--ink2)">uptime</span>
+          <span class="chip m" style="background:var(--sunk);color:var(--ink2)">df</span>
+          <span class="chip m" style="background:var(--sunk);color:var(--ink2)">journalctl</span>
+          <span class="chip m" style="background:var(--sunk);color:var(--ink2)">docker ps</span>
+          <span class="chip m" style="background:var(--sunk);color:var(--ink2)">systemctl status</span>
+          <span class="chip m" style="background:var(--sunk);color:var(--ink2)">wg show</span>
+          <span class="chip" style="background:var(--accent-soft);color:var(--accent)">ещё 74</span>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">
+          <span class="m" style="font-size:15px;font-weight:700">crumb</span>
+          <span class="quiet">обратный путь в шапке вложенного экрана</span>
+        </div>
+        <div class="quiet" style="max-width:700px;margin-bottom:12px">У пятнадцати вкладок
+          настроек заголовок один и тот же — «Настройки», а где именно ты стоишь, видно только
+          по подсвеченному пункту меню, которого на телефоне нет. Строка «Настройки › Почта»
+          над заголовком стоит одну строку и всегда ведёт назад.</div>
+        <div class="crumb">Настройки<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6.2 4 4 4-4 4"/></svg>Почта</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-hd"><h2 style="font-size:15px">Требования к тому, что уже есть</h2><div class="rule"></div></div>
+    <div class="panel" style="padding:14px 18px 8px">
+      <table class="tbl">
+        <thead><tr><th style="width:24%">Что</th><th>Что нужно</th></tr></thead>
+        <tbody>
+          <tr><td class="m" style="font-weight:600;font-size:13px">select</td>
+            <td class="note">значение подписью, а не числом: «7 дней», «за 3 дня», «круглые сутки»,
+              «считать от „посмотреть“». Сейчас в форме стоят голые 7, 3, 90, 300 —
+              и к каждому нужен свой ярлык вроде «Хранить „Сделано“, дней».</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">rowgroup</td>
+            <td class="note">счётчик повторов у группы: «уведомления.счётчик ×13 с 11:54 до 11:58».
+              Иначе журнал агента — пятнадцать одинаковых строк, а журнал доступа — тридцать.</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">graph</td>
+            <td class="note">раскладка силами вместо колец; узел, закрытый для облачной модели,
+              рисуется бледным; выбранный узел открывает карточку рядом, а не уводит на другой
+              экран. Узлы без связей в граф не попадают — они идут строкой под ним.</td></tr>
+          <tr><td class="m" style="font-weight:600;font-size:13px">данные, не компонент</td>
+            <td class="note">строке модели нужен обратный факт «где она занята» — иначе
+              пятьдесят четыре одинаковые строки не отличить друг от друга. Строке роли —
+              сколько отказов у её модели за сутки. То и другое у сервера уже есть,
+              просто не доезжает до экрана.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+</x-dc>
+</body>
+</html>

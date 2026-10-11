@@ -1,0 +1,430 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{display:flex;flex-direction:column;gap:16px;padding:26px 28px 30px}
+  .cap{display:flex;flex-direction:column;gap:6px;max-width:1120px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em;line-height:1.2}
+  .cap p{margin:0;font-size:13px;line-height:1.5;color:#5B5849;max-width:1060px}
+  .cap b{font-weight:600;color:var(--ink)}
+
+  .pair{display:flex;gap:22px;align-items:flex-start}
+  .screen{width:1060px;flex:0 0 1060px;background:var(--paper);border:1px solid #D8D3C6;border-radius:14px;
+    overflow:hidden;box-shadow:0 8px 26px rgba(40,34,20,.10)}
+
+  .top{padding:18px 26px 0;display:flex;align-items:center;gap:16px}
+  .h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em}
+  .addr{font-size:11px;color:var(--ink3);padding:2px 7px;border-radius:5px;background:var(--sunk)}
+  .tabs{display:flex;gap:2px;padding:12px 26px 0;border-bottom:1px solid var(--line)}
+  .tab{height:34px;padding:0 13px;display:inline-flex;align-items:center;gap:6px;position:relative;top:1px;
+    font-size:13px;font-weight:600;color:var(--ink2);border-bottom:2px solid transparent}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+  .cols{display:flex}
+  .local{width:196px;flex:0 0 196px;border-right:1px solid var(--line2);padding:14px 9px 18px 18px;
+    display:flex;flex-direction:column;gap:1px}
+  .lcap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;padding:0 8px 5px}
+  .li{display:flex;align-items:center;gap:8px;height:31px;padding:0 10px;border-radius:8px;font-size:13px;color:var(--ink2)}
+  .li.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+  .li i{width:7px;height:7px;border-radius:50%;display:block;flex:0 0 7px;background:transparent}
+  .li .b{margin-left:auto;font-size:11px;color:var(--ink3)}
+
+  .content{flex:1 1 auto;min-width:0;padding:14px 26px 26px;display:flex;flex-direction:column;gap:16px}
+
+  .sticky-obj{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;
+    background:var(--panel);border:1px solid var(--line);box-shadow:var(--lift);position:relative}
+  .sticky-obj::after{content:'закреплён при прокрутке';position:absolute;right:12px;top:-9px;font-size:9px;
+    letter-spacing:.05em;background:var(--sunk);color:var(--ink3);padding:1px 6px;border-radius:4px}
+  .sticky-obj .av{width:26px;height:26px;border-radius:7px;background:#D93025;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 26px}
+  .sticky-obj .who{font-size:13px;font-weight:600}
+  .sticky-obj .meta{font-size:11px;color:var(--ink3)}
+  .sel{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 9px 0 11px;border-radius:7px;
+    border:1px solid var(--line);background:var(--panel);font-size:12px;font-weight:500;color:var(--ink)}
+  .sel .caret{color:var(--ink3);font-size:10px}
+
+  .subtabs{display:flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk);width:max-content}
+  .subtab{height:26px;padding:0 10px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink2);
+    display:inline-flex;align-items:center;gap:5px}
+  .subtab[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+  .subtab .w{color:var(--warn);font-weight:700}
+
+  .shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:11px;padding:11px 14px;
+    display:flex;align-items:center;gap:14px}
+  .shelf .txt{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .shelf .kick{font-size:10px;font-weight:700;color:var(--warn);letter-spacing:.05em}
+  .shelf .txt b{font-size:13px;font-weight:600}
+  .shelf .txt span{font-size:11px;color:var(--ink2);line-height:1.4}
+
+  .sec{display:flex;flex-direction:column}
+  .sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:5px}
+  .sec-hd h2{margin:0;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)}
+  .sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .sec-hd .n{font-size:11px;color:var(--ink3)}
+
+  .frow{display:flex;align-items:center;gap:11px;padding:8px 3px;border-bottom:1px solid var(--line2)}
+  .frow:last-child{border-bottom:0}
+  .frow .nm{font-size:13px;flex:0 0 260px;display:flex;align-items:center;gap:7px}
+  .frow .nm .m{font-size:12px}
+  .frow .why{flex:1 1 auto;font-size:11px;color:var(--ink3);line-height:1.4}
+  .tog{width:34px;height:19px;border-radius:10px;background:#CFCBC1;position:relative;flex:0 0 34px;display:block}
+  .tog i{position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;display:block;
+    box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .tog.on{background:var(--accent)} .tog.on i{left:17px}
+  .chip{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:5px;font-size:10px;font-weight:600}
+  .chip.warn{background:var(--warn-soft);color:var(--warn)}
+  .chip.ok{background:#E4F1E9;color:var(--ok)}
+
+  .srow{display:flex;align-items:flex-start;gap:16px;padding:10px 3px;border-bottom:1px solid var(--line2)}
+  .srow:last-child{border-bottom:0}
+  .srow .lab{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .srow .lab b{font-size:13px;font-weight:500;line-height:1.35}
+  .srow .lab span{font-size:11px;line-height:1.45;color:var(--ink3)}
+  .srow .ctl{flex:0 0 auto}
+  .step{display:inline-flex;align-items:center;height:28px;border:1px solid var(--line);border-radius:7px;
+    background:var(--panel);overflow:hidden}
+  .step b{font-size:12px;font-weight:600;padding:0 9px;min-width:64px;text-align:center}
+  .step u{width:25px;height:26px;display:inline-flex;align-items:center;justify-content:center;
+    color:var(--ink3);text-decoration:none;font-size:13px}
+  .step u:first-child{border-right:1px solid var(--line2)}
+  .step u:last-child{border-left:1px solid var(--line2)}
+
+  .shared{background:var(--sunk);border-radius:11px;padding:2px 14px 10px;border:1px dashed #D5D0C1}
+  .shared .hd{display:flex;align-items:center;gap:8px;padding:10px 0 4px}
+  .shared .hd b{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)}
+  .shared .hd span{font-size:11px;color:var(--ink3)}
+  .shared .srow{border-bottom-color:#DFDACB}
+  /* опасный блок: своя рамка и своя кнопка — не полоса сохранения */
+  .shared.danger{border:1px solid var(--alert);background:var(--alert-soft)}
+  .shared.danger .hd b{color:var(--alert)}
+  .btn.danger{background:var(--alert);color:#fff;border-color:var(--alert)}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:29px;padding:0 12px;
+    border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--accent);padding:0 6px}
+  .more{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--accent);padding:4px 0 0}
+
+  /* карта переезда */
+  .map{width:420px;flex:0 0 420px;background:var(--panel);border:1px solid #DDD8CA;border-radius:13px;
+    padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px}
+  .map h3{margin:0;font-size:13px;font-weight:700}
+  .map .lead{font-size:11px;line-height:1.5;color:#5B5849}
+  .mg{display:flex;flex-direction:column;gap:3px}
+  .mg .t{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent)}
+  .mg ul{margin:0;padding:0 0 0 14px}
+  .mg li{font-size:11px;line-height:1.5;color:var(--ink2)}
+  .mg li b{font-weight:600;color:var(--ink)}
+  .warnbox{background:var(--warn-soft);border-radius:8px;padding:9px 11px;font-size:11px;line-height:1.5;color:#6B4400}
+  .warnbox b{display:block;font-weight:700;margin-bottom:3px;color:var(--warn)}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">КАНАЛЫ → ПОЧТА · ВНУТРЕННЯЯ ВКЛАДКА «ПАПКИ И ХРАНЕНИЕ» · ЯЩИК owner@example.org</div>
+    <h1>Шесть внутренних вкладок, закреплённый ящик и утопленный блок «общее»</h1>
+    <p>Сегодня экран почты — одна лента на 886 узлов DOM и 88 КБ разметки: назначение ящика, ключи OAuth, SMTP,
+      шесть групп папок, двадцать восемь задач и настройки спама «одинаково для всех ящиков» идут подряд,
+      и <b>читателю не за что зацепиться, чей это параметр</b>. Разделяем на шесть вкладок по задаче человека.
+      Ящик, который правим, закреплён сверху и виден на любой вкладке — иначе через два экрана прокрутки
+      непонятно, чью папку выключаешь. <b>Пароли, OAuth и SMTP уходят в «Подключение» и «Отправку»</b> и
+      больше не соседствуют с бытовыми тумблерами.</p>
+  </div>
+
+  <div class="pair">
+  <div class="screen">
+    <div class="top">
+      <h1 class="h1">Настройки</h1>
+      <span class="addr m">#settings/channels/mail?box=owner@example.org&amp;tab=folders</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <span class="tab" role="tab" aria-selected="false">Главное</span>
+      <span class="tab" role="tab" aria-selected="true">Каналы</span>
+      <span class="tab" role="tab" aria-selected="false">Поведение</span>
+      <span class="tab" role="tab" aria-selected="false">Система</span>
+      <span class="tab" role="tab" aria-selected="false">Безопасность</span>
+    </div>
+
+    <div class="cols">
+      <nav class="local">
+        <div class="lcap">Каналы</div>
+        <div class="li on"><i style="background:var(--warn)"></i>Почта<span class="b">2</span></div>
+        <div class="li"><i></i>Telegram<span class="b">14</span></div>
+        <div class="li"><i></i>MAX<span class="b">93</span></div>
+        <div class="li"><i></i>Уведомления</div>
+        <div class="li"><i></i>Перевод</div>
+      </nav>
+
+      <div class="content">
+
+        <div class="sticky-obj">
+          <span class="av">O</span>
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <span class="who">owner@example.org</span>
+            <span class="meta m">личный · читает и наводит порядок · Google OAuth · 15 папок</span>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <span class="sel">Ящик: owner@example.org <span class="caret">▾</span></span>
+          </div>
+        </div>
+
+        <div class="subtabs" role="tablist">
+          <span class="subtab" role="tab" aria-selected="false">Ящики</span>
+          <span class="subtab" role="tab" aria-selected="false">Обработка</span>
+          <span class="subtab" role="tab" aria-selected="false">Подключение</span>
+          <span class="subtab" role="tab" aria-selected="false">Отправка</span>
+          <span class="subtab" role="tab" aria-selected="true">Папки и хранение <span class="w">5</span></span>
+          <span class="subtab" role="tab" aria-selected="false">Спам</span>
+        </div>
+
+        <div class="shelf">
+          <div class="txt">
+            <div class="kick">СТОИТ ПОСМОТРЕТЬ</div>
+            <b>Сёма разбирает 5 папок, где разбирать нечего</b>
+            <span>Из ярлыка Gmail перенести письмо нельзя — только потеряется пометка; корзину и черновики
+              Сёма и так не разбирает по существу.</span>
+          </div>
+          <span class="btn" style="margin-left:auto">Выключить все 5</span>
+        </div>
+
+        <div class="sec">
+          <div class="sec-hd"><h2>Куда Сёма складывает</h2><div class="rule"></div><span class="n">ящик owner@example.org</span></div>
+          <div class="srow">
+            <div class="lab"><b>Разобранное уносить в</b>
+              <span>«[Gmail]/Вся почта» — ярлык Gmail, а не папка: перенос в него ничего не делает</span></div>
+            <div class="ctl"><span class="sel m">[Gmail]/Вся почта <span class="caret">▾</span></span></div>
+          </div>
+          <div class="srow">
+            <div class="lab"><b>Спам уносить в</b>
+              <span>обычно находится сам по метке <span class="m">\Junk</span></span></div>
+            <div class="ctl"><span class="sel m">[Gmail]/Спам <span class="caret">▾</span></span></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-hd"><h2>Куда Сёма заходит</h2><div class="rule"></div><span class="n">15 папок · включено 10</span></div>
+
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">INBOX</span></div>
+            <div class="why">разбирает: судит, переносит, помечает прочитанным</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">Archive</span></div>
+            <div class="why">разбирает</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">Требуется ответ</span></div>
+            <div class="why">разбирает</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">Приоритетные</span></div>
+            <div class="why">разбирает</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">[Gmail]/Отправленные</span>
+            <span class="chip ok">на месте</span></div>
+            <div class="why">читает от старых к новым, ничего не переносит и не помечает — ваши ответы нужны памяти и поиску</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">[Gmail]/Корзина</span>
+            <span class="chip ok">решает не он</span></div>
+            <div class="why">удалили вы — Сёма читает на месте и ничего не трогает; копия остаётся у него</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">[Gmail]/Важное</span>
+            <span class="chip warn">ярлык, не папка</span></div>
+            <div class="why">перенести отсюда нельзя, только снимется пометка</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">[Gmail]/Помеченные</span>
+            <span class="chip warn">ярлык, не папка</span></div>
+            <div class="why">перенести отсюда нельзя, только снимется пометка</div></div>
+          <div class="frow"><div class="nm"><span class="tog on"><i></i></span><span class="m">[Gmail]/Черновики</span>
+            <span class="chip warn">неотправленное</span></div>
+            <div class="why">разбирать по существу нечего</div></div>
+          <div class="more">Показать ещё 6 папок · Notes, [Школа языка] Времена в английском, [Школа языка] Деловая переписка…</div>
+        </div>
+
+        <div class="shared">
+          <div class="hd"><b>Одинаково для всех ящиков</b><span>2 ящика · меняется сразу у обоих</span></div>
+          <div class="srow">
+            <div class="lab"><b>Стирать спам с почтового сервера через</b>
+              <span>стирается только с сервера: у Сёмы копия остаётся навсегда — письма из его архива не удаляются никогда</span></div>
+            <div class="ctl"><span class="step"><u>−</u><b class="m">15 дней</b><u>+</u></span></div>
+          </div>
+        </div>
+
+        <div class="shared danger">
+          <div class="hd"><b>Опасное · сохраняется отдельно</b><span>не полосой внизу, а своей кнопкой — чтобы не уехало вместе с остальным</span></div>
+          <div class="srow">
+            <div class="lab"><b>Стирать с почтового сервера и обычные письма</b>
+              <span>это ваша переписка, а не спам: включив, вы разрешаете Сёме удалять её с почтового сервера по сроку ниже; копия у Сёмы остаётся</span></div>
+            <div class="ctl"><span class="tog"><i></i></span></div>
+          </div>
+          <div class="srow">
+            <div class="lab"><b>Обычные письма стирать через</b>
+              <span>считается от даты письма; спам сюда не входит — у него свой срок выше</span></div>
+            <div class="ctl"><span class="step"><u>−</u><b class="m">30 дней</b><u>+</u></span></div>
+          </div>
+          <div class="srow" style="border:0;justify-content:flex-end;padding-top:8px"><span class="btn danger">Применить</span></div>
+        </div>
+
+        <div class="more">Дополнительно · перечитать вложения ящика, курсоры папок отправленных</div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="map">
+    <h3>Куда переехали все 28 настроек почты</h3>
+    <div class="lead">Проверено по живому экрану <span class="m">settings:mail</span> и
+      <span class="m">settings:mail@me@example.com</span>. Ни одна не исчезла.</div>
+
+    <div class="mg"><div class="t">Ящики</div><ul>
+      <li>список ящиков с назначением и режимом, «Добавить ящик», «Отключить ящик»</li>
+      <li><b>общее:</b> «Заходить в спам и корзину почтового сервера»</li>
+    </ul></div>
+
+    <div class="mg"><div class="t">Обработка</div><ul>
+      <li>Назначение · Что Сёма делает · Считать чеки и счета · Заводить уведомления из писем ·
+        Показывать облачной модели · Смотреть «Входящие» за</li>
+      <li><b>общее:</b> Что делать с готовым ответом · Кому Сёма вправе отвечать сам</li>
+    </ul></div>
+
+    <div class="mg"><div class="t">Подключение</div><ul>
+      <li>Тип авторизации · Client ID · Client secret · Логин · IMAP-хост · Пароль приложения ·
+        «Проверить подключение» · «Перечитать вложения ящика»</li>
+    </ul></div>
+
+    <div class="mg"><div class="t">Отправка</div><ul>
+      <li>SMTP-хост · Порт · STARTTLS · Логин · Пароль отправки</li>
+    </ul></div>
+
+    <div class="mg"><div class="t">Папки и хранение</div><ul>
+      <li>Разобранное уносить в · Спам уносить в · тумблеры 15 папок с пометкой, что это за папка</li>
+      <li><b>общее:</b> Стирать спам через · Стирать обычные письма · Обычные письма стирать через</li>
+    </ul></div>
+
+    <div class="mg"><div class="t">Спам</div><ul>
+      <li><b>всё общее:</b> Во «Входящих» только разрешённые · Не уносить в спам письма со счетами ·
+        Слова, по которым письмо похоже на счёт · Порог похожести на размеченные вами письма (90 %)</li>
+    </ul></div>
+
+    <div class="warnbox"><b>Что уехало из «Почты» совсем</b>
+      Три раздела задач — «Работают с каждым ящиком всегда» (7), «Подключены к этому ящику» (3) и
+      «Можно подключить» (18) — это 28 строк, половина экрана. Задачами управляют на экране «Задачи»;
+      здесь остаётся строка «Задачи, работающие с почтой — 10 включённых» со ссылкой.</div>
+  </div>
+  </div>
+
+  <div class="cap" style="padding-top:10px">
+    <div class="m kicker">ТА ЖЕ ПОЧТА · ВНУТРЕННЯЯ ВКЛАДКА «СПАМ»</div>
+    <h1>На «Спаме» закреплённый ящик исчезает — вместо него строка области действия</h1>
+    <p>Вкладка «Спам» целиком состоит из настроек, общих для всех ящиков. Оставить над ней закреплённый
+      <span class="m">owner@example.org</span> значило бы соврать: человек подумает, что правит порог
+      похожести для одного ящика. Поэтому на этой вкладке закреплённая полоса меняется на
+      <b>«Общее для всех ящиков · 2»</b>. Имя вкладки короткое — «Спам»: «Спам · для всех ящиков» не влезает
+      в полосу внутренних вкладок на 390 px.</p>
+  </div>
+
+  <div class="screen" style="width:1060px;flex:0 0 auto;align-self:flex-start">
+    <div class="top">
+      <h1 class="h1">Настройки</h1>
+      <span class="addr m">#settings/channels/mail?tab=spam</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <span class="tab" role="tab" aria-selected="false">Главное</span>
+      <span class="tab" role="tab" aria-selected="true">Каналы</span>
+      <span class="tab" role="tab" aria-selected="false">Поведение</span>
+      <span class="tab" role="tab" aria-selected="false">Система</span>
+      <span class="tab" role="tab" aria-selected="false">Безопасность</span>
+    </div>
+
+    <div class="cols">
+      <nav class="local">
+        <div class="lcap">Каналы</div>
+        <div class="li on"><i style="background:var(--warn)"></i>Почта<span class="b">2</span></div>
+        <div class="li"><i></i>Telegram<span class="b">14</span></div>
+        <div class="li"><i></i>MAX<span class="b">93</span></div>
+        <div class="li"><i></i>Уведомления</div>
+        <div class="li"><i></i>Перевод</div>
+      </nav>
+
+      <div class="content">
+
+        <div style="display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:10px;
+          background:var(--sunk);border:1px dashed #D5D0C1">
+          <span style="width:26px;height:26px;border-radius:7px;background:#DCD6C6;flex:0 0 26px;
+            display:flex;align-items:center;justify-content:center;color:var(--ink2)">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="2" y="4.5" width="16" height="11" rx="2"></rect><path d="M2.5 6l7.5 5 7.5-5"></path></svg>
+          </span>
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <span style="font-size:13px;font-weight:700">Общее для всех ящиков · 2</span>
+            <span style="font-size:11px;color:var(--ink3)">owner@example.org, me@example.com —
+              меняется сразу у обоих</span>
+          </div>
+        </div>
+
+        <div class="subtabs" role="tablist">
+          <span class="subtab" role="tab" aria-selected="false">Ящики</span>
+          <span class="subtab" role="tab" aria-selected="false">Обработка</span>
+          <span class="subtab" role="tab" aria-selected="false">Подключение</span>
+          <span class="subtab" role="tab" aria-selected="false">Отправка</span>
+          <span class="subtab" role="tab" aria-selected="false">Папки и хранение</span>
+          <span class="subtab" role="tab" aria-selected="true">Спам</span>
+        </div>
+
+        <div class="sec">
+          <div class="sec-hd"><h2>Кого пускать во «Входящие»</h2><div class="rule"></div></div>
+          <div class="srow">
+            <div class="lab"><b>Во «Входящих» — только те, кого вы разрешили</b>
+              <span>остальные считаются спамом и уходят в папку спама, минуя архив</span></div>
+            <div class="ctl"><span class="tog on"><i></i></span></div>
+          </div>
+          <div class="srow">
+            <div class="lab"><b>Порог похожести на размеченные вами письма</b>
+              <span>Сёма сравнивает новое письмо с теми, что вы сами отметили спамом и не спамом: совпало выше порога — решает так же и переносит сам, ниже — приносит вам на решение. Это похожесть двух писем, а не уверенность модели</span></div>
+            <div class="ctl"><span class="sel m">90 %</span></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-hd"><h2>Что спамом не считать</h2><div class="rule"></div></div>
+          <div class="srow">
+            <div class="lab"><b>Не уносить в спам письма со счетами</b>
+              <span>рассылка и квитанция приходят с одного адреса, а правило — про адрес</span></div>
+            <div class="ctl"><span class="tog on"><i></i></span></div>
+          </div>
+          <div class="srow">
+            <div class="lab"><b>Слова, по которым письмо похоже на счёт</b>
+              <span>через запятую; у каждого свои поставщики и свой язык счетов</span>
+              <div style="font-size:11px;color:var(--ink2);margin-top:3px">Сейчас 13 слов:
+                <span class="m">счёт, счет, квитанция, чек, к оплате, оплатить, оплата, задолженность,
+                invoice, receipt, payment…</span></div></div>
+            <div class="ctl"><span class="btn">Изменить</span></div>
+          </div>
+        </div>
+
+        <div class="more">Дополнительно · сроки стирания с сервера живут на вкладке «Папки и хранение»</div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

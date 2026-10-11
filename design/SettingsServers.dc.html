@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 1560px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .subitem .badge-count { font-size: 10px; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+    .setrow { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .setrow:last-child { border-bottom: none; }
+    .radio { width: 16px; height: 16px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.25); flex-shrink: 0; box-sizing: border-box; }
+    .radio-on { border: 5px solid #007AFF; background: #FFFFFF; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; }
+    .box { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 8px; }
+    .pick { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 12px; color: #1D1D1F; flex-shrink: 0; }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; }
+    .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 4px 6px 4px; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px"></span>
+        Все ящики
+        <span class="badge-count">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>
+        owner@example.org
+        <span class="badge-count">38</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FC3F1D; flex-shrink: 0"></span>
+        me@example.com
+        <span class="badge-count">23</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+      </div>
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 10:46
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; background: #F7F6F4; overflow: hidden; display: flex; justify-content: center">
+    <div style="width: 820px; display: flex; flex-direction: column; gap: 20px; padding: 28px 0">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">Настройки</div>
+        <div style="margin-left: auto; display: flex; height: 26px; border-radius: 7px; background: rgba(0,0,0,0.05); padding: 2px">
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Почта</span>
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Модели</span>
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Инструменты</span>
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Ключи и секреты</span>
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 500; color: #1D1D1F; background: #FFFFFF; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.12)">Серверы</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Серверы · ключ из хранилища, отпечаток запоминается при первом входе</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">prod-1</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32; flex-shrink: 0">связь есть</span></div>
+              <span class="meta">root@203.0.113.10:22 · ключ ssh:prod-1 · SHA256:k3Fz…9Qw</span>
+              <span class='meta' style='color: rgba(60,60,67,0.45)'>последняя команда: journalctl -u nginx -n 50 · чат «Серверы» · сегодня 11:40 · выполнена</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Проверить связь</a> <a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Журнал</a> <a href="#" style="font-size: 12px; color: #D70015; flex-shrink: 0">Удалить</a></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">db-2</span><span class="tag" style="background: rgba(255,59,48,0.14); color: #C4271C; flex-shrink: 0">отпечаток сменился</span></div>
+              <span class="meta">deploy@10.0.0.7:22 · ключ ssh:db-2 · SHA256:pL0a…2Xr → SHA256:Mn7c…8Bq</span>
+              <span class='meta' style='color: rgba(60,60,67,0.45)'>сервер переустановили? команды не выполняются, пока не примете новый отпечаток</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Принять новый отпечаток</a> <a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Журнал</a> <a href="#" style="font-size: 12px; color: #D70015; flex-shrink: 0">Удалить</a></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">backup-host</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75); flex-shrink: 0">новый</span></div>
+              <span class="meta">backup@backup.local:2222 · ключ ssh:backup · публичную часть на сервер ещё не добавили</span>
+              <span class='meta' style='color: rgba(60,60,67,0.45)'>ни разу не подключался · на сервере: echo "ssh-ed25519 AAAA…" &gt;&gt; ~/.ssh/authorized_keys</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Проверить связь</a> <a href="#" style="font-size: 12px; color: #D70015; flex-shrink: 0">Удалить</a></div>
+          </div>
+        </div>
+        <div class="meta" style="padding: 6px 4px 0 4px">Пароли для SSH не поддерживаются — только ключи из хранилища. Приватная часть не покидает Сёму: её берёт ядро по имени сервера, и каждое обращение видно в журнале ключа.</div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Ждут подтверждения · до нажатия на сервер ничего не уходит</div>
+        <div class="card">
+          <div class="setrow" style="background: rgba(255,149,0,0.05)">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-family: ui-monospace, Menlo, monospace; color: #1D1D1F">systemctl restart nginx</span><span class="tag" style="background: rgba(255,149,0,0.16); color: #C93400; flex-shrink: 0">ждёт подтверждения</span></div>
+              <span class="meta">prod-1 · просил чат «Серверы» · сегодня 11:41 · не из списка чтения</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0"><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #007AFF; color: #FFFFFF; font-size: 12px; font-weight: 600">Выполнить</div><a href="#" style="font-size: 12px; color: #007AFF">Выполнить и добавить в чтение</a><a href="#" style="font-size: 12px; color: #D70015">Отклонить</a></div>
+          </div>
+          <div class="setrow" style="background: rgba(255,149,0,0.05)">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-family: ui-monospace, Menlo, monospace; color: #1D1D1F">sudo apt autoremove -y</span><span class="tag" style="background: rgba(255,149,0,0.16); color: #C93400; flex-shrink: 0">ждёт подтверждения</span></div>
+              <span class="meta">prod-1 · просил модуль «Серверы» · задача «Уборка» · сегодня 03:00 · sudo всегда с подтверждением</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0"><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #007AFF; color: #FFFFFF; font-size: 12px; font-weight: 600">Выполнить</div><a href="#" style="font-size: 12px; color: #D70015">Отклонить</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Журнал · сегодня</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F; font-family: ui-monospace, Menlo, monospace; font-weight: 500">journalctl -u nginx -n 50</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32; flex-shrink: 0">выполнена</span></div>
+              <span class="meta">prod-1 · чат «Серверы» · 11:40 · код 0 · 0,8 с · 4,1 КБ</span>
+              
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Вывод</a></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F; font-family: ui-monospace, Menlo, monospace; font-weight: 500">df -h</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32; flex-shrink: 0">выполнена</span></div>
+              <span class="meta">prod-1 · модуль «Серверы» · задача «Проверка дисков» · 11:00 · код 0 · 0,3 с · 0,6 КБ</span>
+              
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Вывод</a></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F; font-family: ui-monospace, Menlo, monospace; font-weight: 500">cat /opt/app/.env</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32; flex-shrink: 0">выполнена</span></div>
+              <span class="meta">prod-1 · чат «Серверы» · 10:52 · код 0 · 2 строки скрыты маской password=</span>
+              
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF; flex-shrink: 0">Вывод</a></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F; font-family: ui-monospace, Menlo, monospace; font-weight: 500">rm -rf /var/lib/docker</span><span class="tag" style="background: rgba(255,59,48,0.14); color: #C4271C; flex-shrink: 0">отказ</span></div>
+              <span class="meta">db-2 · чат «Серверы» · 10:31 · из списка «никогда»</span>
+              
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Круги команд · правятся здесь, не в коде</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Только чтение — без вопроса</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32; flex-shrink: 0">чтение</span></div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap"><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">uptime</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">df</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">free</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">journalctl</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">tail</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">head</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">cat</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">ls</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">ps</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">top -b -n 1</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">docker ps</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">docker logs</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">systemctl status</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">ss</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">du</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">who</span><span class="tag" style="background: rgba(40,200,64,0.12); color: #1E7A32; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">uname</span><a href="#" style="font-size: 12px; color: #007AFF; align-self: center">+ добавить</a></div>
+              <span class="meta">команда из нескольких частей (| ; &amp;&amp;) выполняется без вопроса, только если каждая часть в этом списке</span>
+            </div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Никогда — отказ сразу</span><span class="tag" style="background: rgba(255,59,48,0.14); color: #C4271C; flex-shrink: 0">отказ</span></div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap"><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">rm -rf</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">mkfs</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">dd</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">shutdown</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">reboot</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">halt</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">poweroff</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">chmod -R 777</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">&gt; /dev/sd</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">sh -c</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">bash -c</span><span class="tag" style="background: rgba(255,59,48,0.10); color: #C4271C; padding: 4px 9px; font-family: ui-monospace, Menlo, monospace">eval</span><a href="#" style="font-size: 12px; color: #007AFF; align-self: center">+ добавить</a></div>
+              <span class="meta">всё остальное и любой sudo — подтверждение на каждую команду</span>
+            </div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Пределы</span>
+              <span class="meta">таймаут команды · предел вывода · вывод проходит маски секретов из «Памяти»</span>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center"><div class="pick" style="width: 90px; justify-content: space-between">60 с <span style="color: rgba(60,60,67,0.4)">▾</span></div><div class="pick" style="width: 110px; justify-content: space-between">20 000 симв. <span style="color: rgba(60,60,67,0.4)">▾</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Добавить сервер</div>
+        <div class="card">
+          <div class="setrow" style="align-items: flex-start; flex-direction: column; gap: 10px">
+            <div style="display: flex; gap: 8px; width: 100%">
+              <div class="pick" style="width: 150px">Имя, например web-3</div>
+              <div class="pick" style="flex: 1">адрес или хост</div>
+              <div class="pick" style="width: 70px">22</div>
+              <div class="pick" style="width: 120px">пользователь</div>
+              <div class="pick" style="width: 190px; justify-content: space-between">ssh:prod-1 <span style="color: rgba(60,60,67,0.4)">▾</span></div>
+            </div>
+            <span class="meta">Ключ выбирается из хранилища; нового ключа нет — сгенерируйте его на вкладке «Ключи и секреты» и добавьте публичную часть на сервер.</span>
+            <div style="display: flex; align-items: center; height: 28px; padding: 0 13px; border-radius: 7px; background: #007AFF; color: #FFFFFF; font-size: 12px; font-weight: 600">Добавить и проверить связь</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

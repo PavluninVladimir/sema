@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{display:flex;flex-direction:column;gap:16px;padding:26px 28px 30px}
+  .cap{display:flex;flex-direction:column;gap:6px;max-width:1100px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em;line-height:1.2}
+  .cap p{margin:0;font-size:13px;line-height:1.5;color:#5B5849;max-width:1040px}
+  .cap b{font-weight:600;color:var(--ink)}
+
+  .pair{display:flex;gap:22px;align-items:flex-start}
+
+  .screen{width:760px;flex:0 0 760px;background:var(--paper);border:1px solid #D8D3C6;border-radius:14px;
+    overflow:hidden;box-shadow:0 8px 26px rgba(40,34,20,.10);position:relative;height:1040px}
+  .scr-hd{padding:16px 22px 10px;border-bottom:1px solid var(--line)}
+  .scr-hd h1{margin:0;font-size:20px;font-weight:700}
+  .scr-hd .sub{font-size:11px;color:var(--ink3);margin-top:3px}
+  .scr-body{padding:14px 22px 0}
+
+  .shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:11px;overflow:hidden;margin-bottom:14px}
+  .shelf .hd{padding:9px 13px 7px;font-size:11px;font-weight:700;color:var(--warn);letter-spacing:.04em}
+  .sit{padding:9px 13px;border-top:1px solid var(--shelf-line)}
+  .sit b{display:block;font-size:13px;font-weight:600;line-height:1.3}
+  .sit span{display:block;font-size:11px;line-height:1.45;color:var(--ink2);margin-top:2px}
+
+  .sechd{font-size:12px;font-weight:700;padding:8px 0 6px;border-bottom:1px solid var(--line)}
+  .rr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line2)}
+  .rr .n{flex:1 1 auto;min-width:0}
+  .rr .n b{font-size:13px;font-weight:600;display:block}
+  .rr .n span{font-size:11px;color:var(--ink3);display:block;line-height:1.35;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dd{height:28px;border:1px solid var(--line);border-radius:7px;background:var(--panel);display:flex;
+    align-items:center;padding:0 8px;font-size:11px;gap:5px;flex:0 0 auto}
+  .dd .cv{color:var(--ink3);font-size:9px;margin-left:auto}
+  .dd.w1{width:160px} .dd.w2{width:150px} .dd.w3{width:56px}
+
+  .mrow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line2)}
+  .mrow .nm{font-size:12px;flex:0 0 200px}
+  .mrow .fx{flex:1 1 auto;font-size:10px;color:var(--ink3);line-height:1.35;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .mrow .tg{width:32px;height:18px;border-radius:9px;background:#CFCBC1;position:relative;flex:0 0 32px}
+  .mrow .tg i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;display:block}
+  .mrow .tg.on{background:var(--accent)} .mrow .tg.on i{left:16px}
+  .mrow .bt{height:24px;padding:0 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel);
+    font-size:11px;font-weight:600;display:inline-flex;align-items:center;flex:0 0 auto}
+
+  .fade{position:absolute;left:0;right:0;bottom:0;height:160px;
+    background:linear-gradient(180deg,rgba(251,250,247,0),var(--paper) 62%);display:flex;
+    align-items:flex-end;justify-content:center;padding-bottom:16px}
+  .fade span{font-size:11px;font-weight:600;color:var(--ink3);background:var(--sunk);padding:5px 11px;border-radius:7px}
+
+  .flag{position:absolute;z-index:6;background:var(--alert);color:#fff;font-size:10px;font-weight:700;
+    border-radius:5px;padding:2px 6px;box-shadow:0 2px 6px rgba(0,0,0,.22);white-space:nowrap}
+  .rule{position:absolute;left:0;right:0;border-top:1.5px dashed var(--alert);z-index:5}
+
+  /* замеры */
+  .meas{width:420px;flex:0 0 420px;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--panel);border:1px solid #DDD8CA;border-radius:13px;padding:15px 17px}
+  .card h3{margin:0 0 9px;font-size:13px;font-weight:700}
+  .card .how{font-size:11px;line-height:1.5;color:#5B5849;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:10px;font-weight:700;letter-spacing:.03em;color:var(--ink3);text-align:left;padding:0 6px 6px;text-transform:uppercase}
+  th.num,td.num{text-align:right}
+  td{padding:6px;border-top:1px solid var(--line2);font-size:12px;vertical-align:baseline}
+  td.nm{font-size:12px}
+  td.num{font-size:12px}
+  tr.hot td{background:var(--alert-soft)}
+  tr.hot td:first-child{border-radius:6px 0 0 6px} tr.hot td:last-child{border-radius:0 6px 6px 0}
+
+  .bads{display:flex;flex-direction:column;gap:9px}
+  .bad{display:flex;gap:10px;align-items:flex-start}
+  .bad .num{flex:0 0 30px;font-size:20px;font-weight:700;line-height:1;color:var(--alert)}
+  .bad .tx{flex:1 1 auto}
+  .bad .tx b{display:block;font-size:12px;font-weight:700;margin-bottom:2px}
+  .bad .tx span{font-size:11px;line-height:1.5;color:#5B5849}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">КАК СЕЙЧАС · ЭКРАН «МОДЕЛИ И РОЛИ» · ЗАМЕРЕНО НА ЖИВОМ СЕРВЕРЕ 11.09.2026</div>
+    <h1>Замер прежде правки: 3 597 узлов, 319 КБ и четыре замечания без единой кнопки</h1>
+    <p>Слева — что видит человек, открыв <span class="m">Настройки → Модели и роли</span> на широком экране;
+      показаны первые полтора экрана из шести. Первый экран целиком занят замечаниями, <b>ни у одного из
+      которых нет действия</b> — вместо кнопки в тексте написано «выберите другую в строке роли ниже».
+      Ниже девять ролей, у каждой три безымянных выпадающих списка, и <b>в каждом лежат все 54 модели</b>.
+      Ещё ниже — те же 54 модели строками, из них 50 одинаковых от Perplexity. Справа — замеры всех
+      экранов настроек, снятые <span class="m">curl</span> с того же сервера.</p>
+  </div>
+
+  <div class="pair">
+
+    <div class="screen">
+      <div class="rule" style="top:396px"></div>
+      <div class="flag" style="right:12px;top:381px">первый экран кончился здесь</div>
+      <div class="flag" style="left:200px;top:56px">ни одной кнопки на четыре беды</div>
+      <div class="flag" style="right:12px;top:487px">три списка без подписей</div>
+      <div class="flag" style="right:12px;top:806px">54 строки, из них 50 одинаковых</div>
+
+      <div class="scr-hd">
+        <h1>Модели и роли</h1>
+        <div class="sub">54 модели у 3 провайдеров · 9 ролей · отправок за сутки 916</div>
+      </div>
+
+      <div class="scr-body">
+        <div class="shelf">
+          <div class="hd">СТОИТ ПОСМОТРЕТЬ · 4 ЗАМЕЧАНИЯ</div>
+          <div class="sit"><b>DeepseekPro не тянет роль «Чаты»</b>
+            <span>Сёма не отдал это недоверенной модели: секретное не отдаётся недоверенной модели
+              (номер прошёл контрольную сумму ИНН и рядом стоит подсказка). Назначьте доверенную…</span></div>
+          <div class="sit"><b>claude-fable-5-1 не тянет роль «Арбитр»</b>
+            <span>нет связи с сетью — вопрос остался, повторите, когда связь вернётся · запасной у неё нет —
+              работа просто не делается</span></div>
+          <div class="sit"><b>У роли «Эмбеддинги» модели нет в списке</b>
+            <span>основная text-embedding-bge-m3 — такой модели среди подключённых больше нет. Обращение к ней
+              кончится отказом; выберите другую в строке роли ниже</span></div>
+          <div class="sit"><b>У 50 моделей не названа цена</b>
+            <span>их расход на «Здоровье» и в бюджетах считается нулём. Цена задаётся в строке модели ниже;
+              сам Сёма ничего не подставит — вёрстка страницы цен ничего не обещает</span></div>
+        </div>
+
+        <div class="sechd">Роли · кто именно отвечает, когда Сёме нужна модель</div>
+
+        <div class="rr"><div class="n"><b>Фильтр писем</b><span>Решает, спам ли письмо — работает на каждом новом письме · ещё не спрашивали</span></div>
+          <span class="dd w1 m">deepseek-flash · DeepSeek<span class="cv">▾</span></span>
+          <span class="dd w2 m">qwen3 · на этой машине<span class="cv">▾</span></span>
+          <span class="dd w3 m">120<span class="cv">▾</span></span></div>
+
+        <div class="rr"><div class="n"><b>Чтение картинок</b><span>Фото и скриншоты чеков · ещё не спрашивали</span></div>
+          <span class="dd w1 m">gemini-3.8-flash · Perpl…<span class="cv">▾</span></span>
+          <span class="dd w2 m">нет<span class="cv">▾</span></span>
+          <span class="dd w3 m">60<span class="cv">▾</span></span></div>
+
+        <div class="rr"><div class="n"><b>Чаты</b><span>Ответы по письмам и файлам · последний раз ответил deepseek-flash · 11.09 09:00</span></div>
+          <span class="dd w1 m">deepseek-flash · DeepSeek<span class="cv">▾</span></span>
+          <span class="dd w2 m">gpt-5.6-sol · Perplexity<span class="cv">▾</span></span>
+          <span class="dd w3 m">300<span class="cv">▾</span></span></div>
+
+        <div class="rr"><div class="n"><b>Память</b><span>Извлекает факты и граф из сессий, сводит дубли, сжимает эпизоды — по расписанию</span></div>
+          <span class="dd w1 m">gpt-5.6-luna · Perplexity<span class="cv">▾</span></span>
+          <span class="dd w2 m">deepseek-flash · DeepSeek<span class="cv">▾</span></span>
+          <span class="dd w3 m">300<span class="cv">▾</span></span></div>
+
+        <div class="rr"><div class="n"><b>Модули</b><span>последний раз ответил deepseek-flash · 11.09 10:34</span></div>
+          <span class="dd w1 m">deepseek-flash · DeepSeek<span class="cv">▾</span></span>
+          <span class="dd w2 m">нет<span class="cv">▾</span></span>
+          <span class="dd w3 m">120<span class="cv">▾</span></span></div>
+
+        <div class="rr"><div class="n"><b>Поиск</b><span>Ищет в интернете — нужна модель, которая ходит в сеть (Perplexity, поисковый режим…)</span></div>
+          <span class="dd w1 m">gpt-5.6-luna · Perplexity<span class="cv">▾</span></span>
+          <span class="dd w2 m">нет<span class="cv">▾</span></span>
+          <span class="dd w3 m">120<span class="cv">▾</span></span></div>
+
+        <div style="font-size:11px;color:var(--ink3);padding:8px 0 10px;line-height:1.45">
+          Ещё 3 роли: Арбитр · Судья · Перевод. Три списка в строке — основная модель, запасная и сколько
+          секунд ждём ответа. Не ответила основная — работу доделает запасная.</div>
+
+        <div class="sechd">Модели · 54</div>
+        <div style="font-size:11px;color:var(--ink3);padding:7px 0 4px">Perplexity · 50 моделей</div>
+
+        <div class="mrow"><span class="nm m">anthropic/claude-fable-5</span>
+          <span class="fx">Адрес: api.perplexity.ai; Поиск: ходит в сеть; Видит: только обычное; Занята: не занята; Цена: не задана</span>
+          <span class="tg on"><i></i></span><span class="bt">Проверить</span></div>
+        <div class="mrow"><span class="nm m">anthropic/claude-fable-5-1</span>
+          <span class="fx">Адрес: api.perplexity.ai; Поиск: ходит в сеть; Видит: только обычное; Занята: «Арбитр»; Цена: не задана</span>
+          <span class="tg on"><i></i></span><span class="bt">Проверить</span></div>
+        <div class="mrow"><span class="nm m">anthropic/claude-haiku-4-5</span>
+          <span class="fx">Адрес: api.perplexity.ai; Поиск: ходит в сеть; Видит: только обычное; Занята: не занята; Цена: не задана</span>
+          <span class="tg on"><i></i></span><span class="bt">Проверить</span></div>
+        <div class="mrow"><span class="nm m">anthropic/claude-opus-4-5</span>
+          <span class="fx">Адрес: api.perplexity.ai; Поиск: ходит в сеть; Видит: только обычное; Занята: не занята; Цена: не задана</span>
+          <span class="tg on"><i></i></span><span class="bt">Проверить</span></div>
+        <div class="mrow"><span class="nm m">anthropic/claude-opus-4-6</span>
+          <span class="fx">Адрес: api.perplexity.ai; Поиск: ходит в сеть; Видит: только обычное; Занята: не занята; Цена: не задана</span>
+          <span class="tg on"><i></i></span><span class="bt">Проверить</span></div>
+        <div class="mrow"><span class="nm m">anthropic/claude-opus-4-7</span>
+          <span class="fx">Адрес: api.perplexity.ai; Поиск: ходит в сеть; Видит: только обычное; Занята: не занята; Цена: не задана</span>
+          <span class="tg on"><i></i></span><span class="bt">Проверить</span></div>
+      </div>
+
+      <div class="fade"><span>…и ещё 44 такие же строки, потом DeepSeek, потом форма «Подключить провайдера»</span></div>
+    </div>
+
+    <div class="meas">
+      <div class="card">
+        <h3>Замеры экранов настроек</h3>
+        <div class="how">Разметка, которую сервер отдаёт веб-клиенту:
+          <span class="m">curl -H 'HX-Request: true' https://sema.local:8443/ui?screen=…</span>
+          Узлы — число открывающих тегов, вес — байты ответа. Экраны на телефоне мерил человек в браузере.</div>
+        <table>
+          <tr><th>Экран</th><th class="num">Узлов</th><th class="num">Вес</th><th class="num">Экранов<br>на 390 px</th></tr>
+          <tr class="hot"><td class="nm">Модели и роли</td><td class="num m">3 597</td><td class="num m">319 КБ</td><td class="num m">≈6</td></tr>
+          <tr class="hot"><td class="nm">Telegram</td><td class="num m">1 487</td><td class="num m">154 КБ</td><td class="num m">—</td></tr>
+          <tr><td class="nm">Серверы</td><td class="num m">1 142</td><td class="num m">75 КБ</td><td class="num m">—</td></tr>
+          <tr class="hot"><td class="nm">Почта</td><td class="num m">886</td><td class="num m">88 КБ</td><td class="num m">&gt;11</td></tr>
+          <tr><td class="nm">Доступ</td><td class="num m">626</td><td class="num m">58 КБ</td><td class="num m">&gt;7</td></tr>
+          <tr><td class="nm">Уведомления</td><td class="num m">471</td><td class="num m">44 КБ</td><td class="num m">5</td></tr>
+          <tr><td class="nm">Обзор настроек</td><td class="num m">392</td><td class="num m">34 КБ</td><td class="num m">3</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Откуда берутся 3 597 узлов</h3>
+        <div class="bads">
+          <div class="bad"><span class="num">1458</span><div class="tx"><b>элементов &lt;option&gt; в ролях</b>
+            <span>9 ролей × 3 списка × 54 модели. Ни один из них человек не откроет — а приезжают все, на каждом
+              обновлении экрана.</span></div></div>
+          <div class="bad"><span class="num">50</span><div class="tx"><b>одинаковых строк Perplexity</b>
+            <span>«Agent API: сама ходит в сеть и приносит ссылки · Адрес: api.perplexity.ai · Поиск: ходит в
+              сеть · Видит: только обычное · Цена: не задана» — отличается только имя модели.</span></div></div>
+          <div class="bad"><span class="num">4</span><div class="tx"><b>замечания без действия</b>
+            <span>Занимают весь первый экран. Текст говорит «выберите другую в строке роли ниже» — то есть
+              работу по поиску нужного поля перекладывают на человека.</span></div></div>
+          <div class="bad"><span class="num">17</span><div class="tx"><b>ссылок на настройки в боковом меню</b>
+            <span>Разложены на четыре группы: «Каналы», «Что Сёма умеет», «Где Сёма работает», «Кто что видит».
+              Меню — не место для оглавления настроек: оно про то, куда ходят каждый день.</span></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

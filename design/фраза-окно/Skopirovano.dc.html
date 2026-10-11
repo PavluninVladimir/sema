@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .э { font-family: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .м { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+</helmet>
+
+<!-- После «Скопировать». Кнопка не просто говорит «готово», а показывает
+     обратный счёт очистки буфера: обещание, которое видно, как выполняется.
+     Закрыть окно можно и до конца счёта — очистка живёт отдельно от окна. -->
+
+<div class="э" style="width: 760px; height: 520px; background: #FBFAF7; color: #17181C; font-size: 15px; line-height: 1.45; position: relative; overflow: hidden;">
+
+  <div style="position: absolute; inset: 0; padding: 22px 26px; filter: blur(1.5px); opacity: 0.5;">
+    <div style="font-size: 20px; font-weight: 700;">Доступ</div>
+    <div style="font-size: 11px; color: #686B74; margin-top: 3px;">Вход по ключу устройства — пароля нет вовсе</div>
+    <div style="margin-top: 18px; font-size: 11px; color: #686B74; font-weight: 600; letter-spacing: .02em;">ФРАЗА ВХОДА · ЗАПАСНОЙ ПУТЬ</div>
+    <div style="margin-top: 8px; height: 58px; background: #EFEDE6; border-radius: 10px;"></div>
+    <div style="margin-top: 14px; height: 58px; background: #EFEDE6; border-radius: 10px;"></div>
+  </div>
+  <div style="position: absolute; inset: 0; background: rgba(23,24,28,0.42);"></div>
+
+  <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 468px; background: #FBFAF7; border-radius: 14px; box-shadow: 0 18px 48px rgba(24,20,12,0.28); overflow: hidden;">
+
+    <div style="padding: 20px 22px 0;">
+      <div style="font-size: 20px; font-weight: 700; line-height: 1.2;">Фраза входа заведена</div>
+      <div style="font-size: 13px; color: #585B64; margin-top: 6px;">
+        Показывается один раз. Второго способа узнать её нет — потеряете, придётся заводить новую.
+      </div>
+    </div>
+
+    <div style="margin: 16px 22px 0; background: #EFEDE6; border-radius: 10px; padding: 16px 18px;">
+      <div class="м" style="font-size: 17px; font-weight: 600; letter-spacing: .01em; line-height: 1.6; word-break: break-all; user-select: all;">k7m3-q9p2-wx4r-h8tn-2vce-m6ja-u5df</div>
+    </div>
+
+    <!-- то же место, что занимала жёлтая строка про буфер: теперь она
+         зелёная и отсчитывает. Место не прыгает -->
+    <div style="margin: 12px 22px 0; display: flex; gap: 8px; align-items: flex-start;">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#2E7D4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 15px; margin-top: 2px;"><path d="M3 8.5l3.2 3L13 4.5"/></svg>
+      <div style="font-size: 12px; color: #2E7D4F; line-height: 1.5;">
+        В буфере. Очистим через <span class="м" style="font-weight: 600;">14 с</span> — вставьте, куда собирались, сейчас.
+      </div>
+    </div>
+
+    <div style="margin-top: 18px; padding: 14px 22px; border-top: 1px solid #E3E0D8; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="font-size: 11px; color: #686B74;">на экране ещё 2:31</div>
+      <div style="display: flex; gap: 8px;">
+        <button style="height: 32px; padding: 0 14px; border-radius: 8px; border: 1px solid #D6D2C8; background: none; font: inherit; font-size: 13px; cursor: pointer;">Скопировать ещё раз</button>
+        <button style="height: 32px; padding: 0 14px; border-radius: 8px; border: 0; background: #1F4FD8; color: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;">Готово</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{padding:30px 32px 36px;display:flex;flex-direction:column;gap:22px;width:1660px}
+  .cap{display:flex;flex-direction:column;gap:6px;max-width:1180px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em;line-height:1.2}
+  .cap p{margin:0;font-size:13px;line-height:1.5;color:#5B5849;max-width:1180px}
+  .cap b{font-weight:600;color:var(--ink)}
+
+  .grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;align-items:start}
+  .col{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px 15px 16px;
+    display:flex;flex-direction:column;gap:12px;box-shadow:var(--lift)}
+  .col>.t{display:flex;align-items:baseline;gap:8px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+  .col>.t b{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .col>.t span{font-size:10px;color:var(--ink3);margin-left:auto}
+
+  .sec{display:flex;flex-direction:column;gap:4px}
+  .sec .h{display:flex;align-items:center;gap:6px}
+  .sec .h b{font-size:12px;font-weight:700}
+  .sec .h i{width:6px;height:6px;border-radius:50%;display:block;background:var(--accent)}
+  .sec .h .new{font-size:9px;font-weight:700;letter-spacing:.04em;background:var(--accent-soft);
+    color:var(--accent);border-radius:4px;padding:1px 5px}
+  .sec .src{font-size:10px;color:var(--ink3);line-height:1.4}
+  .sec ul{margin:2px 0 0;padding:0 0 0 13px}
+  .sec li{font-size:11px;line-height:1.5;color:var(--ink2)}
+  .sec li b{font-weight:600;color:var(--ink)}
+  .sec li.moved{color:var(--accent)}
+  .sec li.common::marker{color:var(--warn)}
+  .sec li.common{color:#7A5A14}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--ink2)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:9px;height:9px;border-radius:2px;display:block}
+
+  .out{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:13px;padding:16px 18px;
+    display:flex;flex-direction:column;gap:11px}
+  .out h3{margin:0;font-size:14px;font-weight:700;color:var(--warn)}
+  .outgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .oit{display:flex;flex-direction:column;gap:3px}
+  .oit b{font-size:12px;font-weight:700}
+  .oit span{font-size:11px;line-height:1.5;color:#5B5849}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">КАРТА ПЕРЕЕЗДА · 17 НЫНЕШНИХ ЭКРАНОВ → 5 ВКЛАДОК · СВЕРЕНО ПО ЖИВЫМ ЭКРАНАМ 11.09.2026</div>
+    <h1>Где что оказалось и что уехало из настроек совсем</h1>
+    <p>Доска нужна для одной проверки: <b>ни одна существующая настройка не должна исчезнуть</b>.
+      Столбцы — пять постоянных вкладок, внутри — разделы левой колонки и их содержимое.
+      Синим помечено то, что переехало из чужого раздела; жёлтым — настройки, общие для всех объектов
+      (их видно отдельным блоком, чтобы не принять за настройку одного ящика или одного сервера).</p>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--accent)"></i>переехало из другого раздела</span>
+    <span><i style="background:var(--warn)"></i>общее для всех объектов раздела</span>
+    <span><i style="background:var(--ink3)"></i>внутренние вкладки раздела перечислены строкой «вкладки:»</span>
+  </div>
+
+  <div class="grid">
+
+    <div class="col">
+      <div class="t"><b>Главное</b><span>новое</span></div>
+      <div class="sec"><div class="h"><b>Ждут решения</b><span class="new">НОВОЕ</span></div>
+        <div class="src">собирается из полок «Стоит посмотреть» всех разделов</div>
+        <ul><li>сломанная роль, отсутствующая модель</li><li>сервер не отвечает</li>
+          <li>забытые входы</li><li>у каждой строки ровно одна кнопка</li></ul></div>
+      <div class="sec"><div class="h"><b>Подключения</b><span class="new">НОВОЕ</span></div>
+        <ul><li>Почта · Мессенджеры · Модели · Серверы · Хранилища</li>
+          <li>пять бумажных строк: точка состояния, фраза, факты парами</li></ul></div>
+      <div class="sec"><div class="h"><b>Последняя активность</b><span class="new">НОВОЕ</span></div>
+        <div class="src">журнал доступа + журнал секретов + решения по скиллам</div>
+        <ul><li>обещает ровно то, что известно</li>
+          <li>настоящий аудит настроек (кто, когда, параметр, старое и новое значение;
+            значения секретов не пишутся) — отдельный последний этап</li></ul></div>
+      <div class="sec"><div class="h"><b>Поиск по настройкам</b><span class="new">НОВОЕ</span></div>
+        <ul><li>живёт в шапке на всех вкладках</li>
+          <li>показывает путь: «Безопасность → Доверенная сеть → Частная сеть»</li>
+          <li>слова-приметы уже есть в меню (поле <span class="m">words</span>)</li></ul></div>
+    </div>
+
+    <div class="col">
+      <div class="t"><b>Каналы</b><span>5 разделов</span></div>
+
+      <div class="sec"><div class="h"><b>Почта</b></div>
+        <div class="src">вкладки: Ящики · Обработка · Подключение · Отправка · Папки и хранение · Спам</div>
+        <ul>
+          <li>ящики, назначение, режим, чеки, уведомления, облачная модель</li>
+          <li><b>Подключение:</b> тип авторизации, Client ID/secret, логин, IMAP-хост, пароль приложения</li>
+          <li><b>Отправка:</b> SMTP-хост, порт, STARTTLS, логин, пароль отправки</li>
+          <li>папка архива, папка спама, тумблеры 15 папок</li>
+          <li class="common">общее: срок спама на сервере, срок обычных писем, заходить в спам и корзину</li>
+          <li class="common">вкладка «Спам» вся общая: только разрешённые отправители, слова счетов,
+            порог похожести на размеченные письма (90 %) — на ней закреплённый ящик меняется на строку «Общее для всех ящиков · 2»</li>
+          <li class="common">общее: что делать с готовым ответом, кому отвечать самому</li>
+        </ul></div>
+
+      <div class="sec"><div class="h"><b>Telegram</b></div>
+        <div class="src">вкладки: Аккаунт · Собеседники · Ключи приложения</div>
+        <ul><li>api_id / api_hash, вход телефоном, 14 чатов, права по чату (7 тумблеров), топики,
+          админ-чат, пределы обращений</li></ul></div>
+
+      <div class="sec"><div class="h"><b>MAX</b></div>
+        <ul><li>аккаунт, 93 чата, 4 права по чату, отправка от вашего имени</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Уведомления</b></div>
+        <div class="src">вкладки: Каналы доставки · Правила · Хранение · Проверка доставки</div>
+        <ul><li>каналы mac / web, устройства с пушами, счётчик в меню</li>
+          <li>4 правила писем, «на сколько откладывать», хранить «Сделано» 90 дней</li>
+          <li>«не доставлено 22 из 324» — отдельной вкладкой</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Перевод</b></div>
+        <ul><li>переводить письма сам, язык, свой язык, 4 000 знаков, «сделано / ждут 500»</li></ul></div>
+    </div>
+
+    <div class="col">
+      <div class="t"><b>Поведение</b><span>4 раздела</span></div>
+
+      <div class="sec"><div class="h"><b>Модели и роли</b></div>
+        <div class="src">вкладки: Роли · Модели · Провайдеры и цены · Проблемы</div>
+        <ul><li>9 ролей — ровно столько, сколько их есть: основная, запасная, тайм-аут подписанными полями</li>
+          <li class="moved">«Модели → Служебные модели»: эмбеддер, доверие эмбеддеру, картинка без
+            распознанного текста — из «Инструментов»</li>
+          <li>54 модели, доверие, поиск в сети, цена, часы пик</li>
+          <li><b>один общий поисковый popup</b> на все строки — в разметке списка моделей нет вовсе</li>
+          <li>подключить провайдера, обновить список, предел ответа</li>
+          <li class="moved">«Последние отказы» и 4 замечания — на вкладку «Проблемы» со счётчиком</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Поиск</b></div>
+        <ul><li>4 темы новостей, помнить ссылки 90 дней, сохранять страниц 0</li>
+          <li>подсказка «роли Поиск нужна модель, ходящая в сеть» — со ссылкой на роль</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Скиллы</b></div>
+        <ul><li>6 скиллов по блокам, тумблеры, «Открыть», «Скопировать»</li>
+          <li>добавить скилл: имя, название, блок, приметы, когда применять, текст</li>
+          <li>предел 3 000 токенов на скиллы в запросе</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Развитие</b></div>
+        <ul><li>черновики, ждущие решения; польза скиллов; решённое за неделю</li>
+          <li>писать скиллы самому, судья, 3 предложения в сутки, порог непростоты 5 очков</li></ul></div>
+    </div>
+
+    <div class="col">
+      <div class="t"><b>Система</b><span>6 разделов</span></div>
+
+      <div class="sec"><div class="h"><b>Серверы</b></div>
+        <ul><li>5 машин, адрес, ключ, род, «без sudo», «Проверить связь», журнал</li>
+          <li>сам решает: окно 02:00–04:00, потолок в час, пауза, стоп-кран</li>
+          <li class="common">общее: три круга команд, тайм-ауты чтения и подтверждённой команды, предел вывода</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Агенты</b></div>
+        <ul><li>агент «мак», 3 способности тумблерами, «Позвать агента»</li>
+          <li>где слушать <span class="m">0.0.0.0:8766</span>, отпечаток удостоверяющего центра</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Интеграции</b></div>
+        <ul><li>серверы MCP (1), круги вызовов, добавить сервер</li>
+          <li>трекеры задач (0), добавить трекер: переходник, отбор, частота</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Хранилища</b></div>
+        <ul><li>где лежат файлы (2), S3 и Яндекс.Диск, «Проверить»</li>
+          <li>источники файлов (7), наблюдаемые папки, переезд файлов</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Инструменты</b></div>
+        <ul><li>OCR, PDF, коды на картинках, офисные файлы, песочница, IMAP</li>
+          <li>«Перечитать 40 файлов без текста»</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Работа Сёмы</b><span class="new">НОВОЕ</span></div>
+        <div class="src">переехало из «Уведомлений», где лежало между правилами писем</div>
+        <ul><li class="moved">провод: ждать клиента 10 с, проводов на устройство 8, окно склейки 300 мс</li>
+          <li class="moved">опрос экрана: без провода 4 с, при живом проводе 60 с</li>
+          <li class="moved">чаты команд живут 24 ч, пинать через 5 мин, пинков 3, хвост ветки 12 реплик</li>
+          <li class="moved">часовой пояс <span class="m">Europe/Moscow</span></li></ul></div>
+    </div>
+
+    <div class="col">
+      <div class="t"><b>Безопасность</b><span>5 разделов</span></div>
+
+      <div class="sec"><div class="h"><b>Вход и passkey</b></div>
+        <ul><li>3 ключа устройств, переименовать, завести</li>
+          <li>12 входов, «Выйти», «Выйти везде», свёрнутые группы по ключу</li>
+          <li>имя сервера для passkey, адрес страницы входа</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Токены</b></div>
+        <ul><li>3 отозванных токена с расходом, новый токен: название и 5 прав</li>
+          <li>подсказка «токен идёт в заголовке Authorization: Bearer»</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Доверенная сеть</b></div>
+        <ul><li><b>итог:</b> кто сейчас входит без входа, какие адреса приходили</li>
+          <li>своей считается частная сеть, имена сервера, за прокси, проверка владельца ключа</li>
+          <li>опасное — своим блоком и своей кнопкой</li>
+          <li class="moved">«Кто стучался» — лентой на своём экране, ссылкой отсюда</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Секреты</b></div>
+        <ul><li>20 секретов, кому выдан, кто и когда брал, заменить, журнал</li>
+          <li>секреты ящиков и моделей (показываем, не переносим)</li>
+          <li class="moved">SEMA_KEY, «27 из 27 зашифровано», смена ключа, файл
+            <span class="m">/data/config.yaml</span> — из «Инструментов»</li></ul></div>
+
+      <div class="sec"><div class="h"><b>Передача наружу</b></div>
+        <ul><li>итог строкой: 944 отправки из 958 за сутки, 0 секретного недоверенной</li>
+          <li>спрашивать про чувствительное; сохранённые согласия; свои значения</li>
+          <li>хранить полный текст, срок журнала 30 дней</li>
+          <li class="moved">сама лента отправок — отдельный экран, ссылка «Открыть журнал →»;
+            открывается ещё и со «Здоровья»</li></ul></div>
+    </div>
+
+  </div>
+
+  <div class="out">
+    <h3>Из настроек уехало совсем — и это правильно</h3>
+    <div class="outgrid">
+      <div class="oit"><b>28 строк задач с экрана «Почта»</b>
+        <span>«Работают с каждым ящиком всегда» (7), «Подключены к этому ящику» (3), «Можно подключить» (18).
+          Это половина экрана и чужая предметная область: задачами управляют на «Задачах».
+          В настройках остаётся строка со счётчиком и ссылкой.</span></div>
+      <div class="oit"><b>Ленты журналов, включая «Что ушло наружу»</b>
+        <span>«Кто стучался» (доступ), «Что делалось на серверах», «О чём спрашивали» (агенты), журнал MCP и
+          лента отправок на 958 строк в сутки. Это хроника, а не настройка: в разделе остаётся итог одной
+          строкой и ссылка «Открыть журнал →», сама лента — свой экран. У отправок он открывается ещё и
+          со «Здоровья».</span></div>
+      <div class="oit"><b>Пороги «Здоровья» и очередь</b>
+        <span>Пределы очереди, пороги температуры и расхода, бюджеты правятся на «Здоровье» и «Очереди» —
+          там, где на них смотрят. В настройки они не переезжают и здесь не дублируются.</span></div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

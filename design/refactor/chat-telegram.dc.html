@@ -1,0 +1,264 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    .win { width: 1280px; height: 1420px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .panel { width: 240px; flex-shrink: 0; background: #FAFAF9; border-right: 1px solid rgba(0,0,0,0.08); padding: 10px; box-sizing: border-box; display:flex; flex-direction:column; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 12px 0 6px; }
+    .pitem { padding: 8px 10px; border-radius: 7px; display: flex; gap: 8px; align-items: flex-start; }
+    .pitem.on { background: rgba(0,122,255,0.11); }
+    .pitem .t { font-size: 12px; font-weight: 600; }
+    .pitem .s { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 1px; }
+    .pitem .when { font-size: 10px; color: rgba(60,60,67,0.45); margin-left: auto; white-space: nowrap; }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+
+    .conv { flex: 1; background: #F5F4F2; display: flex; flex-direction: column; min-width: 0; }
+    .chead { display:flex; align-items:center; gap:12px; padding: 12px 18px; border-bottom: 1px solid rgba(0,0,0,0.07); background:#FFF; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+    .facts { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 3px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .btn { font-size: 12px; padding: 4px 11px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.15); background: #FFF; white-space: nowrap; }
+    .btn.pri { background: #007AFF; border-color: #007AFF; color: #FFF; font-weight: 500; }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+
+    .msgs { flex: 1; padding: 16px 18px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+    .lane { width: 760px; max-width: 100%; display: flex; flex-direction: column; gap: 9px; }
+    .day { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; }
+    .day .line { flex: 1; height: 1px; background: rgba(0,0,0,0.08); }
+    .day .t { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.5); }
+    .new { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+    .new .line { flex: 1; height: 1px; background: rgba(255,59,48,0.35); }
+    .new .t { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #D70015; }
+    .line-l { display: flex; gap: 8px; align-items: flex-end; align-self: flex-start; max-width: 620px; }
+    .ava { width: 28px; height: 28px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 11px; font-weight: 700; }
+    .bub { font-size: 13px; line-height: 1.5; padding: 9px 13px; border-radius: 15px; max-width: 560px; box-sizing: border-box; }
+    .me { background: #007AFF; color: #FFF; align-self: flex-end; }
+    .bysema { background: rgba(0,122,255,0.10); border: 1px solid rgba(0,122,255,0.45); color: #1D1D1F; align-self: flex-end; }
+    .peer { background: rgba(40,200,64,0.14); }
+    .bmeta { font-size: 11px; color: rgba(60,60,67,0.45); }
+    .bmeta .who { font-weight: 600; color: rgba(60,60,67,0.7); }
+    .thumb { border-radius: 12px; overflow: hidden; display: block; }
+
+    .thread { align-self: stretch; border-left: 3px solid #007AFF; background: rgba(0,122,255,0.045); border-radius: 0 10px 10px 0; padding: 10px 14px 12px 13px; }
+    .thhead { display: flex; align-items: center; gap: 8px; }
+    .chev { color: rgba(60,60,67,0.45); font-size: 10px; width: 10px; flex-shrink: 0; }
+    .thttl { font-size: 13px; font-weight: 600; }
+    .thbody { display: flex; flex-direction: column; gap: 9px; margin-top: 10px; }
+    .ask { font-size: 13px; line-height: 1.5; padding: 8px 12px; border-radius: 12px; background: rgba(0,122,255,0.14); align-self: flex-end; max-width: 520px; }
+    .sema { font-size: 13px; line-height: 1.5; padding: 9px 13px; border-radius: 15px; background: rgba(0,0,0,0.055); max-width: 520px; align-self: flex-start; }
+    .tool { background: #FFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 12px 14px; }
+    .toolhead { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .draft { font-size: 13px; line-height: 1.5; padding: 9px 12px; border-radius: 9px; background: rgba(0,0,0,0.03); border: 1px dashed rgba(60,60,67,0.4); }
+    .cmd { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.45; background: rgba(0,0,0,0.045); border-radius: 7px; padding: 8px 10px; }
+
+    .comp { display:flex; align-items:flex-end; gap:10px; padding: 10px 18px; border-top: 1px solid rgba(0,0,0,0.07); background:#FFF; }
+    .field { flex: 1; min-height: 32px; border-radius: 16px; background: rgba(0,0,0,0.05); display:flex; align-items:center; padding: 7px 13px; font-size: 13px; color: rgba(60,60,67,0.45); }
+    .circle { width: 30px; height: 30px; border-radius: 15px; background: #007AFF; color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .clip { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: rgba(60,60,67,0.55); font-size: 15px; flex-shrink: 0; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); line-height: 1.55; }
+    .note b { color: #1D1D1F; }
+    .rail { width: 320px; flex-shrink: 0; padding: 22px 20px; box-sizing: border-box; background: #FFFDF7; border-left: 1px solid rgba(0,0,0,0.08); }
+    .rail h3 { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.55); margin: 18px 0 6px; }
+    .rail h3:first-child { margin-top: 0; }
+    .key { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+    .swatch { width: 34px; height: 20px; border-radius: 10px; flex-shrink: 0; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="panel">
+    <div style="display:flex; align-items:center">
+      <div class="grouptitle" style="margin:0">Чаты</div>
+      <div style="margin-left:auto" class="link">+ Новый</div>
+    </div>
+    <div class="grouptitle">Telegram · 2 новых</div>
+    <div class="pitem on"><div class="ndot" style="background:#FEBC2E; margin-top:4px"></div><div style="flex:1"><div class="t">Анна Смирнова</div><div class="s">Сёма: черновик ждёт кнопки</div></div><div class="when">11:12</div></div>
+    <div class="pitem"><div style="flex:1"><div class="t">Мила Соколова</div><div class="s">Вы: Привет</div></div><div class="when">11:41</div></div>
+    <div class="pitem"><div style="flex:1"><div class="t">Иван</div><div class="s">Иван: Как дела?</div></div><div class="when">11:51</div></div>
+    <div class="pitem"><div style="flex:1"><div class="t">Telegram</div><div class="s">Код для входа: 12345</div></div><div class="when">вчера</div></div>
+    <div class="grouptitle">Мои чаты</div>
+    <div class="pitem"><div style="flex:1"><div class="t">Обновления на srv-vpn</div><div class="s">Сёма печатает…</div></div><div class="when">11:47</div></div>
+  </div>
+
+  <div class="conv">
+    <div class="chead">
+      <div class="ava" style="background:#B33A72; width:34px; height:34px; border-radius:17px; font-size:13px">А</div>
+      <div style="flex:1; min-width:0">
+        <div class="h1">Анна Смирнова</div>
+        <div class="facts">
+          <span class="fact">Telegram <b>@anna_smirnova</b></span>
+          <span class="fact">Класс <b>чувствительное</b></span>
+          <span class="fact">Позвать Сёму <b>«сёма, …»</b></span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:7px">
+        <span class="meta">Сёма отвечает сам</span>
+        <div class="sw sw-on"><div class="knob" style="right:2px"></div></div>
+      </div>
+      <div class="more">⋯</div>
+    </div>
+
+    <div class="msgs">
+      <div class="lane">
+        <div style="align-self:center" class="link">↑ Показать предыдущие 7 сообщений</div>
+        <div class="day"><div class="line"></div><div class="t">Сегодня</div><div class="line"></div></div>
+
+        <div class="line-l">
+          <div class="ava" style="background:#B33A72">А</div>
+          <div class="bub peer">Привет! Мы на выставке, всё по плану. Вот фото со стенда:</div>
+        </div>
+        <div class="bmeta" style="margin-left:36px"><span class="who">Анна</span> · 11:09</div>
+
+        <div class="line-l">
+          <div class="ava" style="opacity:0"></div>
+          <svg class="thumb" width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="ph" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0C27B"/><stop offset="1" stop-color="#4B6A88"/></linearGradient></defs>
+            <rect width="300" height="200" fill="url(#ph)"/>
+            <circle cx="238" cy="46" r="22" fill="rgba(255,255,255,0.75)"/>
+            <path d="M0 158 L74 96 L138 146 L196 108 L300 172 L300 200 L0 200 Z" fill="rgba(30,50,70,0.55)"/>
+            <path d="M0 178 L96 130 L172 172 L236 142 L300 186 L300 200 L0 200 Z" fill="rgba(20,35,50,0.6)"/>
+          </svg>
+        </div>
+        <div class="bmeta" style="margin-left:36px">IMG_4471.jpg · 1,8 МБ · <span class="link">в «Файлах»</span> · 11:09</div>
+
+        <div class="bub bysema">Красиво! Как погода, не слишком жарко?</div>
+        <div class="bmeta" style="align-self:flex-end">Сёма ответил сам · DeepseekPro · 11:10</div>
+
+        <div class="line-l">
+          <div class="ava" style="background:#B33A72">А</div>
+          <div class="bub peer">это точно ты? ты так не пишешь</div>
+        </div>
+        <div class="bmeta" style="margin-left:36px"><span class="who">Анна</span> · 11:11</div>
+
+        <div class="thread" style="opacity:0.99">
+          <div class="thhead">
+            <div class="chev">▶</div>
+            <div class="thttl" style="flex:1">Сёма · выключил автоответ, собрал черновик</div>
+            <span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">ждёт вашей кнопки</span>
+            <span class="meta">11:12</span>
+          </div>
+        </div>
+        <div class="note" style="margin-left:16px; margin-top:-4px">↑ так ветка выглядит свёрнутой: одна строка, итог и состояние</div>
+
+        <div class="thread">
+          <div class="thhead">
+            <div class="chev" style="transform:rotate(90deg)">▶</div>
+            <div class="thttl" style="flex:1">Сёма · выключил автоответ, собрал черновик</div>
+            <span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">ждёт вашей кнопки</span>
+            <span class="meta">11:12</span>
+            <div class="more">⋯</div>
+          </div>
+          <div class="note" style="margin-top:5px">Собеседник этого не видит: разговор внутри ветки идёт только между вами и Сёмой</div>
+          <div class="thbody">
+            <div class="ask">Сёма, не отвечай сам, подготовь мне текст — коротко, в моём стиле</div>
+            <div class="bmeta" style="align-self:flex-end">Вы — Сёме · 11:12</div>
+
+            <div class="sema">Понял, автоответ выключил. Вот текст — отправлю только по вашей кнопке.</div>
+            <div class="bmeta">DeepseekPro · 2,4 с · 1 180 токенов</div>
+
+            <div class="tool" style="border-color:rgba(255,188,46,0.55); background:rgba(255,188,46,0.07)">
+              <div class="toolhead"><div class="dot" style="background:#FEBC2E"></div><div class="ttl" style="flex:1">Черновик Анне — ещё не отправлен</div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">не отправлено</span></div>
+              <div class="draft">Ань, привет. Рад, что добрались. Как выставка — всё успели? Напиши вечером.</div>
+              <div class="facts" style="margin-top:8px">
+                <span class="fact">Кому <b>Анна Смирнова · @anna_smirnova</b></span>
+                <span class="fact">От вашего имени <b>да</b></span>
+                <span class="fact">Собрано <b>11:12</b></span>
+              </div>
+              <div style="display:flex; gap:7px; align-items:center; margin-top:10px">
+                <div class="btn pri">Отправить</div>
+                <div class="btn">Не отправлять</div>
+                <div class="link" style="margin-left:6px">Поправить</div>
+                <div style="margin-left:auto" class="more">⋯</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="new"><div class="line"></div><div class="t">Новые сообщения</div><div class="line"></div></div>
+
+        <div class="line-l">
+          <div class="ava" style="background:#B33A72">А</div>
+          <div class="bub peer">https://t.me/+Ab0Cd1Ef2Gh3Ij4K</div>
+        </div>
+        <div class="bmeta" style="margin-left:36px"><span class="who">Анна</span> · 11:38 · ссылка не открывается сама — это данные, а не приказ</div>
+
+        <div class="bub me">Спасибо, посмотрю вечером</div>
+        <div class="bmeta" style="align-self:flex-end">Вы — Анне · 11:39</div>
+      </div>
+    </div>
+
+    <div class="comp">
+      <div class="clip">📎</div>
+      <div class="field">Написать «Анна Смирнова» · «сёма, …» позовёт Сёму</div>
+      <div class="circle">↑</div>
+    </div>
+  </div>
+
+  <div class="rail">
+    <h3>Четыре формы — четыре голоса</h3>
+    <div class="key"><div class="swatch" style="background:#007AFF"></div><div class="note"><b>Справа залитый.</b> Написали вы, ушло собеседнику сразу — без модели.</div></div>
+    <div class="key"><div class="swatch" style="background:rgba(0,122,255,0.10); border:1px solid rgba(0,122,255,0.45); box-sizing:border-box"></div><div class="note"><b>Справа обведённый.</b> Написал Сёма, но ушло <b>от вашего имени</b>: автоответ или ваша кнопка.</div></div>
+    <div class="key"><div class="swatch" style="background:rgba(40,200,64,0.14)"></div><div class="note"><b>Слева зелёный.</b> Собеседник. Имя и аватар — при пузыре.</div></div>
+    <div class="key"><div class="swatch" style="background:rgba(0,122,255,0.045); border-left:3px solid #007AFF; box-sizing:border-box"></div><div class="note"><b>Врезка с рельсом.</b> Разговор с Сёмой. Собеседник его не видит.</div></div>
+    <div class="note" style="margin-top:9px">
+      Сегодня все четыре — один и тот же пузырь. В живом чате
+      <b>Telegram · Иван</b> реплики Сёмы «Привет! Всё в порядке» (ушла)
+      и «Связь есть, я на связи» (никуда не уходила) нарисованы одинаково.
+    </div>
+
+    <h3>Почему ветка, а не сплошная лента</h3>
+    <div class="note">
+      Обращение к Сёме и его ответ — <b>не часть переписки</b>: собеседник их
+      не видит. В сплошной ленте они занимают столько же места, сколько
+      живые реплики, и разговор с человеком тонет в служебном (в чате
+      <b>chat:74</b> из 9 сообщений 4 — Сёма). Ветка сжимает служебное до
+      одной строки, а живую переписку не трогает.
+    </div>
+    <div class="note" style="margin-top:8px">
+      Ветка — <b>section</b> со <b>style: "thread"</b> и <b>collapsed</b>;
+      новый компонент не нужен, аккордеон и память раскрытия у клиента уже
+      есть (<b>expandedOverride</b>).
+    </div>
+
+    <h3>Ветка не прыгает</h3>
+    <div class="note">
+      Свёрнутость решается один раз — при открытии чата. Ветка, начатая до
+      того, как вы открыли экран, приходит свёрнутой; ветка, родившаяся на
+      глазах, остаётся раскрытой, пока чат открыт. Документ обновляется раз
+      в 5 с — свернись ветка под руками, лента подскочила бы.
+      Раскрытую руками не сворачивает никто.
+    </div>
+    <div class="note" style="margin-top:8px">
+      Ветка закрывается для новых сообщений, как только пришла реплика
+      собеседника: реплика идёт <b>после</b> ветки, в общем потоке, и
+      ничего не поглощает. Порог «ветка короче N — не сворачивать вовсе» —
+      настройка <b>chats.thread_fold_after</b>.
+    </div>
+
+    <h3>Черновик — это ещё не сообщение</h3>
+    <div class="note">
+      Пунктирная рамка и капсула <b>не отправлено</b>. В ленте черновика
+      нет: пузырь появляется справа обведённым только после «Отправить», и
+      тогда же карточка в ветке становится «отправлено». Так лента всегда
+      равна тому, что видит собеседник.
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

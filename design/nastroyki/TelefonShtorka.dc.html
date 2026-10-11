@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{padding:24px 26px 28px;display:flex;flex-direction:column;gap:14px;width:470px}
+  .cap{display:flex;flex-direction:column;gap:5px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h2{margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+  .cap p{margin:0;font-size:11px;line-height:1.55;color:#5B5849}
+  .cap b{font-weight:600;color:var(--ink)}
+
+  .phone{width:390px;height:844px;position:relative;overflow:hidden;background:var(--paper);
+    display:flex;flex-direction:column;border:1px solid #D8D3C6;border-radius:22px;
+    box-shadow:0 10px 30px rgba(40,34,20,.14)}
+
+  .hd{padding:18px 16px 8px;flex:0 0 auto}
+  .hd h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em}
+  .search{margin:10px 16px 0;height:40px;border-radius:10px;background:var(--sunk);display:flex;
+    align-items:center;gap:9px;padding:0 12px;color:var(--ink3);font-size:13px;flex:0 0 auto}
+
+  .tabwrap{position:relative;margin-top:12px;flex:0 0 auto}
+  .tabstrip{display:flex;gap:4px;padding:0 16px 9px;overflow:hidden;white-space:nowrap}
+  .tb{height:34px;padding:0 14px;border-radius:9px;display:inline-flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:600;color:var(--ink2);background:var(--sunk);flex:0 0 auto}
+  .tb[aria-selected="true"]{background:var(--ink);color:#fff}
+  .tb .n{display:inline-flex;align-items:center;justify-content:center;height:16px;min-width:16px;padding:0 4px;
+    border-radius:5px;font-size:10px;font-weight:700;background:var(--alert-soft);color:var(--alert)}
+  .fadeL,.fadeR{position:absolute;top:0;bottom:9px;width:40px;pointer-events:none}
+  .fadeL{left:0;background:linear-gradient(90deg,var(--paper) 12%,rgba(251,250,247,0))}
+  .fadeR{right:0;background:linear-gradient(270deg,var(--paper) 12%,rgba(251,250,247,0))}
+  .tabline{height:1px;background:var(--line)}
+
+  .picker{margin:12px 16px 0;height:46px;border-radius:11px;border:1px solid var(--accent);background:var(--panel);
+    display:flex;align-items:center;gap:10px;padding:0 14px;box-shadow:0 0 0 3px var(--accent-soft);flex:0 0 auto}
+  .picker .lbl{font-size:15px;font-weight:600}
+  .picker .n{font-size:11px;color:var(--ink3)}
+  .picker .caret{margin-left:auto;color:var(--accent);font-size:12px}
+  .picker .warn{width:7px;height:7px;border-radius:50%;background:var(--warn);display:block}
+
+  .dim{position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(24,20,12,.34);z-index:8}
+
+  .sheetup{position:absolute;left:0;right:0;bottom:0;z-index:9;background:var(--paper);
+    border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(24,20,12,.24);padding:10px 0 26px;
+    display:flex;flex-direction:column}
+  .grab{width:38px;height:4px;border-radius:2px;background:#CFCBC1;margin:0 auto 12px}
+  .sh-hd{display:flex;align-items:baseline;gap:9px;padding:0 18px 4px}
+  .sh-hd h3{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+  .sh-hd span{font-size:11px;color:var(--ink3)}
+  .sh-search{margin:10px 18px 6px;height:40px;border-radius:10px;background:var(--sunk);display:flex;
+    align-items:center;gap:9px;padding:0 12px;color:var(--ink3);font-size:13px}
+  .sit{display:flex;align-items:center;gap:12px;padding:0 18px;height:56px;border-bottom:1px solid var(--line2)}
+  .sit:last-of-type{border-bottom:0}
+  .sit .ic{width:30px;height:30px;border-radius:9px;background:var(--sunk);flex:0 0 30px;
+    display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+  .sit .tx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .sit .tx b{font-size:15px;font-weight:500}
+  .sit .tx span{font-size:11px;color:var(--ink3)}
+  .sit.on{background:var(--panel)}
+  .sit.on .tx b{font-weight:700}
+  .sit.on .ic{background:var(--accent-soft);color:var(--accent)}
+  .sit .mark{flex:0 0 auto;color:var(--accent)}
+  .sit .warn{width:8px;height:8px;border-radius:50%;background:var(--warn);flex:0 0 8px}
+  .sh-foot{padding:14px 18px 0;font-size:11px;line-height:1.5;color:var(--ink3);border-top:1px solid var(--line2);margin-top:8px}
+
+  .flag{position:absolute;z-index:12;background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+    border-radius:5px;padding:2px 6px;box-shadow:0 2px 6px rgba(0,0,0,.22);white-space:nowrap}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">ТЕЛЕФОН 390×844 · НИЖНЯЯ ШТОРКА РАЗДЕЛОВ</div>
+    <h2>Кнопка «Почта ▾» открывает разделы вкладки — и ничего больше</h2>
+    <p>Шторка показывает разделы <b>только выбранной вкладки</b>: пять строк для «Каналов», четыре для
+      «Поведения», пять для «Системы». Переключать вкладку отсюда нельзя — для этого полоса наверху,
+      она осталась видна над затемнением. Строка высотой 56 px, точка справа — там есть замечание.
+      Шторка — диалог: <span class="m">role=dialog</span>, <span class="m">aria-modal</span>, фокус при открытии
+      встаёт на первый раздел и ходит по кругу внутри, Escape закрывает и возвращает его на кнопку «Почта ▾»,
+      страница под затемнением для чтения вслух не существует.
+      Поле поиска в шторке ищет по разделам этой вкладки; общий поиск по всем настройкам живёт в шапке.</p>
+  </div>
+
+  <div class="phone">
+    <div class="hd"><h1>Настройки</h1></div>
+
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+      Поиск по настройкам
+    </div>
+
+    <div class="tabwrap">
+      <div class="tabstrip" role="tablist">
+        <span class="tb" role="tab" aria-selected="false">Главное <span class="n">4</span></span>
+        <span class="tb" role="tab" aria-selected="true">Каналы</span>
+        <span class="tb" role="tab" aria-selected="false">Поведение</span>
+        <span class="tb" role="tab" aria-selected="false">Система</span>
+        <span class="tb" role="tab" aria-selected="false">Безопасность</span>
+      </div>
+      <div class="fadeL"></div>
+      <div class="fadeR"></div>
+    </div>
+    <div class="tabline"></div>
+
+    <div class="picker">
+      <span class="warn"></span>
+      <span class="lbl">Почта</span>
+      <span class="n">1 из 5 разделов</span>
+      <span class="caret">▴</span>
+    </div>
+
+    <div class="dim"></div>
+    <div class="flag" style="left:14px;top:126px">полоса вкладок осталась видна</div>
+
+    <div class="sheetup" role="dialog" aria-modal="true" aria-label="Разделы настройки">
+      <div class="grab"></div>
+      <div class="sh-hd"><h3>Каналы</h3><span>откуда и куда Сёма пишет</span></div>
+
+      <div class="sh-search">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+        Найти раздел
+      </div>
+
+      <div class="sit on">
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="2" y="4.5" width="16" height="11" rx="2"></rect><path d="M2.5 6l7.5 5 7.5-5"></path></svg>
+        </span>
+        <div class="tx"><b>Почта</b><span>2 ящика · 41 непрочитанное · 1 замечание</span></div>
+        <span class="warn"></span>
+        <span class="mark">
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 10.5l4 4 8-9"></path></svg>
+        </span>
+      </div>
+
+      <div class="sit">
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M17 4L2.8 9.6l4.4 1.5L16 5.4 8.8 12.2l.4 4.4 2.4-3.2 3.6 2.6z"></path></svg>
+        </span>
+        <div class="tx"><b>Telegram</b><span>14 чатов, права выданы 5 · на связи</span></div>
+      </div>
+
+      <div class="sit">
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M3 16V5l4.2 6.5L11.4 5v11"></path><path d="M14.5 5v11"></path></svg>
+        </span>
+        <div class="tx"><b>MAX</b><span>93 чата, выбран 1 · на связи</span></div>
+      </div>
+
+      <div class="sit">
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5.5 8a4.5 4.5 0 019 0c0 4 1.5 5.5 1.5 5.5H4S5.5 12 5.5 8z"></path>
+            <path d="M8.5 16a1.8 1.8 0 003 0"></path></svg>
+        </span>
+        <div class="tx"><b>Уведомления</b><span>2 канала доставки · 4 правила писем</span></div>
+      </div>
+
+      <div class="sit">
+        <span class="ic">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M2.5 5h7"></path><path d="M6 3.5V5c0 4-1.5 6.5-3.5 8"></path>
+            <path d="M4 9.5c1.5 2.5 3.5 3.6 5.5 4.2"></path><path d="M10.5 17l3.5-9 3.5 9"></path>
+            <path d="M11.8 14.2h4.4"></path></svg>
+        </span>
+        <div class="tx"><b>Перевод</b><span>выключен · ждут перевода 500 писем</span></div>
+      </div>
+
+      <div class="sh-foot">Разделы других вкладок — на полосе наверху. Шторка закрывается свайпом вниз,
+        нажатием мимо и клавишей Esc на внешней клавиатуре.</div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

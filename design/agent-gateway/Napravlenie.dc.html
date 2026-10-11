@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+    .лист { width: 980px; background: #fff; border-radius: 12px; padding: 26px 28px 24px; box-shadow: 0 16px 44px rgba(0,0,0,0.14); }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.2px; }
+    .подзаголовок { font-size: 12px; color: #6e6e73; line-height: 1.5; margin-bottom: 22px; max-width: 62em; }
+    .схема { display: flex; align-items: stretch; gap: 0; }
+    .узел { flex: 0 0 240px; border: 1px solid rgba(0,0,0,0.12); border-radius: 10px; padding: 12px 13px; background: #fafafa; }
+    .узел b { font-size: 13px; font-weight: 600; display: block; }
+    .узел .где { font-size: 11px; color: #8e8e93; margin-top: 2px; display: block; }
+    .узел ul { margin: 9px 0 0; padding-left: 15px; font-size: 11px; color: #4b4b50; line-height: 1.5; }
+    .мост { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 0 12px; }
+    .провод { border: 1px solid rgba(0,0,0,0.12); border-radius: 9px; padding: 8px 11px; font-size: 11px; line-height: 1.45; position: relative; background: #fff; }
+    .провод b { font-size: 11px; font-weight: 700; display: block; margin-bottom: 2px; }
+    .провод .стрелка { position: absolute; right: 9px; top: 8px; font-size: 13px; color: #0071e3; }
+    .упр { border-color: rgba(0,113,227,0.45); background: rgba(0,113,227,0.05); }
+    .поток { border-color: rgba(47,158,68,0.45); background: rgba(47,158,68,0.05); }
+    .поток .стрелка { color: #2f9e44; }
+    .мелко { font-size: 10px; color: #8e8e93; text-align: center; }
+    .примечания { margin-top: 20px; display: flex; gap: 12px; }
+    .прим { flex: 1; border-top: 2px solid #1c1c1e; padding-top: 8px; font-size: 11px; line-height: 1.5; color: #4b4b50; }
+    .прим b { color: #1c1c1e; display: block; margin-bottom: 3px; font-size: 11px; }
+    .прим.жёлт { border-top-color: #b25000; }
+  </style>
+</helmet>
+<div class="лист">
+  <h1>Кто звонит и что идёт по какому проводу</h1>
+  <div class="подзаголовок">Переворачивается только направление TCP: Сёма открывает сокет, но остаётся стороной с серверным сертификатом, а шлюз — стороной с сертификатом от его центра. Поэтому выдача сертификатов, вход по одноразовому коду и разрешение способностей поимённо не меняются ни строкой.</div>
+
+  <div class="схема">
+    <div class="узел">
+      <b>Сёма</b>
+      <span class="где">дома, за роутером · порт наружу не открыт</span>
+      <ul>
+        <li>звонит сам: прячется он</li>
+        <li>сервер TLS на обоих проводах</li>
+        <li>вносит запрос в свой же порт по петле</li>
+      </ul>
+    </div>
+
+    <div class="мост">
+      <div class="провод упр">
+        <span class="стрелка">→</span>
+        <b>Управляющий провод — один</b>
+        Кадры JSON-RPC под замком, пинг раз в две минуты. По нему приходит только просьба «открой поток».
+      </div>
+      <div class="провод поток">
+        <span class="стрелка">→</span>
+        <b>Поток — своё соединение на каждый запрос</b>
+        Экран, вложение, живое обновление. Байты идут напрямую, ничего не копится в памяти.
+      </div>
+      <div class="мелко">оба — на ОДИН публичный порт шлюза; кто зачем пришёл, Сёма говорит первым кадром</div>
+    </div>
+
+    <div class="узел">
+      <b>Шлюз</b>
+      <span class="где">203.0.113.12 · sema.example.org</span>
+      <ul>
+        <li>слушает и ждёт: набирать некуда</li>
+        <li>клиент TLS, сертификат от центра Сёмы</li>
+        <li>отсев: список путей Сёмы, частота, бан</li>
+        <li>публичный сертификат держит nginx рядом</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="примечания">
+    <div class="прим">
+      <b>Почему порт один</b>
+      Дома Сёму изолируют на роутере, и там откроют ровно одну строку правил. Диапазон под потоки пришлось бы открывать целиком — а это то же самое, что не изолировать.
+    </div>
+    <div class="прим">
+      <b>Почему потоки отдельно</b>
+      Кадры управления пишутся в один поток под замком: одна закачка вложения заткнула бы и пинги, и все запросы. А живое обновление в «запрос — ответ» не укладывается вовсе.
+    </div>
+    <div class="прим жёлт">
+      <b>Названная цена</b>
+      Чтобы отсеивать, надо видеть: на машине шлюза содержимое проходит в открытом виде. Относиться к ней надо как к домашнему серверу — отдельная машина, никаких чужих служб, роль только шлюза.
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

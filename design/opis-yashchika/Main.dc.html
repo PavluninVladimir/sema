@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#6E717A;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --ok-soft:#E4F1E9;
+    --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .page{width:980px;padding:0 0 28px}
+  .head{padding:14px 18px 10px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:14px}
+  .head h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.015em;line-height:1.1}
+  .head .sub{font-size:13px;color:var(--ink2);margin-top:4px}
+  .tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .seg{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk)}
+  .seg span{height:26px;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink2);
+    display:inline-flex;align-items:center}
+  .seg span.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+  .filt{display:flex;gap:10px;align-items:center;padding:8px 18px 0}
+  .inp{height:28px;padding:0 10px 0 28px;border-radius:8px;background:var(--sunk);font-size:13px;
+    display:flex;align-items:center;min-width:300px;position:relative;color:var(--ink)}
+  .inp::before{content:"";position:absolute;left:9px;width:12px;height:12px;border:1.6px solid var(--ink3);
+    border-radius:50%}
+  .col{padding:16px 18px 0}
+  .sec-hd{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .sec-hd h2{margin:0;font-size:13px;font-weight:700}
+  .sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:var(--lift);
+    overflow:hidden}
+  .row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line2)}
+  .row:last-child{border-bottom:0}
+  .av{width:28px;height:28px;border-radius:50%;flex:0 0 28px;color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:12px;font-weight:700}
+  .body{flex:1 1 auto;min-width:0}
+  .l1{display:flex;align-items:baseline;gap:8px}
+  .nm{font-size:15px;font-weight:600;line-height:1.3;min-width:0;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap}
+  .who{font-size:11px;color:var(--ink3)}
+  .why{font-size:12px;color:var(--ink3);margin-top:2px}
+  .pill{display:inline-flex;align-items:center;height:19px;padding:0 8px;border-radius:999px;
+    font-size:10px;font-weight:700;flex:0 0 auto}
+  .pill.prov{background:var(--warn-soft);color:var(--warn)}
+  .btn{height:28px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    font-size:12px;font-weight:600;color:var(--ink);display:inline-flex;align-items:center;white-space:nowrap}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .dots{width:26px;height:26px;display:flex;align-items:center;justify-content:center;gap:3px;color:var(--ink3)}
+  .dots i{width:3px;height:3px;border-radius:50%;background:currentColor;display:block}
+  .note{font-size:11px;color:var(--ink3);line-height:1.5;padding:10px 2px 0}
+  .prev{background:var(--sunk);border-radius:9px;padding:9px 12px;margin:12px 0 0;font-size:12px;
+    color:var(--ink2);line-height:1.5}
+  .prev b{color:var(--ink)}
+  .kv{display:flex;gap:6px;font-size:11px;color:var(--ink3);margin-top:4px}
+  .kv .v{color:var(--ink);font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+  .flag{display:inline-block;background:var(--ok);color:#fff;font-size:10px;font-weight:700;
+    border-radius:5px;padding:2px 6px;margin-left:8px;vertical-align:1px}
+  </style>
+</helmet>
+
+<div class="page">
+  <div class="head">
+    <div>
+      <h1>Почта</h1>
+      <div class="sub">поиск по всем ящикам</div>
+    </div>
+    <div class="tools">
+      <span class="seg"><span class="on">Письма</span><span>Отправители</span></span>
+      <span class="btn">Проверить сейчас</span>
+    </div>
+  </div>
+  <div class="filt">
+    <span class="inp m">Ticket#2026091000000001</span>
+    <span class="seg"><span class="on">сегодня</span><span>с прошлого захода</span><span>неделя</span></span>
+  </div>
+
+  <div class="col">
+    <div class="sec-hd"><h2>Найдено · 1 письмо</h2><span class="rule"></span></div>
+    <div class="card">
+      <div class="row">
+        <div class="av" style="background:#9C6100">V</div>
+        <div class="body">
+          <div class="l1">
+            <span class="nm">[Ticket#2026091000000001] Ограничение исходящей скорости на VPS 203.0.113.11 (vps-hub)</span>
+          </div>
+          <div class="who m">support@hosting.example · сегодня 18:12 · owner@example.org</div>
+          <div class="why">Сёма это письмо не разбирал: оно лежит в папке «Спам» на почтовом сервере</div>
+        </div>
+        <span class="pill prov">в спаме у провайдера</span>
+        <span class="btn pri">Забрать письмо</span>
+        <span class="dots"><i></i><i></i><i></i></span>
+      </div>
+    </div>
+
+    <div class="prev">
+      <b>Что это значит.</b> Сёма помнит конверты писем из папок, с которыми не работает: кто, тема, дата
+      и номер письма. Текста и вложений у него нет, пока вы не нажмёте «Забрать письмо» — и не появится:
+      чужой спам не должен занимать место и уходить моделям.
+      <div class="kv"><span>в описи по этому ящику</span><span class="v">3 412 писем</span><span>·</span>
+        <span>занимают</span><span class="v">1,1 МБ</span><span>·</span>
+        <span>окно</span><span class="v">90 дней</span></div>
+    </div>
+
+    <div class="note">
+      Раньше на этот запрос экран отвечал «ничего не найдено», и это была неправда: письмо есть, просто
+      Сёма про него не знал.<span class="flag">ради этого всё</span>
+    </div>
+
+    <div class="sec-hd" style="margin-top:22px"><h2>Ещё по этому отправителю</h2><span class="rule"></span></div>
+    <div class="card">
+      <div class="row">
+        <div class="av" style="background:#9C6100">V</div>
+        <div class="body">
+          <div class="l1"><span class="nm">[Ticket#2026081600000002] Добрый день! А что случилось с сервером VPS-10242?</span></div>
+          <div class="who m">support@hosting.example · 16 августа 10:31</div>
+        </div>
+        <span class="btn">Открыть письмо</span>
+        <span class="dots"><i></i><i></i><i></i></span>
+      </div>
+      <div class="row">
+        <div class="av" style="background:#9C6100">V</div>
+        <div class="body">
+          <div class="l1"><span class="nm">Re: [Ticket#2026081600000002] Добрый день! А что случилось с сервером VPS-10242?</span></div>
+          <div class="who m">support@hosting.example · 16 августа 11:49</div>
+        </div>
+        <span class="btn">Открыть письмо</span>
+        <span class="dots"><i></i><i></i><i></i></span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

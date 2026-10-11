@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каркас настроек</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Макет настроек Сёмы — общая основа. Токены из internal/web/static/style.css,
+   шкала 20 / 13 / 11 / 10, контролы 32 и 28, радиус 8. */
+:root {
+  --bg: #FBFAF7; --card: #FFFFFF; --menu-bg: #F4F2EC; --surface: #EFEDE6;
+  --text: #17181C; --text-2: #585B64; --text-3: #686B74;
+  --border: #E3E0D8; --border-2: #EFECE4;
+  --accent: #1F4FD8; --accent-bg: #E8EDFC;
+  --ok: #2E7D4F; --ok-bg: #E4F1E9; --info: #2A5FCC; --info-bg: #E7EDFB;
+  --warn: #9C6100; --warn-bg: #FBF0DC; --alert: #BE3320; --alert-bg: #FBE7E3;
+  --shelf: #FFF9EE; --shelf-line: #EBDCBF; --hover: #FFFFFF;
+  --elev: 0 1px 2px rgba(24,20,12,.07); --switch-off: #CFCBC1;
+  --font: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --control: 32px; --control-row: 28px; --radius: 8px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131417; --card: #1B1D21; --menu-bg: #0F1013; --surface: #212429;
+  --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --ok: #5FC98D; --ok-bg: #16261D; --info: #8FB2FF; --info-bg: #181E2C;
+  --warn: #E2A54C; --warn-bg: #282016; --alert: #FF8874; --alert-bg: #2C1A17;
+  --shelf: #221C12; --shelf-line: #4A3A20; --hover: #1B1D21;
+  --elev: 0 1px 2px rgba(0,0,0,.4); --switch-off: #3B3F46; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #131417; --card: #1B1D21; --menu-bg: #0F1013; --surface: #212429;
+  --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --ok: #5FC98D; --ok-bg: #16261D; --info: #8FB2FF; --info-bg: #181E2C;
+  --warn: #E2A54C; --warn-bg: #282016; --alert: #FF8874; --alert-bg: #2C1A17;
+  --shelf: #221C12; --shelf-line: #4A3A20; --hover: #1B1D21;
+  --elev: 0 1px 2px rgba(0,0,0,.4); --switch-off: #3B3F46; color-scheme: dark; }
+
+* { box-sizing: border-box }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 13px/1.45 var(--font); -webkit-font-smoothing: antialiased }
+a { color: var(--accent); text-decoration: none }
+button { font: inherit; color: inherit }
+.m { font-family: var(--mono); font-variant-numeric: tabular-nums }
+[hidden] { display: none !important }
+
+/* ---- полоска макета (не часть интерфейса) ---- */
+.mockbar { position: sticky; top: 0; z-index: 60; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 7px 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--text-2) }
+.mockbar b { color: var(--text); font-weight: 600 }
+.mockbar .sp { flex: 1 }
+.mockbar .seg { background: var(--card) }
+.mockbar nav { display: flex; gap: 10px; flex-wrap: wrap }
+.mockbar nav a.cur { color: var(--text); font-weight: 600 }
+@media (max-width: 720px) {
+  .mockbar { gap: 6px 10px; padding: 6px 12px }
+  .mockbar nav { flex: 1 1 100%; overflow-x: auto; white-space: nowrap; flex-wrap: nowrap; scrollbar-width: none }
+  .mockbar .sp { display: none }
+}
+.legend-note { max-width: 980px; margin: 14px auto 0; padding: 0 20px; font-size: 11px; color: var(--text-3); line-height: 1.5 }
+.legend-note b { color: var(--text-2); font-weight: 600 }
+
+/* ---- рамка приложения: контейнер, в 390 px становится телефоном ---- */
+.frame { container-type: inline-size; container-name: app; margin: 0 auto; background: var(--bg); position: relative; min-height: calc(100vh - 36px) }
+.frame.phone { max-width: 390px; min-height: 0; height: 760px; overflow: auto; border-inline: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,.08); border-radius: 0 0 14px 14px }
+.app { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: inherit }
+.app.with-menu { grid-template-columns: 220px 232px minmax(0, 1fr) }
+
+/* главное меню Сёмы — только на каркасе, для места «Настроек» */
+.menu { background: var(--menu-bg); border-right: 1px solid var(--border); padding: 12px 10px; font-size: 13px; color: var(--text-2) }
+.menu .owner { display: flex; align-items: center; gap: 8px; padding: 2px 8px 12px; font-size: 12px }
+.menu .owner .face { width: 24px; height: 24px; border-radius: 50%; background: #2F6FEB; color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 600 }
+.menu .owner .gear { margin-left: auto; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--card); box-shadow: var(--elev); color: var(--text) }
+.menu .g { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: .03em; padding: 10px 10px 4px }
+.menu .it { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 10px; border-radius: 8px }
+.menu .it.on { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--elev) }
+.menu .it .n { margin-left: auto; font-size: 11px; color: var(--text-3) }
+.menu .it .n.alert { color: var(--alert); font-weight: 600 }
+.menu .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); display: inline-block }
+.menu .ic { width: 14px; height: 14px; border: 1.5px solid currentColor; border-radius: 4px; opacity: .6; flex: none }
+
+/* колонка разделов настроек */
+.column { background: var(--menu-bg); border-right: 1px solid var(--border-2); padding: 12px 10px 20px; display: flex; flex-direction: column; gap: 2px; min-height: inherit }
+.column .ttl { font-size: 11px; color: var(--text-3); padding: 2px 10px 6px; display: flex; align-items: center; gap: 6px }
+.column .ttl b { color: var(--text); font-size: 13px; font-weight: 600 }
+.column .search { margin: 0 0 8px }
+.column .grp { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: .03em; padding: 12px 10px 4px }
+.column .li { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border-radius: 8px; color: var(--text-2); cursor: pointer; border: 0; background: none; width: 100%; text-align: left; font-size: 13px }
+.column .li:hover { color: var(--text) }
+.column .li.on { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--elev) }
+.column .li .n { margin-left: auto; font-size: 11px; color: var(--text-3); font-weight: 500 }
+.column .li .n.warn { color: var(--warn); font-weight: 600 } .column .li .n.alert { color: var(--alert); font-weight: 600 }
+.column .li .d { width: 7px; height: 7px; border-radius: 50%; margin-left: auto; flex: none }
+.column .li .n + .d { margin-left: 6px }
+.column .foot { margin-top: auto; padding: 12px 10px 0; font-size: 11px; color: var(--text-3); line-height: 1.5; border-top: 1px solid var(--border-2) }
+
+.search { position: relative; display: flex; align-items: center }
+.search input { width: 100%; height: var(--control); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: inherit; font-size: 13px; padding: 0 10px 0 30px }
+.search svg { position: absolute; left: 9px; width: 14px; height: 14px; color: var(--text-3) }
+
+/* содержимое */
+.content { padding: 18px 28px 40px; min-width: 0; position: relative }
+.col { max-width: 980px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-content: start }
+.col > * { min-width: 0 }
+.col.read { max-width: 760px }
+.crumb { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); cursor: pointer; background: none; border: 0; padding: 0 }
+.head { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap }
+.head .ttl { min-width: 0; flex: 1 1 320px }
+.head h1 { font-size: 20px; margin: 0; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; text-wrap: balance }
+.head .sub { color: var(--text-2); margin-top: 3px; font-size: 13px; max-width: 70ch }
+.head .acts { margin-left: auto; display: flex; gap: 8px; align-items: center; flex: none }
+.head .acts .more-slot { width: var(--control); height: var(--control); display: inline-flex; align-items: center; justify-content: center }
+.ent { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--elev); position: sticky; top: 36px; z-index: 5 }
+.ent .av { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; flex: none }
+.ent .who { min-width: 0; display: grid; gap: 1px }
+.ent .who b { font-size: 13px; font-weight: 600 }
+.ent .who span { font-size: 11px; color: var(--text-3) }
+.ent .right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex: none }
+
+.subtabs { display: flex; gap: 2px; padding: 2px; background: var(--surface); border-radius: 9px; width: max-content; max-width: 100%; overflow-x: auto; scrollbar-width: none }
+.subtabs::-webkit-scrollbar { display: none }
+.subtab { height: 26px; padding: 0 11px; border-radius: 7px; font-size: 12px; font-weight: 600; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; border: 0; background: none }
+.subtab.on { background: var(--card); color: var(--text); box-shadow: var(--elev) }
+.cnt { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 999px; background: var(--card); color: var(--text-2); line-height: 1 }
+.subtab.on .cnt:not(.warn):not(.alert) { background: var(--surface) }
+.cnt.warn { background: var(--warn); color: #fff } .cnt.alert { background: var(--alert); color: #fff }
+
+/* разделы и строки */
+.sec { display: grid; gap: 8px }
+.sec > h2 { font-size: 11px; font-weight: 700; color: var(--text-2); letter-spacing: .04em; text-transform: uppercase; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.sec > h2 .n { font-weight: 500; color: var(--text-3); text-transform: none; letter-spacing: 0; font-size: 11px }
+.sec > h2 .r { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 500 }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 2px 14px }
+.card.pad { padding: 12px 14px }
+.row { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-2); min-height: 44px; position: relative }
+.row:last-child { border-bottom: 0 }
+.row.go { cursor: pointer }
+.row.go::after { content: "›"; color: var(--text-3); font-size: 17px; line-height: 1; flex: none; margin-left: 2px }
+.row.go:hover .t { color: var(--accent) }
+.row .av { width: 28px; height: 28px; border-radius: 50%; background: var(--text-3); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; flex: none }
+.row .av.sq { border-radius: 8px }
+.row .dot { width: 8px; height: 8px; border-radius: 50%; flex: none }
+.row .body { flex: 1; min-width: 0 }
+.row .t { font-size: 13px; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; line-height: 1.3 }
+.row .t .m { font-weight: 500; font-size: 12.5px }
+.row .c { font-size: 11px; color: var(--text-2); margin-top: 2px; line-height: 1.4; overflow-wrap: anywhere }
+.row .c.one { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden }
+.facts { display: flex; flex-wrap: wrap; gap: 3px 14px; margin-top: 4px; font-size: 11px }
+.facts .l { color: var(--text-3); margin-right: 4px } .facts .v { font: 500 11px/1.5 var(--mono); font-variant-numeric: tabular-nums }
+.row .right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex: none }
+.row.quiet { opacity: .6 }
+.row.lvl-warn { box-shadow: inset 3px 0 0 var(--warn); padding-left: 10px }
+.row.lvl-alert { box-shadow: inset 3px 0 0 var(--alert); padding-left: 10px }
+.row.lvl-ok { box-shadow: inset 3px 0 0 var(--ok); padding-left: 10px }
+
+.pill { font-size: 10px; font-weight: 600; border-radius: 5px; padding: 2px 7px; background: var(--surface); color: var(--text-2); white-space: nowrap; line-height: 1.5 }
+.pill.ok { background: var(--ok-bg); color: var(--ok) } .pill.info { background: var(--info-bg); color: var(--info) }
+.pill.warn { background: var(--warn-bg); color: var(--warn) } .pill.alert { background: var(--alert-bg); color: var(--alert) }
+.pill.new { background: var(--accent-bg); color: var(--accent) }
+
+.btn { height: var(--control-row); border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: var(--radius); font: inherit; font-size: 12px; font-weight: 600; padding: 0 11px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px }
+.btn:hover { border-color: var(--text-3) }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; height: var(--control) }
+.btn.danger { color: var(--alert); border-color: transparent; background: none }
+.btn.danger:hover { background: var(--alert-bg) }
+.btn.link { border-color: transparent; background: none; color: var(--accent) }
+.btn.more { width: var(--control-row); padding: 0; justify-content: center; letter-spacing: 1px; font-weight: 700 }
+.btn.tall { height: var(--control) }
+.tog { width: 36px; height: 20px; border-radius: 10px; background: var(--switch-off); position: relative; flex: none; cursor: pointer; border: 0; padding: 0; display: block }
+.tog::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: left .15s }
+.tog.on { background: var(--accent) } .tog.on::after { left: 18px }
+.tog:focus-visible, .btn:focus-visible, .seg button:focus-visible, .subtab:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+.seg { display: inline-flex; background: var(--surface); border-radius: var(--radius); padding: 2px; gap: 2px; flex: none; max-width: 100% }
+.seg button { border: 0; background: none; font: inherit; font-size: 12px; color: var(--text-2); height: 24px; padding: 0 10px; border-radius: 6px; cursor: pointer; white-space: nowrap }
+.seg button.on { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--elev) }
+.seg button.on.ok { background: var(--ok-bg); color: var(--ok); box-shadow: none }
+.seg button.on.warn { background: var(--warn-bg); color: var(--warn); box-shadow: none }
+.seg button.on.alert { background: var(--alert-bg); color: var(--alert); box-shadow: none }
+.seg.small button { font-size: 11px; padding: 0 8px; height: 22px }
+.sel { display: inline-flex; align-items: center; gap: 6px; height: var(--control-row); padding: 0 8px 0 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; color: var(--text); max-width: 100%; overflow: hidden }
+.sel::after { content: "▾"; color: var(--text-3); font-size: 10px; margin-left: auto }
+.sel span { overflow: hidden; text-overflow: ellipsis }
+.num { width: 86px; height: var(--control-row); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: 500 12px var(--mono); padding: 0 8px; text-align: right }
+.unit { font-size: 11px; color: var(--text-3) }
+.inp { height: var(--control-row); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: inherit; font-size: 12px; padding: 0 9px; min-width: 0 }
+.inp.w { width: 240px; max-width: 100% }
+.inp.m { font-family: var(--mono) }
+.inp.time { width: 70px; font-family: var(--mono); text-align: center; padding: 0 4px }
+
+/* строка настройки: подпись и подсказка слева, один контрол справа */
+.set { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 16px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border-2) }
+.set:last-child { border-bottom: 0 }
+.set .l { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.set .h { grid-column: 1; font-size: 11px; color: var(--text-3); line-height: 1.4; max-width: 64ch }
+.set .h.more { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer }
+.set .h.more.open { display: block }
+.set .ctl { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 8px; justify-self: end; flex-wrap: wrap; justify-content: flex-end }
+.set.changed .l::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent) }
+.set .v { font: 500 12px var(--mono); color: var(--text-2) }
+.set.ro .ctl { color: var(--text-2); font-size: 12px }
+
+/* полка «ждут вас» */
+.shelf { background: var(--shelf); border: 1px solid var(--shelf-line); border-radius: 10px; padding: 8px 14px }
+.shelf .k { font-size: 10px; font-weight: 700; color: var(--warn); letter-spacing: .05em; padding: 4px 0 2px; display: flex; gap: 8px; align-items: center }
+.shelf .k span { font-weight: 500; color: var(--text-3); letter-spacing: 0 }
+.shelf .row { border-bottom-color: var(--shelf-line) }
+
+/* тонкая настройка и опасное */
+details.fine { border: 1px dashed var(--border); border-radius: 10px }
+details.fine > summary { list-style: none; cursor: pointer; padding: 10px 14px; display: flex; gap: 8px; align-items: center; font-size: 12px; font-weight: 600; color: var(--text-2) }
+details.fine > summary::-webkit-details-marker { display: none }
+details.fine > summary::before { content: "›"; font-size: 17px; line-height: 1; color: var(--text-3); width: 12px; text-align: center; transition: transform .15s }
+details.fine[open] > summary::before { transform: rotate(90deg) }
+details.fine > summary .n { font-weight: 500; color: var(--text-3) }
+details.fine > summary .r { margin-left: auto; font-weight: 500; color: var(--text-3) }
+details.fine .inner { border-top: 1px dashed var(--border); padding: 4px 14px 8px; display: grid; gap: 14px }
+details.fine .inner h3 { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 0 }
+details.fine .inner .set { padding: 7px 0 }
+details.fine .inner .set .l { font-size: 12px }
+.sec.danger .card { border-color: color-mix(in srgb, var(--alert) 45%, var(--border)) }
+.sec.danger > h2 { color: var(--alert) }
+.how { font-size: 11px; color: var(--text-3) }
+.how summary { cursor: pointer; color: var(--text-2); font-weight: 600; font-size: 11px }
+.how p { margin: 6px 0 0; max-width: 72ch; line-height: 1.5 }
+
+/* полоса сохранения и нижняя полоса телефона */
+.savebar { position: sticky; bottom: 0; z-index: 20; display: flex; gap: 10px; align-items: center; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--card); border-top: 1px solid var(--border); box-shadow: 0 -2px 8px rgba(0,0,0,.06); margin: 10px -28px -40px; font-size: 12px; color: var(--text-2) }
+.savebar b { color: var(--text) }
+.savebar .right { margin-left: auto; display: flex; gap: 8px }
+.tabbar { display: none }
+
+/* метрики, таблицы, чипы */
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px }
+.metric { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; box-shadow: inset 3px 0 0 transparent }
+.metric.warn { box-shadow: inset 3px 0 0 var(--warn) } .metric.alert { box-shadow: inset 3px 0 0 var(--alert) } .metric.ok { box-shadow: inset 3px 0 0 var(--ok) }
+.metric .l { font-size: 11px; color: var(--text-2); font-weight: 600 } .metric .v { font-size: 20px; font-weight: 600; margin-top: 2px; line-height: 1.1 } .metric .v small { font-size: 11px; color: var(--text-3); font-weight: 500; margin-left: 3px } .metric .c { font-size: 11px; color: var(--text-3); margin-top: 3px }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 12px }
+.tbl th { font-size: 11px; font-weight: 600; color: var(--text-3); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap }
+.tbl td { padding: 7px 8px; border-bottom: 1px solid var(--border-2); vertical-align: middle }
+.tbl tr:last-child td { border-bottom: 0 }
+.tbl td.who b { font-size: 13px; font-weight: 600; display: block }
+.tbl td.who span { font-size: 11px; color: var(--text-3); display: block; margin-top: 1px }
+.tbl td .sel { max-width: 200px }
+.tbl td.r { text-align: right }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center }
+.chip { border: 1px solid var(--border); background: var(--card); color: var(--text-2); font: inherit; font-size: 12px; height: var(--control-row); padding: 0 10px; border-radius: 999px; cursor: pointer; white-space: nowrap }
+.chip.on { background: var(--text); color: var(--card); border-color: var(--text) }
+.chip .cnt { margin-left: 4px }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.toolbar .search { flex: 1 1 220px; max-width: 320px }
+.ok-text { color: var(--ok) } .warn-text { color: var(--warn) } .alert-text { color: var(--alert) }
+.callout { background: var(--accent-bg); border-radius: 8px; padding: 8px 12px; font-size: 11px; color: var(--text-2); line-height: 1.5 }
+.callout b { color: var(--text) }
+.note { font-size: 11px; color: var(--text-3); line-height: 1.5; max-width: 76ch }
+.empty { text-align: center; padding: 22px 10px; color: var(--text-2) }
+.empty b { display: block; font-size: 13px; color: var(--text); margin-bottom: 3px }
+.empty span { font-size: 11px }
+.scr { display: none } .scr.on { display: block }
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+.colbox { border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: grid; gap: 8px; align-content: start; min-width: 0; background: var(--card) }
+.colbox h3 { margin: 0; font-size: 13px; display: flex; justify-content: space-between; gap: 8px }
+.colbox.allow h3 { color: var(--ok) } .colbox.ask h3 { color: var(--warn) } .colbox.deny h3 { color: var(--alert) }
+.colbox .ex { color: var(--text-2); font-size: 11px; margin: 0 }
+.colbox .inp { min-width: 0; width: 0; flex: 1 1 60px }
+.colbox h3 .pill { flex: none }
+.pats { display: flex; flex-wrap: wrap; gap: 6px; max-height: 170px; overflow: auto }
+.pat { font-family: var(--mono); font-size: 11px; background: var(--surface); border-radius: 6px; padding: 3px 4px 3px 8px; display: inline-flex; align-items: center; gap: 4px; max-width: 100% }
+.pat i { font-style: normal; color: var(--text-3); padding: 0 3px; cursor: pointer }
+.pat.hit { outline: 2px solid var(--accent) }
+.hl { animation: hl 1.6s ease-out 1 }
+@keyframes hl { 0% { background: var(--accent-bg) } 100% { background: transparent } }
+.tail { color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 0 }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; background: var(--text); color: var(--card); font-size: 12px; padding: 8px 14px; border-radius: 999px; transition: .2s; z-index: 100; pointer-events: none; max-width: 90vw }
+.toast.on { opacity: 1; transform: translate(-50%, 0) }
+
+/* ---- телефон: контейнер уже 720 px ---- */
+@container app (max-width: 720px) {
+  .app, .app.with-menu { grid-template-columns: minmax(0, 1fr) }
+  .menu, .column { display: none }
+  .content { padding: 10px 16px 150px }
+  .head .acts { margin-left: auto }
+  .head .sub { font-size: 12px }
+  .ent { top: 0; padding: 8px 10px }
+  .ent .right .btn:not(.more) { display: none }
+  .set { grid-template-columns: minmax(0, 1fr) }
+  .set .ctl { grid-column: 1; grid-row: auto; justify-self: start; margin-top: 6px; justify-content: flex-start }
+  .set .ctl .seg { width: 100% } .set .ctl .seg button { flex: 1 1 0; justify-content: center; text-align: center }
+  .set .ctl .inp.w, .set .ctl .sel { width: 100% }
+  .row { flex-wrap: wrap; row-gap: 6px }
+  .row .right { margin-left: 0; width: 100%; justify-content: flex-start; padding-left: 0 }
+  .row .av ~ .right { padding-left: 40px }
+  .row .dot ~ .right { padding-left: 20px }
+  .row .tog ~ .right { padding-left: 48px }
+  .row.go { padding-right: 18px }
+  .row.go::after { position: absolute; right: 2px; top: 12px; margin: 0 }
+  .head .acts { max-width: 100%; flex-wrap: wrap; justify-content: flex-end }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .tbl thead { display: none }
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100% }
+  .tbl tr { padding: 8px 0; border-bottom: 1px solid var(--border-2) }
+  .tbl td { padding: 2px 0; border: 0 }
+  .tbl td[data-l]::before { content: attr(data-l); display: inline-block; font-size: 11px; color: var(--text-3); width: 96px }
+  .tbl td .sel { max-width: calc(100% - 100px) }
+  .cols3 { grid-template-columns: minmax(0, 1fr) }
+  .savebar { margin: 10px -16px 0; bottom: 56px }
+  .tabbar { display: flex; position: sticky; bottom: 0; z-index: 25; background: var(--card); border-top: 1px solid var(--border); margin: 0 -16px -150px; height: 56px }
+  .tabbar div { flex: 1; display: grid; place-items: center; gap: 3px; font: 500 11px/1 var(--font); color: var(--text-2); position: relative }
+  .tabbar div.on { color: var(--text); font-weight: 600 }
+  .tabbar div .ic { width: 20px; height: 20px; border: 1.5px solid currentColor; border-radius: 6px; opacity: .7 }
+  .tabbar div .n { position: absolute; top: 6px; left: calc(50% + 8px); font-size: 10px; background: var(--alert); color: #fff; border-radius: 999px; padding: 1px 5px; font-weight: 700 }
+  .phone-only:not(.scr) { display: block } .scr.phone-only.on { display: block } .desk-only { display: none !important }
+  .toolbar .search { max-width: none; flex-basis: 100% }
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px }
+}
+@container app (min-width: 721px) { .phone-only { display: none !important } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
+
+/* страница: каркас */
+.rootlist .row { padding: 11px 0 }
+.rootlist .row .av { width: 26px; height: 26px; font-size: 11px; border-radius: 7px }
+.res .path { font-size: 11px; color: var(--text-3) }
+.res .path b { color: var(--text-2); font-weight: 500 }
+.res .t mark { background: var(--accent-bg); color: inherit; border-radius: 3px; padding: 0 2px }
+.handy .set .l small { font-size: 11px; color: var(--text-3); font-weight: 400 }
+.obzor-note { font-size: 11px; color: var(--text-3) }
+.chg .was { font: 500 11px var(--mono); color: var(--text-3) }
+.chg .was b { color: var(--text); font-weight: 500 }
+</style>
+</head>
+<body>
+<div class="mockbar">
+  <b>Настройки Сёмы · макет</b>
+  <nav>
+    <a class="cur" href="Karkas.html">Каркас и Обзор</a>
+    <a href="Modeli.html">Модели</a>
+    <a href="Servers.html">Серверы</a>
+    <a href="Pochta.html">Почта</a>
+    <a href="Predely.html">Интеграции · пределы</a>
+  </nav>
+  <span class="sp"></span>
+  <div class="seg small" aria-label="Ширина"><button data-mode="desk" class="on">Десктоп</button><button data-mode="phone">Телефон 390</button></div>
+  <div class="seg small" aria-label="Тема"><button data-theme-pick="auto" class="on">Как в системе</button><button data-theme-pick="light">Светлая</button><button data-theme-pick="dark">Тёмная</button></div>
+</div>
+
+<div class="frame">
+<div class="app with-menu">
+
+  <!-- главное меню Сёмы: показано, чтобы было видно, где «Настройки» -->
+  <aside class="menu" aria-label="Меню Сёмы">
+    <div class="owner"><span class="face">O</span><span>owner@example.org</span><span class="gear" title="Настройки">⚙</span></div>
+    <div class="g">Переписка</div>
+    <div class="it"><span class="ic"></span>Чаты <span class="n"><span class="dot"></span></span></div>
+    <div class="it"><span class="ic"></span>Почта <span class="n">108</span></div>
+    <div class="it"><span class="ic"></span>Файлы</div>
+    <div class="g">Сёма сам</div>
+    <div class="it"><span class="ic"></span>Задачи</div>
+    <div class="it"><span class="ic"></span>Скрипты</div>
+    <div class="it"><span class="ic"></span>Модули</div>
+    <div class="it"><span class="ic"></span>Память</div>
+    <div class="it"><span class="ic"></span>Здоровье <span class="n"><span class="dot"></span></span></div>
+    <div class="g">&nbsp;</div>
+    <div class="it"><span class="ic"></span>Уведомления <span class="n alert">3</span></div>
+    <div class="it on"><span class="ic"></span>Настройки <span class="n alert">2</span></div>
+  </aside>
+
+  <!-- колонка разделов: одна на все настройки, вместо пяти вкладок -->
+  <aside class="column" aria-label="Разделы настроек">
+    <div class="ttl"><b>Настройки</b></div>
+    <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4l3.1 3.1"/></svg><input id="q-desk" type="search" placeholder="Найти настройку" autocomplete="off" aria-label="Найти настройку"></div>
+    <button class="li on" data-go="obzor">Обзор <span class="n alert">2</span></button>
+    <div class="grp">Каналы</div>
+    <button class="li" data-go="stub" data-title="Почта" data-mock="Pochta.html">Почта <span class="n warn">36</span></button>
+    <button class="li" data-go="stub" data-title="Telegram">Telegram</button>
+    <button class="li" data-go="stub" data-title="MAX">MAX</button>
+    <button class="li" data-go="notify" data-owns="notify">Уведомления <span class="d" style="background:var(--warn)"></span></button>
+    <button class="li" data-go="stub" data-title="Перевод">Перевод</button>
+    <div class="grp">Поведение</div>
+    <button class="li" data-go="stub" data-title="Модели и роли" data-mock="Modeli.html">Модели и роли <span class="n warn">1</span></button>
+    <button class="li" data-go="stub" data-title="Поиск" data-mock="Predely.html">Поиск</button>
+    <button class="li" data-go="stub" data-title="Скиллы">Скиллы</button>
+    <button class="li" data-go="stub" data-title="Развитие">Развитие</button>
+    <div class="grp">Система</div>
+    <button class="li" data-go="stub" data-title="Серверы" data-mock="Servers.html">Серверы <span class="n alert">1</span></button>
+    <button class="li" data-go="stub" data-title="Агенты">Агенты</button>
+    <button class="li" data-go="stub" data-title="Интеграции" data-mock="Predely.html">Интеграции</button>
+    <button class="li" data-go="stub" data-title="Хранилища">Хранилища</button>
+    <button class="li" data-go="stub" data-title="Инструменты">Инструменты</button>
+    <button class="li" data-go="stub" data-title="Работа Сёмы">Работа Сёмы</button>
+    <div class="grp">Безопасность</div>
+    <button class="li" data-go="stub" data-title="Вход и доступ">Вход и доступ</button>
+    <button class="li" data-go="stub" data-title="Ключи и секреты">Ключи и секреты</button>
+    <button class="li" data-go="stub" data-title="Что ушло наружу">Что ушло наружу</button>
+    <button class="li" data-go="stub" data-title="Журнал настроек">Журнал настроек</button>
+    <div class="foot">18 разделов и Обзор в одной колонке. Четыре слова прежних вкладок остались заголовками групп: ничего не переучивать, но на один слой меньше.</div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ТЕЛЕФОН: корень настроек — список, не вкладки -->
+    <section class="scr phone-only" id="root">
+      <div class="col">
+        <div class="head"><div class="ttl"><h1>Настройки</h1><div class="sub">2 замечания ждут вас</div></div></div>
+        <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4l3.1 3.1"/></svg><input id="q-phone" type="search" placeholder="Найти настройку" autocomplete="off" aria-label="Найти настройку"></div>
+        <div class="card rootlist">
+          <div class="row go" data-go="obzor"><span class="av sq" style="background:var(--alert)">!</span><div class="body"><div class="t">Обзор</div><div class="c">отпечаток srv-bots сменился · 36 писем ждут решения по спаму</div></div></div>
+        </div>
+        <div class="sec"><h2>Каналы</h2><div class="card rootlist">
+          <div class="row go" data-go="stub" data-title="Почта" data-mock="Pochta.html"><span class="av sq" style="background:#D8433A">✉</span><div class="body"><div class="t">Почта</div><div class="c">2 ящика · 36 писем ждут решения</div></div><div class="right"><span class="pill warn">36</span></div></div>
+          <div class="row go" data-go="stub" data-title="Telegram"><span class="av sq" style="background:#229ED9">T</span><div class="body"><div class="t">Telegram</div><div class="c">17 собеседников, права у 6 · 1 канал</div></div></div>
+          <div class="row go" data-go="stub" data-title="MAX"><span class="av sq" style="background:#7A5AE0">M</span><div class="body"><div class="t">MAX</div><div class="c">93 чата, выбрано 2 · отправка от вашего имени выключена</div></div></div>
+          <div class="row go" data-go="notify"><span class="av sq" style="background:#D98A1C">!</span><div class="body"><div class="t">Уведомления</div><div class="c">2 канала · за неделю не дошло 18 из 65</div></div><div class="right"><span class="dot" style="background:var(--warn)"></span></div></div>
+          <div class="row go" data-go="stub" data-title="Перевод"><span class="av sq" style="background:#686B74">Я</span><div class="body"><div class="t">Перевод</div><div class="c">выключен · ждут перевода 500 писем</div></div></div>
+        </div></div>
+        <div class="sec"><h2>Поведение</h2><div class="card rootlist">
+          <div class="row go" data-go="stub" data-title="Модели и роли" data-mock="Modeli.html"><span class="av sq" style="background:#2F6FEB">◆</span><div class="body"><div class="t">Модели и роли</div><div class="c">173 модели от 5 провайдеров · 10 ролей заняты</div></div><div class="right"><span class="pill warn">1</span></div></div>
+          <div class="row go" data-go="stub" data-title="Поиск" data-mock="Predely.html"><span class="av sq" style="background:#686B74">⌕</span><div class="body"><div class="t">Поиск</div><div class="c">роль «Поиск» — sonar · SearXNG не настроен</div></div></div>
+          <div class="row go" data-go="stub" data-title="Скиллы"><span class="av sq" style="background:#2E9A5B">S</span><div class="body"><div class="t">Скиллы</div><div class="c">6 из 6 включены</div></div></div>
+          <div class="row go" data-go="stub" data-title="Развитие"><span class="av sq" style="background:#2E9A5B">↑</span><div class="body"><div class="t">Развитие</div><div class="c">черновиков нет · 157 уроков за неделю</div></div></div>
+        </div></div>
+        <div class="sec"><h2>Система</h2><div class="card rootlist">
+          <div class="row go" data-go="stub" data-title="Серверы" data-mock="Servers.html"><span class="av sq" style="background:#17181C">▣</span><div class="body"><div class="t">Серверы</div><div class="c">5 машин · 4 отвечают · у srv-bots сменился отпечаток</div></div><div class="right"><span class="pill alert">1</span></div></div>
+          <div class="row go" data-go="stub" data-title="Агенты"><span class="av sq" style="background:#686B74">A</span><div class="body"><div class="t">Агенты</div><div class="c">3 агента, 2 на связи</div></div></div>
+          <div class="row go" data-go="stub" data-title="Интеграции" data-mock="Predely.html"><span class="av sq" style="background:#686B74">⇄</span><div class="body"><div class="t">Интеграции</div><div class="c">2 сервера MCP на связи · Planner подключён</div></div></div>
+          <div class="row go" data-go="stub" data-title="Хранилища"><span class="av sq" style="background:#686B74">▤</span><div class="body"><div class="t">Хранилища</div><div class="c">363 файла · 92,9 МБ · зеркало 147 из 147</div></div></div>
+          <div class="row go" data-go="stub" data-title="Инструменты"><span class="av sq" style="background:#686B74">⚒</span><div class="body"><div class="t">Инструменты</div><div class="c">pdftotext, tesseract, коды — всё на месте</div></div></div>
+          <div class="row go" data-go="stub" data-title="Работа Сёмы"><span class="av sq" style="background:#686B74">♥</span><div class="body"><div class="t">Работа Сёмы</div><div class="c">наблюдатель включён · провод, опрос, часовой пояс</div></div></div>
+        </div></div>
+        <div class="sec"><h2>Безопасность</h2><div class="card rootlist">
+          <div class="row go" data-go="stub" data-title="Вход и доступ"><span class="av sq" style="background:#686B74">⚿</span><div class="body"><div class="t">Вход и доступ</div><div class="c">5 ключей · 5 входов · 115 отбито за двое суток</div></div></div>
+          <div class="row go" data-go="stub" data-title="Ключи и секреты"><span class="av sq" style="background:#686B74">✱</span><div class="body"><div class="t">Ключи и секреты</div><div class="c">6 ваших · 21 служебный · ключ шифрования задан</div></div></div>
+          <div class="row go" data-go="stub" data-title="Что ушло наружу"><span class="av sq" style="background:#686B74">↗</span><div class="body"><div class="t">Что ушло наружу</div><div class="c">425 отправок за сутки · секретного недоверенной 0</div></div></div>
+          <div class="row go" data-go="stub" data-title="Журнал настроек"><span class="av sq" style="background:#686B74">≡</span><div class="body"><div class="t">Журнал настроек</div><div class="c">257 ваших правок · хранится 180 дней</div></div></div>
+        </div></div>
+        <p class="note">На телефоне корень настроек — этот список. Пяти вкладок и кнопки-шторки «Каналы · Почта ⌄» больше нет: раздел открывается нажатием, назад — кнопкой «‹ Настройки».</p>
+      </div>
+    </section>
+
+    <!-- РЕЗУЛЬТАТЫ ПОИСКА -->
+    <section class="scr" id="poisk">
+      <div class="col">
+        <button class="crumb phone-only" data-back="root">‹ Настройки</button>
+        <div class="head"><div class="ttl"><h1>Нашлось <span class="m" id="q-echo" style="font-weight:400;color:var(--text-3)"></span></h1><div class="sub">ищется по названию настройки, её подсказке, разделу и словам, которыми её обычно называют</div></div></div>
+        <div class="card" id="res"></div>
+        <p class="note">Поиск — главный вход в настройки: он находит не раздел, а саму настройку, и открывает её экран с подсветкой строки. Названия разделов человек не помнит, он ищет «пуши», «окно», «sudo», «цена».</p>
+      </div>
+    </section>
+
+    <!-- ОБЗОР -->
+    <section class="scr on" id="obzor">
+      <div class="col">
+        <button class="crumb phone-only" data-back="root">‹ Настройки</button>
+        <div class="head"><div class="ttl"><h1>Обзор</h1><div class="sub">Что ждёт решения, живо ли подключённое и что вы меняли сами</div></div></div>
+
+        <div class="shelf">
+          <div class="k">ЖДУТ РЕШЕНИЯ <span>2 замечания · кнопка открывает саму настройку</span></div>
+          <div class="row lvl-alert"><div class="body"><div class="t">Отпечаток сервера srv-bots сменился — команды туда не выполняются</div><div class="c">Серверы · с 02:33 · так бывает после переустановки сервера; если вы его не переустанавливали — это тревога</div></div><div class="right"><button class="btn primary" data-go="stub" data-title="Серверы" data-mock="Servers.html">Разобраться →</button></div></div>
+          <div class="row lvl-warn"><div class="body"><div class="t">36 писем ждут вашего решения по спаму</div><div class="c">Почта · 2 ящика · Сёма не уверен и приносит их вам</div></div><div class="right"><button class="btn primary">Разобрать →</button></div></div>
+        </div>
+        <details class="fine"><summary>Ещё 2 замечания попроще <span class="r">не срочно</span></summary><div class="inner" style="gap:0">
+          <div class="row"><div class="body"><div class="t">У 108 моделей не названа цена — их расход считается нулём</div><div class="c">Модели · проверка цен разбирает страницу провайдера и предлагает карточкой</div></div><div class="right"><button class="btn" data-go="stub" data-title="Модели и роли" data-mock="Modeli.html">Проверить цены →</button></div></div>
+          <div class="row"><div class="body"><div class="t">Открыто 5 входов, три из них по фразе — забытые вкладки живут до срока</div><div class="c">Вход и доступ · «Выйти везде» закроет все, включая этот браузер</div></div><div class="right"><button class="btn" data-go="stub" data-title="Вход и доступ">Посмотреть входы →</button></div></div>
+        </div></details>
+
+        <div class="sec"><h2>Состояние <span class="n">живо ли то, что подключено</span></h2><div class="card">
+          <div class="row go" data-go="stub" data-title="Почта" data-mock="Pochta.html"><span class="dot" style="background:var(--ok)"></span><div class="body"><div class="t">Почта</div><div class="c">Сёма читает оба ящика и наводит в них порядок · заходил 08:46</div><div class="facts"><span><span class="l">Ящиков</span><span class="v">2</span></span><span><span class="l">Папок в разборе</span><span class="v">24</span></span><span><span class="l">Писем в архиве</span><span class="v">2 683</span></span></div></div></div>
+          <div class="row go" data-go="stub" data-title="Telegram"><span class="dot" style="background:var(--ok)"></span><div class="body"><div class="t">Мессенджеры</div><div class="c">оба на связи и от вашего имени</div><div class="facts"><span><span class="l">Telegram</span><span class="v">17 чатов, права у 6</span></span><span><span class="l">MAX</span><span class="v">93 чата, выбран 2</span></span></div></div></div>
+          <div class="row go" data-go="stub" data-title="Модели и роли" data-mock="Modeli.html"><span class="dot" style="background:var(--warn)"></span><div class="body"><div class="t">Модели</div><div class="c">у 108 моделей не названа цена — их расход считается нулём</div><div class="facts"><span><span class="l">Подключено</span><span class="v">173</span></span><span><span class="l">Ролей занято</span><span class="v">10 из 10</span></span><span><span class="l">Отправок за сутки</span><span class="v">425</span></span></div></div></div>
+          <div class="row go" data-go="stub" data-title="Серверы" data-mock="Servers.html"><span class="dot" style="background:var(--alert)"></span><div class="body"><div class="t">Серверы</div><div class="c">у srv-bots сменился отпечаток — ждёт вас; остальные отвечают</div><div class="facts"><span><span class="l">Машин</span><span class="v">5</span></span><span><span class="l">Отвечают</span><span class="v">4</span></span><span><span class="l">Сёма ведёт сам</span><span class="v">4</span></span></div></div></div>
+          <div class="row go" data-go="stub" data-title="Хранилища"><span class="dot" style="background:var(--ok)"></span><div class="body"><div class="t">Хранилища</div><div class="c">файлы на месте, зеркало в порядке</div><div class="facts"><span><span class="l">Файлов</span><span class="v">363</span></span><span><span class="l">Занято</span><span class="v">92,9 МБ</span></span><span><span class="l">Зеркало</span><span class="v">яндекс-диск · 147 из 147</span></span></div></div></div>
+          <div class="row go" data-go="stub" data-title="Вход и доступ"><span class="dot" style="background:var(--ok)"></span><div class="body"><div class="t">Доступ</div><div class="c">вход по ключу устройства; из домашней сети — без входа</div><div class="facts"><span><span class="l">Ключей</span><span class="v">5</span></span><span><span class="l">Входов</span><span class="v">5</span></span><span><span class="l">Отбито за двое суток</span><span class="v">115</span></span></div></div></div>
+        </div></div>
+
+        <div class="sec handy"><h2>Под рукой <span class="pill new">новое</span><span class="n">пять настроек, которые вы меняли чаще всего за месяц — по журналу; здесь они живые</span></h2><div class="card">
+          <div class="set"><div class="l">Ночная смена выполняет наряд <small>Серверы</small></div><div class="h">сейчас вхолостую: наряд собирается и показывается в отчёте, но не выполняется</div><div class="ctl"><button class="tog" role="switch" aria-checked="false" aria-label="Ночная смена выполняет наряд"></button></div></div>
+          <div class="set"><div class="l">Отправка от вашего имени <small>MAX</small></div><div class="h">выключено — Сёма готовит текст, а отправляете вы</div><div class="ctl"><button class="tog" role="switch" aria-checked="false" aria-label="Отправка от вашего имени"></button></div></div>
+          <div class="set"><div class="l">Пост канала — разговор <small>Telegram</small></div><div class="h">пост свежее этого срока становится разговором с комментариями</div><div class="ctl"><input class="num" value="30" aria-label="дней"><span class="unit">дней</span></div></div>
+          <div class="set"><div class="l">Переводить письма сам <small>Перевод</small></div><div class="h">каждое письмо — вызов модели роли «Перевод»</div><div class="ctl"><button class="tog" role="switch" aria-checked="false" aria-label="Переводить письма сам"></button></div></div>
+          <div class="set"><div class="l">Смотреть «Входящие» за <small>Почта · owner@example.org</small></div><div class="h">всё, что старше, разбирает отдельная задача — от свежих к старым</div><div class="ctl"><span class="sel"><span>7 дней</span></span></div></div>
+        </div></div>
+
+        <div class="sec chg"><h2>Вы меняли <span class="n">последние ваши правки · служебные отметки Сёмы сюда не попадают</span></h2><div class="card">
+          <div class="row"><div class="body"><div class="t">Ночная смена выполняет наряд</div><div class="c">вчера 23:10 · Серверы → Самостоятельность</div></div><div class="right"><span class="was">выключено → <b>включено</b></span></div></div>
+          <div class="row"><div class="body"><div class="t">Окно самостоятельности · srv-vpn</div><div class="c">29.09 21:02 · Серверы → srv-vpn</div></div><div class="right"><span class="was">02:00-04:00 → <b>02:00-06:00</b></span></div></div>
+          <div class="row"><div class="body"><div class="t">Срок хранения журнала настроек</div><div class="c">28.09 10:40 · Журнал настроек</div></div><div class="right"><span class="was">90 → <b>180 дней</b></span></div></div>
+          <div class="row"><div class="body"><div class="t">Заведён ключ устройства «iPhone»</div><div class="c">сегодня 08:28 · Вход и доступ</div></div></div>
+          <div class="row"><div class="body"><div class="c">Весь журнал: 257 ваших правок, 6 646 отметок Сёмы — отдельным фильтром</div></div><div class="right"><button class="btn link" data-go="stub" data-title="Журнал настроек">Открыть журнал →</button></div></div>
+        </div></div>
+
+        <div class="savebar" hidden><span data-count></span><div class="right"><button class="btn tall" data-undo>Отменить</button><button class="btn primary" data-save>Сохранить</button></div></div>
+      </div>
+    </section>
+
+    <!-- ПРИМЕР ЭКРАНА РАЗДЕЛА: Уведомления -->
+    <section class="scr" id="notify" data-tabset>
+      <div class="col">
+        <button class="crumb phone-only" data-back="root">‹ Настройки</button>
+        <div class="head"><div class="ttl"><h1>Уведомления</h1><div class="sub">2 канала доставки · за неделю не дошло 18 из 65</div></div><div class="acts"><button class="btn tall">Добавить канал</button><span class="more-slot"><button class="btn more" aria-label="Ещё">···</button></span></div></div>
+        <div class="subtabs" role="tablist">
+          <button class="subtab on" data-tab="ch">Каналы доставки <span class="cnt">2</span></button>
+          <button class="subtab" data-tab="rules">Правила почты <span class="cnt">5</span></button>
+          <button class="subtab" data-tab="show">Что показывать</button>
+        </div>
+
+        <div data-pane="ch" style="display:grid;gap:18px">
+          <div class="card"><div class="row lvl-warn"><div class="body"><div class="t">За неделю не дошло 18 из 65</div><div class="c">все 18 — канал «Mac»: житель машины был не на связи или способность «уведомления» не разрешена</div></div><div class="right"><button class="btn">Посмотреть</button></div></div></div>
+          <div class="sec"><h2>Каналы доставки</h2><div class="card">
+            <div class="row"><button class="tog on" role="switch" aria-checked="true" aria-label="Mac"></button><div class="body"><div class="t">Mac · системные уведомления <span class="pill ok">работает</span></div><div class="c one">показывает житель машины «мак» · последняя доставка сегодня 08:52 · тихие часы 23:00–08:00 · все источники</div></div><div class="right"><button class="btn">Проверить</button><button class="btn more" aria-label="Ещё">···</button></div></div>
+            <div class="row" style="flex-wrap:wrap"><button class="tog on" role="switch" aria-checked="true" aria-label="Chrome на маке"></button><div class="body"><div class="t">Chrome на маке · пуши в браузер <span class="pill ok">работает</span></div><div class="c one">подписано 1 устройство · последняя доставка сегодня 08:52 · содержимого писем в пуше нет никогда</div></div><div class="right"><button class="btn">Проверить</button><button class="btn more" aria-label="Свернуть">⌃</button></div>
+              <div style="flex-basis:100%;padding:4px 0 2px 48px" class="desk-only"></div>
+              <div style="flex-basis:100%;padding-left:0">
+                <div class="set"><div class="l">Порог уровня</div><div class="h">ниже порога канал молчит, запись остаётся на экране «Уведомления»</div><div class="ctl"><div class="seg small"><button>инфо</button><button class="on warn">внимание</button><button>тревога</button></div></div></div>
+                <div class="set"><div class="l">Источники</div><div class="h">откуда брать: без отметок — все</div><div class="ctl"><div class="chips"><button class="chip on">Серверы</button><button class="chip on">Почта</button><button class="chip">Запросы</button><button class="chip on">Модули</button></div></div></div>
+                <div class="set"><div class="l">Тихие часы</div><div class="h">в это время канал копит и показывает утром одной записью</div><div class="ctl"><input class="inp time" value="23:00" aria-label="с"><span class="unit">–</span><input class="inp time" value="08:00" aria-label="до"></div></div>
+              </div>
+            </div>
+            <div class="row"><div class="body"><div class="t">Пуши на этом устройстве</div><div class="c">браузер спросит разрешение и подпишется; повторное нажатие отписывает</div></div><div class="right"><button class="btn primary" style="height:28px">Получать пуши</button></div></div>
+          </div></div>
+          <details class="fine"><summary>Устройства с пушами <span class="n">1</span></summary><div class="inner" style="gap:0"><div class="row"><div class="body"><div class="t m">Macintosh · Chrome</div><div class="c">подписано 7 сентября 10:37 · последняя доставка сегодня 08:52</div></div><div class="right"><button class="btn danger">Отписать</button></div></div></div></details>
+          <div class="savebar" hidden><span data-count></span><div class="right"><button class="btn tall" data-undo>Отменить</button><button class="btn primary" data-save>Сохранить</button></div></div>
+        </div>
+
+        <div data-pane="rules" hidden style="display:grid;gap:18px">
+          <div class="sec"><h2>Правила «письмо → уведомление» <span class="n">применяются на каждом новом письме</span></h2><div class="card">
+            <div class="row"><button class="tog on" role="switch" aria-checked="true"></button><div class="body"><div class="t">Счета и квитанции <span class="pill">срок</span></div><div class="c">группа «Счета» · срок из письма через модель · напоминать за 3 дня</div></div><div class="right"><button class="btn more" aria-label="Ещё">···</button></div></div>
+            <div class="row"><button class="tog on" role="switch" aria-checked="true"></button><div class="body"><div class="t">Приглашения в календаре <span class="pill">ics</span></div><div class="c">письма с вложением .ics · напоминать за 1 день</div></div><div class="right"><button class="btn more" aria-label="Ещё">···</button></div></div>
+            <div class="row"><button class="tog on" role="switch" aria-checked="true"></button><div class="body"><div class="t">Письма без ответа <span class="pill">без ответа</span></div><div class="c">отправитель: люди · сверяется с архивом · через 5 дней</div></div><div class="right"><button class="btn more" aria-label="Ещё">···</button></div></div>
+            <div class="row" hidden data-more-rule><button class="tog" role="switch" aria-checked="false"></button><div class="body"><div class="t">Госуслуги <span class="pill">срок</span></div><div class="c">отправитель: @gosuslugi.ru · срок из письма</div></div><div class="right"><button class="btn more" aria-label="Ещё">···</button></div></div>
+            <div class="row" hidden data-more-rule><button class="tog on" role="switch" aria-checked="true"></button><div class="body"><div class="t">Доставка <span class="pill">слова</span></div><div class="c">слова: заказ, доставка, курьер · без срока</div></div><div class="right"><button class="btn more" aria-label="Ещё">···</button></div></div>
+            <div class="tail" data-reveal="[data-more-rule]">Ещё 2 правила</div>
+          </div></div>
+          <div class="savebar" hidden><span data-count></span><div class="right"><button class="btn tall" data-undo>Отменить</button><button class="btn primary" data-save>Сохранить</button></div></div>
+        </div>
+
+        <div data-pane="show" hidden style="display:grid;gap:18px">
+          <div class="card">
+            <div class="set"><div class="l">Счётчик в меню считает записи от уровня</div><div class="h">«внимание» — тревоги и то, что стоит посмотреть сегодня; «инфо» — вообще всё открытое</div><div class="ctl"><div class="seg small"><button>инфо</button><button class="on">внимание</button><button>тревога</button></div></div></div>
+            <div class="set"><div class="l">Хранить сделанные</div><div class="h">закрытые записи убираются по сроку; открытые живут, пока не решите</div><div class="ctl"><input class="num" value="90"><span class="unit">дней</span></div></div>
+            <div class="set"><div class="l">Чаты команд живут</div><div class="h">разговор «Разобраться» удаляется после сводки в память; каждое подтверждение продлевает срок</div><div class="ctl"><input class="num" value="24"><span class="unit">ч</span></div></div>
+          </div>
+          <p class="callout"><b>Переехало.</b> Провод и опрос экрана (<span class="m">ui.live_ms</span>, <span class="m">ui.poll_s</span>, <span class="m">ui.ws_per_session</span>), пинатель чатов и часовой пояс — это про то, как Сёма работает, а не про уведомления. Теперь они в «Система → Работа Сёмы», и поиск их там находит.</p>
+          <div class="savebar" hidden><span data-count></span><div class="right"><button class="btn tall" data-undo>Отменить</button><button class="btn primary" data-save>Сохранить</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ЗАГЛУШКА: разделы, у которых свой макет -->
+    <section class="scr" id="stub">
+      <div class="col">
+        <button class="crumb phone-only" data-back="root">‹ Настройки</button>
+        <div class="head"><div class="ttl"><h1 id="stub-h1">Раздел</h1><div class="sub">экран раздела собран в своём макете или следует общим правилам</div></div></div>
+        <div class="callout" id="stub-note"></div>
+        <div class="card"><div class="row"><div class="body"><div class="t">Как выглядит любой раздел</div><div class="c">заголовок и одна фраза о состоянии · справа одно главное действие и «···» · внутренние вкладки, если раздел — каталог (не больше пяти) · список сущностей строками, каждая открывает свой экран · «Тонкая настройка» свёрнутой строкой внизу · «Опасное» отдельной карточкой в самом низу</div></div></div></div>
+      </div>
+    </section>
+
+    <!-- нижняя полоса телефона: в приложении она есть всегда -->
+    <div class="tabbar" aria-hidden="true"><div><span class="ic"></span>Меню</div><div><span class="ic"></span>Ждут вас<span class="n">3</span></div><div><span class="ic"></span>Почта</div><div class="on"><span class="ic"></span>Чаты</div></div>
+  </main>
+</div>
+</div>
+
+<div class="legend-note">
+<b>Что показывает этот макет.</b> Слева главное меню Сёмы — как сейчас; в нём «Настройки» одной строкой со счётчиком «ждут решения». Дальше одна колонка на все настройки: пять прежних вкладок стали четырьмя заголовками групп над теми же разделами, «Главное» — строкой «Обзор» наверху. Поиск вверху колонки ищет настройку, а не раздел (наберите «окно», «пуш», «sudo», «цена», «spam»). На телефоне колонка становится корневым списком, раздел открывается целым экраном с кнопкой назад, а полоса сохранения стоит над нижней полосой приложения. «Уведомления» показаны целиком как пример раздела: вкладки, строки каналов с раскрытием настроек на месте вместо текстовых вопросов, свёрнутый редкий блок, полоса сохранения. Кнопки, тумблеры и сегменты живые; «Сохранить» ничего не отправляет.
+</div>
+
+<script>
+/* Поведение макета: переходы, вкладки, переключатели, полоса сохранения,
+   режим «телефон» и тема. Это макет — ничего никуда не отправляется. */
+(function () {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const frame = $('.frame');
+
+  /* --- полоска макета --- */
+  $$('[data-mode]').forEach(b => b.addEventListener('click', () => {
+    frame.classList.toggle('phone', b.dataset.mode === 'phone');
+    $$('[data-mode]').forEach(x => x.classList.toggle('on', x === b));
+    frame.scrollTop = 0;
+  }));
+  $$('[data-theme-pick]').forEach(b => b.addEventListener('click', () => {
+    const v = b.dataset.themePick;
+    if (v === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', v);
+    $$('[data-theme-pick]').forEach(x => x.classList.toggle('on', x === b));
+  }));
+  if (location.search.includes('phone')) { const b = $('[data-mode="phone"]'); b && b.click(); }
+
+  /* --- переходы между экранами макета: стек, как на телефоне --- */
+  const stack = [];
+  function show(id, push = true) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const cur = $('.scr.on');
+    if (cur && push && cur !== target) stack.push(cur.id);
+    $$('.scr').forEach(s => s.classList.toggle('on', s === target));
+    $$('.column .li').forEach(li => li.classList.toggle('on', li.dataset.go === id || li.dataset.owns === id));
+    frame.scrollTop = 0; window.scrollTo({ top: 0 });
+    updateSave();
+  }
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (go && !e.target.closest('.tog, .seg, .btn:not([data-go]), .sel, input')) { e.preventDefault(); show(go.dataset.go); return; }
+    const back = e.target.closest('[data-back]');
+    if (back) { e.preventDefault(); const prev = stack.pop() || back.dataset.back; show(prev, false); return; }
+  });
+
+  /* --- внутренние вкладки --- */
+  document.addEventListener('click', e => {
+    const t = e.target.closest('.subtab[data-tab]');
+    if (!t) return;
+    const set = t.closest('[data-tabset]') || document;
+    $$('.subtab[data-tab]', t.parentElement).forEach(x => x.classList.toggle('on', x === t));
+    $$('[data-pane]', set).forEach(p => { if (p.closest('[data-tabset]') === set) p.hidden = p.dataset.pane !== t.dataset.tab; });
+    (frame.classList.contains('phone') ? frame : window).scrollTo({ top: 0 });
+  });
+
+  /* --- тумблеры, сегменты, числа: отметка «изменено» и полоса сохранения --- */
+  function markChanged(el) {
+    const host = el.closest('.set, .row, tr');
+    if (!host) return;
+    if (el.dataset.instant !== undefined) { flash(host); return; }
+    host.classList.toggle('changed', host.dataset.initial !== snapshot(host));
+    updateSave();
+  }
+  function snapshot(host) {
+    return $$('.tog, .seg button.on, .num, .inp, .sel', host).map(x => x.classList.contains('tog') ? x.classList.contains('on') : x.classList.contains('on') ? x.textContent : x.value ?? x.textContent).join('|');
+  }
+  $$('.set, .row, tr').forEach(h => h.dataset.initial = snapshot(h));
+  document.addEventListener('click', e => {
+    const tog = e.target.closest('.tog');
+    if (tog) { tog.classList.toggle('on'); tog.setAttribute('aria-checked', tog.classList.contains('on')); markChanged(tog); return; }
+    const sb = e.target.closest('.seg button');
+    if (sb) { $$('button', sb.parentElement).forEach(x => x.classList.toggle('on', x === sb)); markChanged(sb); return; }
+    const h = e.target.closest('.set .h.more');
+    if (h) h.classList.toggle('open');
+    const tail = e.target.closest('.tail[data-reveal]');
+    if (tail) { $$(tail.dataset.reveal).forEach(r => r.hidden = false); tail.remove(); }
+  });
+  document.addEventListener('input', e => { if (e.target.matches('.num, .inp')) markChanged(e.target); });
+
+  function updateSave() {
+    const scr = $('.scr.on') || document;
+    const bar = $('.savebar', scr) || $('.savebar');
+    if (!bar) return;
+    const changed = $$('.changed', scr);
+    bar.hidden = changed.length === 0;
+    const what = $('[data-count]', bar);
+    if (what) {
+      const names = changed.map(c => ($('.l', c) || $('.t', c) || $('td.who b', c) || c).textContent.trim().replace(/\s+/g, ' ')).slice(0, 2);
+      what.innerHTML = `Изменено <b>${changed.length}</b>: ${names.map(n => '«' + n + '»').join(', ')}${changed.length > 2 ? ' и ещё ' + (changed.length - 2) : ''}`;
+    }
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-save]')) { $$('.changed').forEach(c => { c.classList.remove('changed'); c.dataset.initial = snapshot(c); }); updateSave(); toast('Сохранено. Сёма живёт по новым настройкам с этой секунды.'); }
+    if (e.target.closest('[data-undo]')) { location.reload(); }
+  });
+  function flash(el) { el.classList.remove('hl'); void el.offsetWidth; el.classList.add('hl'); }
+  function toast(text) {
+    let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.append(t); }
+    t.textContent = text; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600);
+  }
+  window.sema = { show, flash, toast, updateSave };
+  updateSave();
+})();
+
+/* страница: поиск по настройкам и заглушки */
+(function () {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const INDEX = [
+    ['Каналы → Почта → Общее', 'Заходить в спам и корзину почтового сервера', 'читает на месте, ничего не судит', 'spam корзина сервер папки', 'stub', 'Почта', 'Pochta.html'],
+    ['Каналы → Почта → Спам', 'Порог похожести на размеченные вами письма', '90 % · похожесть, а не уверенность модели', 'spam спам порог', 'stub', 'Почта', 'Pochta.html'],
+    ['Каналы → Почта → Спам', 'Во «Входящих» — только те, кого вы разрешили', 'белый список · разрешено 30 адресов', 'spam спам белый список whitelist', 'stub', 'Почта', 'Pochta.html'],
+    ['Каналы → Почта → owner@… → Обработка', 'Показывать облачной модели', 'выключите — письма увидит только модель на этой машине', 'облако наружу cloud закрытый ящик', 'stub', 'Почта', 'Pochta.html'],
+    ['Каналы → Почта → owner@… → Хранение', 'Стирать спам с сервера через', '30 дней · только на почтовом сервере', 'срок хранение стирать', 'stub', 'Почта', 'Pochta.html'],
+    ['Каналы → Telegram → Ответы и пределы', 'Как часто заходить', 'раз в 5 минут, до 50 сообщений', 'телеграм заход предел', 'stub', 'Telegram', ''],
+    ['Каналы → Telegram → Каналы', 'Пост канала — разговор', '30 дней · общее для всех каналов', 'пост канал telegram срок', 'stub', 'Telegram', ''],
+    ['Каналы → Уведомления → Каналы доставки → Mac', 'Тихие часы', '23:00–08:00', 'пуш уведомления тихие часы mac', 'notify', '', ''],
+    ['Каналы → Уведомления → Каналы доставки → Chrome', 'Порог уровня', 'внимание', 'пуш push уровень порог браузер', 'notify', '', ''],
+    ['Каналы → Уведомления → Что показывать', 'Счётчик в меню считает записи от уровня', 'внимание', 'счётчик меню уведомления', 'notify', '', ''],
+    ['Поведение → Модели и роли → Роли', 'Роль «Чаты» — основная модель', 'gpt-6-luna · OpenAI', 'модель роль чаты', 'stub', 'Модели и роли', 'Modeli.html'],
+    ['Поведение → Модели и роли → Провайдеры → OpenAI → Цены', 'Откуда цены', 'страница провайдера · проверены вчера', 'цена прайс деньги provider', 'stub', 'Модели и роли', 'Modeli.html'],
+    ['Поведение → Модели и роли → Провайдеры → DeepSeek → Остаток', 'Предупредить, когда меньше', '$2.00', 'остаток баланс деньги', 'stub', 'Модели и роли', 'Modeli.html'],
+    ['Поведение → Модели и роли → gpt-6-luna', 'Доверять закрытое', 'внешняя', 'доверие модель секретное', 'stub', 'Модели и роли', 'Modeli.html'],
+    ['Поведение → Поиск → Тонкая настройка', 'Запросов в сутки на модуль', '40', 'searxng поиск предел', 'stub', 'Поиск', 'Predely.html'],
+    ['Поведение → Скиллы → Тонкая настройка', 'Токенов на скиллы в одном запросе', '3 000', 'скилл токены промпт', 'stub', 'Скиллы', ''],
+    ['Система → Серверы → srv-vpn → Самостоятельность', 'Окно самостоятельной работы', '02:00–06:00', 'окно сервер ночь самостоятельность', 'stub', 'Серверы', 'Servers.html'],
+    ['Система → Серверы → srv-vpn → Самостоятельность', 'Не больше изменений в час', '3', 'потолок сервер изменений', 'stub', 'Серверы', 'Servers.html'],
+    ['Система → Серверы → хозяин → Обзор', 'Команды с sudo', 'запрещены', 'sudo root хозяин сервер', 'stub', 'Серверы', 'Servers.html'],
+    ['Система → Серверы → Самостоятельность', 'Ночная смена выполняет наряд', 'вхолостую', 'ночная смена наряд dry run', 'stub', 'Серверы', 'Servers.html'],
+    ['Система → Серверы → Тонкая настройка', 'Срок страховки возврата', '5 минут', 'страховка возврат rollback', 'stub', 'Серверы', 'Servers.html'],
+    ['Система → Интеграции → Тонкая настройка', 'Вызовов за один ответ', '3', 'mcp чат вызовы предел', 'stub', 'Интеграции', 'Predely.html'],
+    ['Система → Интеграции → planner → Правила', 'Новый инструмент, которого сервер раньше не называл', 'Запретить', 'mcp правила инструмент', 'stub', 'Интеграции', 'Predely.html'],
+    ['Система → Агенты → Тонкая настройка', 'Где слушать агентов', '0.0.0.0:8766', 'агент порт адрес слушать', 'stub', 'Агенты', ''],
+    ['Система → Работа Сёмы', 'Опрос экрана без провода', '4 с', 'опрос провод poll ws', 'stub', 'Работа Сёмы', ''],
+    ['Система → Работа Сёмы', 'Часовой пояс', 'Europe/Moscow', 'часовой пояс время timezone', 'stub', 'Работа Сёмы', ''],
+    ['Система → Хранилища → яндекс-диск', 'Токен Диска', 'секрет YaDiskToken', 'яндекс диск токен зеркало', 'stub', 'Хранилища', ''],
+    ['Безопасность → Вход и доступ → Доверенная сеть', 'Считать своей всю частную сеть', 'включено', 'сеть без входа private локальная', 'stub', 'Вход и доступ', ''],
+    ['Безопасность → Ключи и секреты → Шифрование', 'Ключ шифрования', 'задан · 27 из 27 зашифровано', 'ключ шифрование SEMA_KEY сменить', 'stub', 'Ключи и секреты', ''],
+    ['Безопасность → Что ушло наружу', 'Чувствительное — облачной модели', 'разрешать', 'наружу чувствительное класс облако', 'stub', 'Что ушло наружу', ''],
+  ];
+  let before = 'obzor';
+  function search(q) {
+    q = q.trim().toLowerCase();
+    const res = $('#res');
+    if (!q) { if ($('#poisk').classList.contains('on')) sema.show(before, false); return; }
+    if (!$('#poisk').classList.contains('on')) { before = $('.scr.on')?.id || 'obzor'; sema.show('poisk', false); }
+    $('#q-echo').textContent = '«' + q + '»';
+    const words = q.split(/\s+/);
+    const hits = INDEX.filter(r => words.every(w => (r[0] + ' ' + r[1] + ' ' + r[2] + ' ' + r[3]).toLowerCase().includes(w)));
+    res.innerHTML = hits.length ? hits.map(r => `<div class="row go res" data-go="${r[4]}" data-title="${r[5]}" data-mock="${r[6]}"><div class="body"><div class="path">${r[0].replace(/→/g, '<b>→</b>')}</div><div class="t">${hl(r[1], words)}</div><div class="c">${r[2]}</div></div></div>`).join('')
+      : `<div class="empty"><b>Ничего не нашлось</b><span>ищется по названию настройки, подсказке, разделу и словам-приметам: «пуш», «окно», «sudo», «цена», «spam»</span></div>`;
+  }
+  function hl(t, words) { let o = t; words.forEach(w => { o = o.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'i'), '<mark>$1</mark>'); }); return o; }
+  ['#q-desk', '#q-phone'].forEach(id => { const i = $(id); i && i.addEventListener('input', e => { const other = $(id === '#q-desk' ? '#q-phone' : '#q-desk'); if (other) other.value = e.target.value; search(e.target.value); }); });
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-title]');
+    if (!t) return;
+    $('#stub-h1').textContent = t.dataset.title;
+    const mock = t.dataset.mock;
+    $('#stub-note').innerHTML = mock ? `Этот раздел нарисован целиком в макете <a href="${mock}">${mock}</a> — откройте его из полоски сверху. Здесь он только занимает своё место в каркасе.`
+      : `У раздела «${t.dataset.title}» отдельного макета нет: он следует общим правилам ниже и описан в README.`;
+  });
+  $$('[data-mode]').forEach(b => b.addEventListener('click', () => { sema.show(b.dataset.mode === 'phone' ? 'root' : 'obzor', false); }));
+  if (document.querySelector('.frame').clientWidth <= 720) sema.show('root', false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+    a { color: #0071e3; } a:hover { color: #0058b0; }
+    .win { width: 760px; height: 640px; display: flex; flex-direction: column; background: #f5f5f7; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+    .шапка { padding: 12px 18px; border-bottom: 1px solid rgba(0,0,0,0.10); }
+    .шапка h1 { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.2px; }
+    .подпись { font-size: 11px; color: #6e6e73; margin-top: 2px; }
+    .кнопки { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .действие { height: 26px; padding: 0 10px; border-radius: 7px; border: 1px solid rgba(0,0,0,0.10); background: #fff; font-size: 12px; display: flex; align-items: center; }
+    .лента { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+    .день { font-size: 11px; color: #6e6e73; text-align: center; margin: 4px 0 8px; }
+    .пузырь { display: flex; margin: 6px 0; }
+    .пузырь .текст { padding: 9px 13px; border-radius: 16px; max-width: 72%; font-size: 13px; line-height: 1.35; white-space: pre-wrap; }
+    .мета { font-size: 11px; color: #8e8e93; margin: 2px 8px 0; }
+    .пузырь.якорь .текст { background: rgba(40,200,64,0.14); border: 1px dashed rgba(0,0,0,0.25); }
+    .пузырь.свой { justify-content: flex-end; } .пузырь.свой .текст { background: #0071e3; color: #fff; }
+    .пузырь.сёма .текст { background: #fff; border: 1px solid rgba(0,0,0,0.10); }
+    .капсула { display: inline-flex; align-items: center; height: 18px; padding: 0 8px; border-radius: 9px; font-size: 10px; font-weight: 600; background: rgba(0,88,176,0.14); color: #0058b0; margin-left: 8px; }
+    .карточка { border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; background: #fff; padding: 10px 12px; margin: 8px 0; font-size: 12px; max-width: 78%; }
+    .карточка .заголовок { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+    .карточка pre { margin: 6px 0; font-size: 11px; color: #6e6e73; white-space: pre-wrap; font-family: "SF Mono", Menlo, monospace; }
+    .карточка .кн { display: flex; gap: 8px; margin-top: 8px; }
+    .primary { background: #0071e3; color: #fff; border-color: #0071e3; }
+    .ввод { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-top: 1px solid rgba(0,0,0,0.10); }
+    .поле { flex: 1; height: 34px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.10); background: #fff; display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: #8e8e93; }
+    .отправить { height: 30px; padding: 0 12px; border-radius: 8px; background: #0071e3; color: #fff; font-size: 12px; display: flex; align-items: center; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="шапка">
+    <h1>Сёма · Заявки</h1>
+    <div class="подпись">ветка разговора «Заявки» в группе «Дом» · собеседники этого не видят · модель DeepseekPro · думает обычно</div>
+    <div class="кнопки"><span class="действие">К разговору</span><span class="действие">Переименовать</span><span class="действие" style="color: #c4271c">Удалить ветку</span></div>
+  </div>
+  <div class="лента">
+    <div class="день">сегодня</div>
+    <div class="пузырь якорь"><div class="текст">Только не раньше двенадцати, я до обеда на работе</div></div>
+    <div class="мета">Митя · 10:36 <span class="капсула">по сообщению</span></div>
+    <div class="пузырь свой"><div class="текст">Сёма, найди мастера по отоплению на завтра после 12 и предложи ему текст</div></div>
+    <div class="мета" style="text-align: right">10:37</div>
+    <div class="пузырь сёма"><div class="текст">В «Заявках» два раза звали Олега (+7 9…), в июне он чинил стояк. Предлагаю написать ему и Мите — по кнопке, сам не отправлю.</div></div>
+    <div class="мета">Сёма · DeepseekPro · 10:37</div>
+    <div class="карточка">
+      <div class="заголовок"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"><path d="M2 8l12-6-4 12-2-5z"></path></svg>Telegram · Митя <span class="капсула" style="margin-left: auto; background: rgba(178,80,0,0.16); color: #b25000">ждёт кнопки</span></div>
+      <pre>Мастер придёт завтра в 12:30, Олег. Будешь дома?</pre>
+      <div class="кн"><span class="действие primary">Отправить</span><span class="действие">Отклонить</span></div>
+    </div>
+    <div class="мета" style="margin-top: 6px">ушедшее появится в ленте «Заявок», здесь останется карточка «отправлено»</div>
+  </div>
+  <div class="ввод">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8e8e93" stroke-width="1.5" stroke-linecap="round"><path d="M10.5 5.5l-4.6 4.6a1.6 1.6 0 002.3 2.3l5-5a3 3 0 00-4.3-4.3l-5 5"></path></svg>
+    <div class="поле">Написать Сёме · собеседник этого не видит</div>
+    <span class="отправить">Отправить</span>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

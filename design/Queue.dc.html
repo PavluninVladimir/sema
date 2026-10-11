@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 1080px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .subitem .badge-count { font-size: 10px; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+    .setrow { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .setrow:last-child { border-bottom: none; }
+    .radio { width: 16px; height: 16px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.25); flex-shrink: 0; box-sizing: border-box; }
+    .radio-on { border: 5px solid #007AFF; background: #FFFFFF; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; }
+    .box { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 8px; }
+    .pick { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 12px; color: #1D1D1F; flex-shrink: 0; }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; }
+    .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 4px 6px 4px; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px"></span>
+        Все ящики
+        <span class="badge-count">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>
+        owner@example.org
+        <span class="badge-count">38</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FC3F1D; flex-shrink: 0"></span>
+        me@example.com
+        <span class="badge-count">23</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+      </div>
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 10:46
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; background: #F7F6F4; overflow: hidden; display: flex; justify-content: center">
+    <div style="width: 820px; display: flex; flex-direction: column; gap: 20px; padding: 28px 0">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">Очередь</div>
+        <span class="meta">фоновая работа Сёмы: что ждёт, что идёт, что застряло</span>
+        <div style="margin-left: auto; display: flex; gap: 8px; align-items: center"><a href="#" style="font-size: 12px; color: #007AFF">Пауза всей очереди</a><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #007AFF; color: #FFFFFF; font-size: 12px; font-weight: 600">Ускорить</div></div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Сейчас · ждут 63 · в работе 1 · застряли 2 · ~3 ч до конца</div>
+        <div class="card">
+
+          <div class="setrow" style="align-items: flex-start">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #0058B0; margin-top: 6px; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Разбор памяти</span><span class="tag" style="background: rgba(0,122,255,0.12); color: #0063CC">идёт</span></div>
+              <span class="meta">ждут 45 · сделано за час 20 · ~2 ч 15 мин · роль «Память» · qwen-4b, запасная DeepseekFlash</span><div style="width: 220px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.08); margin-top: 4px"><div style="width: 32%; height: 6px; border-radius: 3px; background: #007AFF"></div></div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Ускорить</a> <a href="#" style="font-size: 12px; color: #007AFF">Пауза</a></div>
+          </div>
+
+          <div class="setrow" style="align-items: flex-start">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #FF3B30; margin-top: 6px; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Граф памяти</span><span class="tag" style="background: rgba(255,59,48,0.14); color: #C4271C">застряли 2</span></div>
+              <span class="meta">ждут 12 · 2 записи не дались после 5 попыток · остальные идут следом</span>
+              <div style="margin-top: 6px; padding: 8px 10px; border-radius: 8px; background: rgba(255,59,48,0.06); display: flex; flex-direction: column; gap: 3px">
+                <span class="meta" style="color: #C4271C">запись 41 · «модель не вернула JSON» · 5 попыток · последняя 11:02</span>
+                <span class="meta" style="color: #C4271C">запись 58 · «текст длиннее предела» · 5 попыток · последняя 10:47</span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Повторить застрявшие</a> <a href="#" style="font-size: 12px; color: #C4271C">Пропустить</a></div>
+          </div>
+
+          <div class="setrow" style="align-items: flex-start">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #8E8E93; margin-top: 6px; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Кристаллы сессий</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75)">пусто</span></div>
+              <span class="meta">работы нет · последняя сессия свёрнута сегодня 09:12</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Сделать сейчас</a></div>
+          </div>
+
+          <div class="setrow" style="align-items: flex-start">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #FF9500; margin-top: 6px; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Зеркало файлов</span><span class="tag" style="background: rgba(255,149,0,0.16); color: #B25000">ждёт модель</span></div>
+              <span class="meta">ждут 6 · пауза до 11:30: роль на передышке, попытки не тратятся</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Сделать сейчас</a></div>
+          </div>
+
+          <div class="setrow" style="align-items: flex-start">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #8E8E93; margin-top: 6px; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">События модулей</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75)">пусто</span></div>
+              <span class="meta">работы нет · за сутки 84, все успешно</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Журнал</a></div>
+          </div>
+        </div>
+        <div class="meta" style="padding: 6px 4px 0 4px">Одна работа на объект: повторная постановка поднимает приоритет, а не создаёт вторую. Ручной запуск не плодит проходы. Недоступность модели и исчерпанный бюджет не тратят попытки: работа ждёт с отметкой «не раньше». Ничего не уходит из очереди без успеха или вашего решения.</div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Пределы · правятся здесь</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">За один проход</span>
+              <span class="meta">сколько работ берёт воркер · как часто просыпается · сколько попыток до «застряло»</span>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center"><div class="pick" style="width: 70px; justify-content: space-between">20 <span style="color: rgba(60,60,67,0.4)">▾</span></div><div class="pick" style="width: 110px; justify-content: space-between">каждые 30 с <span style="color: rgba(60,60,67,0.4)">▾</span></div><div class="pick" style="width: 70px; justify-content: space-between">5 <span style="color: rgba(60,60,67,0.4)">▾</span></div></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Обращений к модели в минуту</span>
+              <span class="meta">чтобы разбор старого не съел дневные токены · бюджеты проверяются как обычно</span>
+            </div>
+            <div class="pick" style="width: 90px; justify-content: space-between">10 <span style="color: rgba(60,60,67,0.4)">▾</span></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Хранить сделанное</span>
+              <span class="meta">история очереди: что и когда было сделано</span>
+            </div>
+            <div class="pick" style="width: 90px; justify-content: space-between">7 дней <span style="color: rgba(60,60,67,0.4)">▾</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">На «Здоровье» · блок очереди</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #FF3B30; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Очередь: ждут 63, застряли 2</span>
+              <span class="meta">разбор памяти ~2 ч · граф памяти требует решения</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Открыть</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

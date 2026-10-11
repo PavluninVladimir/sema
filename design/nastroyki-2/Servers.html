@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Серверы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Макет настроек Сёмы — общая основа. Токены из internal/web/static/style.css,
+   шкала 20 / 13 / 11 / 10, контролы 32 и 28, радиус 8. */
+:root {
+  --bg: #FBFAF7; --card: #FFFFFF; --menu-bg: #F4F2EC; --surface: #EFEDE6;
+  --text: #17181C; --text-2: #585B64; --text-3: #686B74;
+  --border: #E3E0D8; --border-2: #EFECE4;
+  --accent: #1F4FD8; --accent-bg: #E8EDFC;
+  --ok: #2E7D4F; --ok-bg: #E4F1E9; --info: #2A5FCC; --info-bg: #E7EDFB;
+  --warn: #9C6100; --warn-bg: #FBF0DC; --alert: #BE3320; --alert-bg: #FBE7E3;
+  --shelf: #FFF9EE; --shelf-line: #EBDCBF; --hover: #FFFFFF;
+  --elev: 0 1px 2px rgba(24,20,12,.07); --switch-off: #CFCBC1;
+  --font: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --control: 32px; --control-row: 28px; --radius: 8px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131417; --card: #1B1D21; --menu-bg: #0F1013; --surface: #212429;
+  --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --ok: #5FC98D; --ok-bg: #16261D; --info: #8FB2FF; --info-bg: #181E2C;
+  --warn: #E2A54C; --warn-bg: #282016; --alert: #FF8874; --alert-bg: #2C1A17;
+  --shelf: #221C12; --shelf-line: #4A3A20; --hover: #1B1D21;
+  --elev: 0 1px 2px rgba(0,0,0,.4); --switch-off: #3B3F46; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #131417; --card: #1B1D21; --menu-bg: #0F1013; --surface: #212429;
+  --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --ok: #5FC98D; --ok-bg: #16261D; --info: #8FB2FF; --info-bg: #181E2C;
+  --warn: #E2A54C; --warn-bg: #282016; --alert: #FF8874; --alert-bg: #2C1A17;
+  --shelf: #221C12; --shelf-line: #4A3A20; --hover: #1B1D21;
+  --elev: 0 1px 2px rgba(0,0,0,.4); --switch-off: #3B3F46; color-scheme: dark; }
+
+* { box-sizing: border-box }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 13px/1.45 var(--font); -webkit-font-smoothing: antialiased }
+a { color: var(--accent); text-decoration: none }
+button { font: inherit; color: inherit }
+.m { font-family: var(--mono); font-variant-numeric: tabular-nums }
+[hidden] { display: none !important }
+
+/* ---- полоска макета (не часть интерфейса) ---- */
+.mockbar { position: sticky; top: 0; z-index: 60; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 7px 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--text-2) }
+.mockbar b { color: var(--text); font-weight: 600 }
+.mockbar .sp { flex: 1 }
+.mockbar .seg { background: var(--card) }
+.mockbar nav { display: flex; gap: 10px; flex-wrap: wrap }
+.mockbar nav a.cur { color: var(--text); font-weight: 600 }
+@media (max-width: 720px) {
+  .mockbar { gap: 6px 10px; padding: 6px 12px }
+  .mockbar nav { flex: 1 1 100%; overflow-x: auto; white-space: nowrap; flex-wrap: nowrap; scrollbar-width: none }
+  .mockbar .sp { display: none }
+}
+.legend-note { max-width: 980px; margin: 14px auto 0; padding: 0 20px; font-size: 11px; color: var(--text-3); line-height: 1.5 }
+.legend-note b { color: var(--text-2); font-weight: 600 }
+
+/* ---- рамка приложения: контейнер, в 390 px становится телефоном ---- */
+.frame { container-type: inline-size; container-name: app; margin: 0 auto; background: var(--bg); position: relative; min-height: calc(100vh - 36px) }
+.frame.phone { max-width: 390px; min-height: 0; height: 760px; overflow: auto; border-inline: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,.08); border-radius: 0 0 14px 14px }
+.app { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: inherit }
+.app.with-menu { grid-template-columns: 220px 232px minmax(0, 1fr) }
+
+/* главное меню Сёмы — только на каркасе, для места «Настроек» */
+.menu { background: var(--menu-bg); border-right: 1px solid var(--border); padding: 12px 10px; font-size: 13px; color: var(--text-2) }
+.menu .owner { display: flex; align-items: center; gap: 8px; padding: 2px 8px 12px; font-size: 12px }
+.menu .owner .face { width: 24px; height: 24px; border-radius: 50%; background: #2F6FEB; color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 600 }
+.menu .owner .gear { margin-left: auto; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--card); box-shadow: var(--elev); color: var(--text) }
+.menu .g { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: .03em; padding: 10px 10px 4px }
+.menu .it { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 10px; border-radius: 8px }
+.menu .it.on { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--elev) }
+.menu .it .n { margin-left: auto; font-size: 11px; color: var(--text-3) }
+.menu .it .n.alert { color: var(--alert); font-weight: 600 }
+.menu .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); display: inline-block }
+.menu .ic { width: 14px; height: 14px; border: 1.5px solid currentColor; border-radius: 4px; opacity: .6; flex: none }
+
+/* колонка разделов настроек */
+.column { background: var(--menu-bg); border-right: 1px solid var(--border-2); padding: 12px 10px 20px; display: flex; flex-direction: column; gap: 2px; min-height: inherit }
+.column .ttl { font-size: 11px; color: var(--text-3); padding: 2px 10px 6px; display: flex; align-items: center; gap: 6px }
+.column .ttl b { color: var(--text); font-size: 13px; font-weight: 600 }
+.column .search { margin: 0 0 8px }
+.column .grp { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: .03em; padding: 12px 10px 4px }
+.column .li { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border-radius: 8px; color: var(--text-2); cursor: pointer; border: 0; background: none; width: 100%; text-align: left; font-size: 13px }
+.column .li:hover { color: var(--text) }
+.column .li.on { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--elev) }
+.column .li .n { margin-left: auto; font-size: 11px; color: var(--text-3); font-weight: 500 }
+.column .li .n.warn { color: var(--warn); font-weight: 600 } .column .li .n.alert { color: var(--alert); font-weight: 600 }
+.column .li .d { width: 7px; height: 7px; border-radius: 50%; margin-left: auto; flex: none }
+.column .li .n + .d { margin-left: 6px }
+.column .foot { margin-top: auto; padding: 12px 10px 0; font-size: 11px; color: var(--text-3); line-height: 1.5; border-top: 1px solid var(--border-2) }
+
+.search { position: relative; display: flex; align-items: center }
+.search input { width: 100%; height: var(--control); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: inherit; font-size: 13px; padding: 0 10px 0 30px }
+.search svg { position: absolute; left: 9px; width: 14px; height: 14px; color: var(--text-3) }
+
+/* содержимое */
+.content { padding: 18px 28px 40px; min-width: 0; position: relative }
+.col { max-width: 980px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-content: start }
+.col > * { min-width: 0 }
+.col.read { max-width: 760px }
+.crumb { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); cursor: pointer; background: none; border: 0; padding: 0 }
+.head { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap }
+.head .ttl { min-width: 0; flex: 1 1 320px }
+.head h1 { font-size: 20px; margin: 0; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; text-wrap: balance }
+.head .sub { color: var(--text-2); margin-top: 3px; font-size: 13px; max-width: 70ch }
+.head .acts { margin-left: auto; display: flex; gap: 8px; align-items: center; flex: none }
+.head .acts .more-slot { width: var(--control); height: var(--control); display: inline-flex; align-items: center; justify-content: center }
+.ent { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--elev); position: sticky; top: 36px; z-index: 5 }
+.ent .av { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; flex: none }
+.ent .who { min-width: 0; display: grid; gap: 1px }
+.ent .who b { font-size: 13px; font-weight: 600 }
+.ent .who span { font-size: 11px; color: var(--text-3) }
+.ent .right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex: none }
+
+.subtabs { display: flex; gap: 2px; padding: 2px; background: var(--surface); border-radius: 9px; width: max-content; max-width: 100%; overflow-x: auto; scrollbar-width: none }
+.subtabs::-webkit-scrollbar { display: none }
+.subtab { height: 26px; padding: 0 11px; border-radius: 7px; font-size: 12px; font-weight: 600; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; border: 0; background: none }
+.subtab.on { background: var(--card); color: var(--text); box-shadow: var(--elev) }
+.cnt { font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 999px; background: var(--card); color: var(--text-2); line-height: 1 }
+.subtab.on .cnt:not(.warn):not(.alert) { background: var(--surface) }
+.cnt.warn { background: var(--warn); color: #fff } .cnt.alert { background: var(--alert); color: #fff }
+
+/* разделы и строки */
+.sec { display: grid; gap: 8px }
+.sec > h2 { font-size: 11px; font-weight: 700; color: var(--text-2); letter-spacing: .04em; text-transform: uppercase; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.sec > h2 .n { font-weight: 500; color: var(--text-3); text-transform: none; letter-spacing: 0; font-size: 11px }
+.sec > h2 .r { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 500 }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 2px 14px }
+.card.pad { padding: 12px 14px }
+.row { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-2); min-height: 44px; position: relative }
+.row:last-child { border-bottom: 0 }
+.row.go { cursor: pointer }
+.row.go::after { content: "›"; color: var(--text-3); font-size: 17px; line-height: 1; flex: none; margin-left: 2px }
+.row.go:hover .t { color: var(--accent) }
+.row .av { width: 28px; height: 28px; border-radius: 50%; background: var(--text-3); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; flex: none }
+.row .av.sq { border-radius: 8px }
+.row .dot { width: 8px; height: 8px; border-radius: 50%; flex: none }
+.row .body { flex: 1; min-width: 0 }
+.row .t { font-size: 13px; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; line-height: 1.3 }
+.row .t .m { font-weight: 500; font-size: 12.5px }
+.row .c { font-size: 11px; color: var(--text-2); margin-top: 2px; line-height: 1.4; overflow-wrap: anywhere }
+.row .c.one { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden }
+.facts { display: flex; flex-wrap: wrap; gap: 3px 14px; margin-top: 4px; font-size: 11px }
+.facts .l { color: var(--text-3); margin-right: 4px } .facts .v { font: 500 11px/1.5 var(--mono); font-variant-numeric: tabular-nums }
+.row .right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex: none }
+.row.quiet { opacity: .6 }
+.row.lvl-warn { box-shadow: inset 3px 0 0 var(--warn); padding-left: 10px }
+.row.lvl-alert { box-shadow: inset 3px 0 0 var(--alert); padding-left: 10px }
+.row.lvl-ok { box-shadow: inset 3px 0 0 var(--ok); padding-left: 10px }
+
+.pill { font-size: 10px; font-weight: 600; border-radius: 5px; padding: 2px 7px; background: var(--surface); color: var(--text-2); white-space: nowrap; line-height: 1.5 }
+.pill.ok { background: var(--ok-bg); color: var(--ok) } .pill.info { background: var(--info-bg); color: var(--info) }
+.pill.warn { background: var(--warn-bg); color: var(--warn) } .pill.alert { background: var(--alert-bg); color: var(--alert) }
+.pill.new { background: var(--accent-bg); color: var(--accent) }
+
+.btn { height: var(--control-row); border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: var(--radius); font: inherit; font-size: 12px; font-weight: 600; padding: 0 11px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px }
+.btn:hover { border-color: var(--text-3) }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; height: var(--control) }
+.btn.danger { color: var(--alert); border-color: transparent; background: none }
+.btn.danger:hover { background: var(--alert-bg) }
+.btn.link { border-color: transparent; background: none; color: var(--accent) }
+.btn.more { width: var(--control-row); padding: 0; justify-content: center; letter-spacing: 1px; font-weight: 700 }
+.btn.tall { height: var(--control) }
+.tog { width: 36px; height: 20px; border-radius: 10px; background: var(--switch-off); position: relative; flex: none; cursor: pointer; border: 0; padding: 0; display: block }
+.tog::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: left .15s }
+.tog.on { background: var(--accent) } .tog.on::after { left: 18px }
+.tog:focus-visible, .btn:focus-visible, .seg button:focus-visible, .subtab:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+.seg { display: inline-flex; background: var(--surface); border-radius: var(--radius); padding: 2px; gap: 2px; flex: none; max-width: 100% }
+.seg button { border: 0; background: none; font: inherit; font-size: 12px; color: var(--text-2); height: 24px; padding: 0 10px; border-radius: 6px; cursor: pointer; white-space: nowrap }
+.seg button.on { background: var(--card); color: var(--text); font-weight: 600; box-shadow: var(--elev) }
+.seg button.on.ok { background: var(--ok-bg); color: var(--ok); box-shadow: none }
+.seg button.on.warn { background: var(--warn-bg); color: var(--warn); box-shadow: none }
+.seg button.on.alert { background: var(--alert-bg); color: var(--alert); box-shadow: none }
+.seg.small button { font-size: 11px; padding: 0 8px; height: 22px }
+.sel { display: inline-flex; align-items: center; gap: 6px; height: var(--control-row); padding: 0 8px 0 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; color: var(--text); max-width: 100%; overflow: hidden }
+.sel::after { content: "▾"; color: var(--text-3); font-size: 10px; margin-left: auto }
+.sel span { overflow: hidden; text-overflow: ellipsis }
+.num { width: 86px; height: var(--control-row); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: 500 12px var(--mono); padding: 0 8px; text-align: right }
+.unit { font-size: 11px; color: var(--text-3) }
+.inp { height: var(--control-row); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: inherit; font-size: 12px; padding: 0 9px; min-width: 0 }
+.inp.w { width: 240px; max-width: 100% }
+.inp.m { font-family: var(--mono) }
+.inp.time { width: 70px; font-family: var(--mono); text-align: center; padding: 0 4px }
+
+/* строка настройки: подпись и подсказка слева, один контрол справа */
+.set { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 16px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border-2) }
+.set:last-child { border-bottom: 0 }
+.set .l { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.set .h { grid-column: 1; font-size: 11px; color: var(--text-3); line-height: 1.4; max-width: 64ch }
+.set .h.more { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer }
+.set .h.more.open { display: block }
+.set .ctl { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 8px; justify-self: end; flex-wrap: wrap; justify-content: flex-end }
+.set.changed .l::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent) }
+.set .v { font: 500 12px var(--mono); color: var(--text-2) }
+.set.ro .ctl { color: var(--text-2); font-size: 12px }
+
+/* полка «ждут вас» */
+.shelf { background: var(--shelf); border: 1px solid var(--shelf-line); border-radius: 10px; padding: 8px 14px }
+.shelf .k { font-size: 10px; font-weight: 700; color: var(--warn); letter-spacing: .05em; padding: 4px 0 2px; display: flex; gap: 8px; align-items: center }
+.shelf .k span { font-weight: 500; color: var(--text-3); letter-spacing: 0 }
+.shelf .row { border-bottom-color: var(--shelf-line) }
+
+/* тонкая настройка и опасное */
+details.fine { border: 1px dashed var(--border); border-radius: 10px }
+details.fine > summary { list-style: none; cursor: pointer; padding: 10px 14px; display: flex; gap: 8px; align-items: center; font-size: 12px; font-weight: 600; color: var(--text-2) }
+details.fine > summary::-webkit-details-marker { display: none }
+details.fine > summary::before { content: "›"; font-size: 17px; line-height: 1; color: var(--text-3); width: 12px; text-align: center; transition: transform .15s }
+details.fine[open] > summary::before { transform: rotate(90deg) }
+details.fine > summary .n { font-weight: 500; color: var(--text-3) }
+details.fine > summary .r { margin-left: auto; font-weight: 500; color: var(--text-3) }
+details.fine .inner { border-top: 1px dashed var(--border); padding: 4px 14px 8px; display: grid; gap: 14px }
+details.fine .inner h3 { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 0 }
+details.fine .inner .set { padding: 7px 0 }
+details.fine .inner .set .l { font-size: 12px }
+.sec.danger .card { border-color: color-mix(in srgb, var(--alert) 45%, var(--border)) }
+.sec.danger > h2 { color: var(--alert) }
+.how { font-size: 11px; color: var(--text-3) }
+.how summary { cursor: pointer; color: var(--text-2); font-weight: 600; font-size: 11px }
+.how p { margin: 6px 0 0; max-width: 72ch; line-height: 1.5 }
+
+/* полоса сохранения и нижняя полоса телефона */
+.savebar { position: sticky; bottom: 0; z-index: 20; display: flex; gap: 10px; align-items: center; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--card); border-top: 1px solid var(--border); box-shadow: 0 -2px 8px rgba(0,0,0,.06); margin: 10px -28px -40px; font-size: 12px; color: var(--text-2) }
+.savebar b { color: var(--text) }
+.savebar .right { margin-left: auto; display: flex; gap: 8px }
+.tabbar { display: none }
+
+/* метрики, таблицы, чипы */
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px }
+.metric { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; box-shadow: inset 3px 0 0 transparent }
+.metric.warn { box-shadow: inset 3px 0 0 var(--warn) } .metric.alert { box-shadow: inset 3px 0 0 var(--alert) } .metric.ok { box-shadow: inset 3px 0 0 var(--ok) }
+.metric .l { font-size: 11px; color: var(--text-2); font-weight: 600 } .metric .v { font-size: 20px; font-weight: 600; margin-top: 2px; line-height: 1.1 } .metric .v small { font-size: 11px; color: var(--text-3); font-weight: 500; margin-left: 3px } .metric .c { font-size: 11px; color: var(--text-3); margin-top: 3px }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 12px }
+.tbl th { font-size: 11px; font-weight: 600; color: var(--text-3); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap }
+.tbl td { padding: 7px 8px; border-bottom: 1px solid var(--border-2); vertical-align: middle }
+.tbl tr:last-child td { border-bottom: 0 }
+.tbl td.who b { font-size: 13px; font-weight: 600; display: block }
+.tbl td.who span { font-size: 11px; color: var(--text-3); display: block; margin-top: 1px }
+.tbl td .sel { max-width: 200px }
+.tbl td.r { text-align: right }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center }
+.chip { border: 1px solid var(--border); background: var(--card); color: var(--text-2); font: inherit; font-size: 12px; height: var(--control-row); padding: 0 10px; border-radius: 999px; cursor: pointer; white-space: nowrap }
+.chip.on { background: var(--text); color: var(--card); border-color: var(--text) }
+.chip .cnt { margin-left: 4px }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.toolbar .search { flex: 1 1 220px; max-width: 320px }
+.ok-text { color: var(--ok) } .warn-text { color: var(--warn) } .alert-text { color: var(--alert) }
+.callout { background: var(--accent-bg); border-radius: 8px; padding: 8px 12px; font-size: 11px; color: var(--text-2); line-height: 1.5 }
+.callout b { color: var(--text) }
+.note { font-size: 11px; color: var(--text-3); line-height: 1.5; max-width: 76ch }
+.empty { text-align: center; padding: 22px 10px; color: var(--text-2) }
+.empty b { display: block; font-size: 13px; color: var(--text); margin-bottom: 3px }
+.empty span { font-size: 11px }
+.scr { display: none } .scr.on { display: block }
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+.colbox { border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: grid; gap: 8px; align-content: start; min-width: 0; background: var(--card) }
+.colbox h3 { margin: 0; font-size: 13px; display: flex; justify-content: space-between; gap: 8px }
+.colbox.allow h3 { color: var(--ok) } .colbox.ask h3 { color: var(--warn) } .colbox.deny h3 { color: var(--alert) }
+.colbox .ex { color: var(--text-2); font-size: 11px; margin: 0 }
+.colbox .inp { min-width: 0; width: 0; flex: 1 1 60px }
+.colbox h3 .pill { flex: none }
+.pats { display: flex; flex-wrap: wrap; gap: 6px; max-height: 170px; overflow: auto }
+.pat { font-family: var(--mono); font-size: 11px; background: var(--surface); border-radius: 6px; padding: 3px 4px 3px 8px; display: inline-flex; align-items: center; gap: 4px; max-width: 100% }
+.pat i { font-style: normal; color: var(--text-3); padding: 0 3px; cursor: pointer }
+.pat.hit { outline: 2px solid var(--accent) }
+.hl { animation: hl 1.6s ease-out 1 }
+@keyframes hl { 0% { background: var(--accent-bg) } 100% { background: transparent } }
+.tail { color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 0 }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; background: var(--text); color: var(--card); font-size: 12px; padding: 8px 14px; border-radius: 999px; transition: .2s; z-index: 100; pointer-events: none; max-width: 90vw }
+.toast.on { opacity: 1; transform: translate(-50%, 0) }
+
+/* ---- телефон: контейнер уже 720 px ---- */
+@container app (max-width: 720px) {
+  .app, .app.with-menu { grid-template-columns: minmax(0, 1fr) }
+  .menu, .column { display: none }
+  .content { padding: 10px 16px 150px }
+  .head .acts { margin-left: auto }
+  .head .sub { font-size: 12px }
+  .ent { top: 0; padding: 8px 10px }
+  .ent .right .btn:not(.more) { display: none }
+  .set { grid-template-columns: minmax(0, 1fr) }
+  .set .ctl { grid-column: 1; grid-row: auto; justify-self: start; margin-top: 6px; justify-content: flex-start }
+  .set .ctl .seg { width: 100% } .set .ctl .seg button { flex: 1 1 0; justify-content: center; text-align: center }
+  .set .ctl .inp.w, .set .ctl .sel { width: 100% }
+  .row { flex-wrap: wrap; row-gap: 6px }
+  .row .right { margin-left: 0; width: 100%; justify-content: flex-start; padding-left: 0 }
+  .row .av ~ .right { padding-left: 40px }
+  .row .dot ~ .right { padding-left: 20px }
+  .row .tog ~ .right { padding-left: 48px }
+  .row.go { padding-right: 18px }
+  .row.go::after { position: absolute; right: 2px; top: 12px; margin: 0 }
+  .head .acts { max-width: 100%; flex-wrap: wrap; justify-content: flex-end }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .tbl thead { display: none }
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100% }
+  .tbl tr { padding: 8px 0; border-bottom: 1px solid var(--border-2) }
+  .tbl td { padding: 2px 0; border: 0 }
+  .tbl td[data-l]::before { content: attr(data-l); display: inline-block; font-size: 11px; color: var(--text-3); width: 96px }
+  .tbl td .sel { max-width: calc(100% - 100px) }
+  .cols3 { grid-template-columns: minmax(0, 1fr) }
+  .savebar { margin: 10px -16px 0; bottom: 56px }
+  .tabbar { display: flex; position: sticky; bottom: 0; z-index: 25; background: var(--card); border-top: 1px solid var(--border); margin: 0 -16px -150px; height: 56px }
+  .tabbar div { flex: 1; display: grid; place-items: center; gap: 3px; font: 500 11px/1 var(--font); color: var(--text-2); position: relative }
+  .tabbar div.on { color: var(--text); font-weight: 600 }
+  .tabbar div .ic { width: 20px; height: 20px; border: 1.5px solid currentColor; border-radius: 6px; opacity: .7 }
+  .tabbar div .n { position: absolute; top: 6px; left: calc(50% + 8px); font-size: 10px; background: var(--alert); color: #fff; border-radius: 999px; padding: 1px 5px; font-weight: 700 }
+  .phone-only:not(.scr) { display: block } .scr.phone-only.on { display: block } .desk-only { display: none !important }
+  .toolbar .search { max-width: none; flex-basis: 100% }
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px }
+}
+@container app (min-width: 721px) { .phone-only { display: none !important } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
+
+.cmd { font: 500 12px var(--mono); overflow-wrap: anywhere }
+.verdict { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; min-height: 24px; font-size: 11px; color: var(--text-3) }
+.verdict .pill { font-size: 11px }
+.lvl-ex { font-size: 11px; color: var(--text-3); line-height: 1.45; display: grid; gap: 3px; margin-top: 4px }
+.lvl-ex b { color: var(--text-2); font-weight: 600 }
+.lvl-ex .cur { color: var(--text) }
+.fp { font: 500 11px var(--mono); overflow-wrap: anywhere; color: var(--text-2) }
+</style>
+</head>
+<body>
+<div class="mockbar">
+  <b>Настройки Сёмы · макет</b>
+  <nav>
+    <a href="Karkas.html">Каркас и Обзор</a>
+    <a href="Modeli.html">Модели</a>
+    <a class="cur" href="Servers.html">Серверы</a>
+    <a href="Pochta.html">Почта</a>
+    <a href="Predely.html">Интеграции · пределы</a>
+  </nav>
+  <span class="sp"></span>
+  <div class="seg small" aria-label="Ширина"><button data-mode="desk" class="on">Десктоп</button><button data-mode="phone">Телефон 390</button></div>
+  <div class="seg small" aria-label="Тема"><button data-theme-pick="auto" class="on">Как в системе</button><button data-theme-pick="light">Светлая</button><button data-theme-pick="dark">Тёмная</button></div>
+</div>
+
+<div class="frame">
+<div class="app">
+  <aside class="column" aria-label="Разделы настроек">
+    <div class="ttl"><b>Настройки</b></div>
+    <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4l3.1 3.1"/></svg><input type="search" placeholder="Найти настройку" aria-label="Найти настройку"></div>
+    <button class="li">Обзор <span class="n alert">2</span></button>
+    <div class="grp">Каналы</div>
+    <button class="li">Почта <span class="n warn">36</span></button><button class="li">Telegram</button><button class="li">MAX</button><button class="li">Уведомления <span class="d" style="background:var(--warn)"></span></button><button class="li">Перевод</button>
+    <div class="grp">Поведение</div>
+    <button class="li">Модели и роли <span class="n warn">1</span></button><button class="li">Поиск</button><button class="li">Скиллы</button><button class="li">Развитие</button>
+    <div class="grp">Система</div>
+    <button class="li on" data-go="list" data-owns="host">Серверы <span class="n alert">2 ждут</span></button><button class="li">Агенты</button><button class="li">Интеграции</button><button class="li">Хранилища</button><button class="li">Инструменты</button><button class="li">Работа Сёмы</button>
+    <div class="grp">Безопасность</div>
+    <button class="li">Вход и доступ</button><button class="li">Ключи и секреты</button><button class="li">Что ушло наружу</button><button class="li">Журнал настроек</button>
+  </aside>
+
+  <main class="content">
+
+    <!-- РАЗДЕЛ «СЕРВЕРЫ» -->
+    <section class="scr on" id="list" data-tabset>
+      <div class="col">
+        <button class="crumb phone-only">‹ Настройки</button>
+        <div class="head"><div class="ttl"><h1>Серверы</h1><div class="sub">5 машин. На четырёх Сёма может менять что-то сам, посоветовавшись с двумя моделями; «хозяин» — только вы, и sudo там запрещён.</div></div><div class="acts"><button class="btn tall primary" data-go="add">Добавить сервер</button><span class="more-slot"><button class="btn more" aria-label="Ещё">···</button></span></div></div>
+        <div class="subtabs" role="tablist">
+          <button class="subtab on" data-tab="hosts">Машины <span class="cnt">5</span><span class="cnt alert">2 ждут</span></button>
+          <button class="subtab" data-tab="auto">Самостоятельность</button>
+          <button class="subtab" data-tab="log">Что делалось</button>
+        </div>
+
+        <div data-pane="hosts" style="display:grid;gap:18px">
+          <div class="shelf">
+            <div class="k">ЖДУТ ВАС <span>2 команды · до нажатия на сервер ничего не уходит</span></div>
+            <div class="row"><div class="body"><div class="cmd">sudo apt-get upgrade -y</div><div class="c">srv-bots · просил модуль «Серверы под присмотром» · сегодня 02:33 · правило «Спросить»: sudo всегда с вашей кнопкой</div></div><div class="right"><button class="btn primary" style="height:28px">Выполнить</button><button class="btn danger">Отклонить</button><button class="btn more" aria-label="Ещё">···</button></div></div>
+            <div class="row"><div class="body"><div class="cmd">ps aux --sort=-%cpu | head -n 8</div><div class="c">хозяин · просил чат «Серверы» · сегодня 06:44 · <b>нет правила</b> — не выполнена: не подошло ни одно правило сервера</div></div><div class="right"><button class="btn primary" style="height:28px">Спрашивать для неё</button><button class="btn">Разрешить её</button><button class="btn more" aria-label="Ещё">···</button></div></div>
+          </div>
+          <div class="sec"><h2>Машины · 5</h2><div class="card">
+            <div class="row go lvl-alert" data-go="host" data-host="srv-bots"><span class="av sq" style="background:var(--alert)">S</span><div class="body"><div class="t">srv-bots <span class="pill alert">отпечаток сменился</span><span class="pill">Linux</span></div><div class="c">команды не выполняются, пока вы не примете новый отпечаток · sema@203.0.113.26 · полная самостоятельность, окно 02:00–04:00</div></div><div class="right"><button class="btn primary" style="height:28px">Принять новый отпечаток…</button></div></div>
+            <div class="row go" data-go="host" data-host="Microtik"><span class="av sq" style="background:#17181C">M</span><div class="body"><div class="t">Microtik <span class="pill">RouterOS</span><span class="pill warn">полная</span></div><div class="c">sema@192.168.88.1 · последняя команда сегодня 06:16 · окно 02:00–04:00</div></div><div class="right"><button class="btn">Проверить связь</button></div></div>
+            <div class="row go" data-go="host" data-host="srv-vpn"><span class="av sq" style="background:#2F6FEB">S</span><div class="body"><div class="t">srv-vpn <span class="pill">Linux</span><span class="pill warn">полная</span></div><div class="c">sema@203.0.113.12 · последняя команда сегодня 02:30 · окно 02:00–06:00</div></div><div class="right"><button class="btn">Проверить связь</button></div></div>
+            <div class="row go" data-go="host" data-host="WireGuard"><span class="av sq" style="background:#2F6FEB">W</span><div class="body"><div class="t">WireGuard <span class="pill">Linux</span><span class="pill warn">полная</span></div><div class="c">sema@203.0.113.40 · последняя команда сегодня 02:30 · окно 02:00–04:00</div></div><div class="right"><button class="btn">Проверить связь</button></div></div>
+            <div class="row go" data-go="host" data-host="хозяин"><span class="av sq" style="background:#2E9A5B">⌂</span><div class="body"><div class="t">хозяин <span class="pill">Linux</span><span class="pill">без sudo</span></div><div class="c">машина, где работает Сёма · ivan@172.18.0.1 · ручное · последняя команда 11 сентября</div></div><div class="right"><button class="btn">Проверить связь</button></div></div>
+          </div></div>
+          <details class="how"><summary>Как это устроено</summary><p>Паролей Сёма не хранит и не умеет — только ключи из хранилища; приватная часть не выдаётся ни модулю, ни модели, а каждое её чтение видно в журнале ключа. Отпечаток сервера запоминается при первом входе; сменился — Сёма откажется входить, пока вы не подтвердите новый. «Выполнить и разрешить впредь» заводит серверу правило «Разрешить» на команду целиком, а не на первое слово.</p></details>
+        </div>
+
+        <div data-pane="auto" hidden style="display:grid;gap:18px">
+          <div class="card">
+            <div class="set"><div class="l">Ночная смена выполняет наряд</div><div class="h more">сейчас вхолостую: наряд собирается и целиком показывается в отчёте, но ни один шаг не выполняется. Осмотр при этом идёт по-настоящему — читающие команды выполняются всегда. Неделю смотрите, что Сёма собирался делать ночью, и по этому решаете, давать ли ему руки</div><div class="ctl"><button class="tog" role="switch" aria-checked="false"></button></div></div>
+            <div class="set ro"><div class="l">Сёма ведёт сам</div><div class="h">уровень, окно и потолок — у каждого сервера на его экране</div><div class="ctl"><span class="v">4 из 5 машин</span><button class="btn danger">Остановить все…</button></div></div>
+            <div class="set ro"><div class="l">Суд двух моделей</div><div class="h">изменяющую команду разбирает арбитр, вердикт выносит судья; любая заминка читается как «спросить вас»</div><div class="ctl"><span class="v ok-text">gpt-6.1-sol → gpt-6-sol · разные</span><button class="btn link">К ролям</button></div></div>
+            <div class="set ro"><div class="l">Скиллы администрирования</div><div class="h">по ним Сёма осматривает сервер и пишет наряд; правятся на «Скиллах» или просьбой в чате</div><div class="ctl"><span class="v">«Linux-сервер», «MikroTik RouterOS»</span><button class="btn link">Открыть</button></div></div>
+          </div>
+          <details class="fine"><summary>Тонкая настройка <span class="n">11 параметров · пределы ночной смены, страховки и SSH</span></summary><div class="inner">
+            <h3>Ночная смена</h3>
+            <div class="set"><div class="l">Шагов за смену, не больше</div><div class="h">пустой наряд — нормальный итог: выдуманная ночью работа хуже несделанной</div><div class="ctl"><input class="num" value="10"></div></div>
+            <div class="set"><div class="l">Команд осмотра</div><div class="h">читающие команды из скилла; круг чтения здесь и фильтр, и охрана</div><div class="ctl"><input class="num" value="12"></div></div>
+            <div class="set"><div class="l">Осмотр не дольше</div><div class="ctl"><input class="num" value="180"><span class="unit">с</span></div></div>
+            <div class="set"><div class="l">Смена раз в</div><div class="h">у серверов без окна</div><div class="ctl"><input class="num" value="24"><span class="unit">ч</span></div></div>
+            <div class="set"><div class="l">Скилл для Linux</div><div class="ctl"><span class="sel"><span>Linux-сервер</span></span></div></div>
+            <div class="set"><div class="l">Скилл для RouterOS</div><div class="ctl"><span class="sel"><span>MikroTik RouterOS</span></span></div></div>
+            <h3>Страховка и потолок</h3>
+            <div class="set"><div class="l">Срок страховки возврата</div><div class="h more">перед командой из круга «Спросить» на сервере заводится отложенный возврат; связь вернулась и проба сошлась — страховка снимается, иначе сервер вернёт себя сам через этот срок</div><div class="ctl"><input class="num" value="5"><span class="unit">мин</span></div></div>
+            <div class="set"><div class="l">Потолок изменений в час по умолчанию</div><div class="h">у сервера может быть свой</div><div class="ctl"><input class="num" value="3"></div></div>
+            <h3>SSH</h3>
+            <div class="set"><div class="l">Таймаут чтения</div><div class="h">суд и ночная смена работают с ним — долгое остаётся человеку</div><div class="ctl"><input class="num" value="60"><span class="unit">с</span></div></div>
+            <div class="set"><div class="l">Таймаут подтверждённой команды</div><div class="h">только у команды, подтверждённой вами: apt upgrade в минуту не укладывается</div><div class="ctl"><input class="num" value="600"><span class="unit">с</span></div></div>
+            <div class="set"><div class="l">Предел вывода</div><div class="h">вывод проходит маски секретов из «Памяти»</div><div class="ctl"><input class="num" value="20000"><span class="unit">симв.</span></div></div>
+          </div></details>
+          <details class="how"><summary>Что сильнее суда</summary><p>«Запретить» отказывает сразу и на любом уровне; на «полной» правило «Спросить» (ключи, пользователи, файрвол, сеть, удаление пакетов, сброс настроек) идёт на суд только со страховкой возврата; команда, пришедшая снаружи — например из письма, — идёт вам, кто бы её ни просил. Что не подошло ни под одно правило сервера, запрещено. После выполнения Сёма гоняет пробу; не сошлось — сервер останавливается и приходит тревога.</p></details>
+          <div class="savebar" hidden><span data-count></span><div class="right"><button class="btn tall" data-undo>Отменить</button><button class="btn primary" data-save>Сохранить</button></div></div>
+        </div>
+
+        <div data-pane="log" hidden style="display:grid;gap:14px">
+          <div class="toolbar"><div class="chips"><button class="chip on">Все</button><button class="chip">Выполнены</button><button class="chip">Отказы</button><button class="chip">Сёма сам</button><button class="chip">Ночная смена</button></div></div>
+          <div class="card">
+            <div class="row"><div class="body"><div class="cmd">/system script print detail</div><div class="c">Microtik · чат «Серверы» · сегодня 06:16 · код 0 · 0,8 с · 4,1 КБ</div></div><div class="right"><span class="pill ok">выполнена</span><button class="btn link">Вывод</button></div></div>
+            <div class="row"><div class="body"><div class="cmd">ps aux --sort=-%cpu | head -n 8</div><div class="c">srv-bots · ночная смена · сегодня 02:33 · код 0 · 0,4 с · 1,2 КБ</div></div><div class="right"><span class="pill ok">выполнена</span><button class="btn link">Вывод</button></div></div>
+            <div class="row"><div class="body"><div class="cmd">sudo apt-get upgrade -y</div><div class="c">srv-bots · модуль «Серверы под присмотром» · сегодня 02:33 · ждёт вашей кнопки</div></div><div class="right"><span class="pill warn">ждёт</span></div></div>
+            <div class="row"><div class="body"><div class="cmd">rm -rf /var/log/old</div><div class="c">srv-vpn · чат «Уведомление · srv-vpn» · вчера 23:41 · правило «Запретить»: rm -rf</div></div><div class="right"><span class="pill alert">отказ</span></div></div>
+            <div class="row"><div class="body"><div class="cmd">systemctl restart wg-quick@wg0</div><div class="c">WireGuard · ночная смена · суд: арбитр → судья → проба сошлась · вчера 02:14 · страховка снята</div></div><div class="right"><span class="pill ok">выполнена · сам</span><button class="btn link">Вывод</button></div></div>
+            <div class="tail">Показать ещё · 20 из 1 204</div>
+          </div>
+          <p class="note">Журнал приезжает только при открытии вкладки, первой страницей 20 строк. Это хроника, а не настройка: на первом экране раздела её нет.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ЭКРАН СЕРВЕРА -->
+    <section class="scr" id="host" data-tabset>
+      <div class="col read">
+        <button class="crumb" data-back="list">‹ Серверы</button>
+        <div class="ent"><span class="av" style="background:#2F6FEB" id="host-av">S</span><div class="who"><b id="host-name">srv-vpn</b><span>Linux · sema@203.0.113.12:22 · на связи · полная самостоятельность</span></div><div class="right"><button class="btn">Проверить связь</button><button class="btn more" aria-label="Ещё">···</button></div></div>
+        <div class="subtabs" role="tablist"><button class="subtab on" data-tab="ov">Обзор</button><button class="subtab" data-tab="au">Самостоятельность</button><button class="subtab" data-tab="ru">Правила</button><button class="subtab" data-tab="lg">Журнал</button></div>
+
+        <div data-pane="ov" style="display:grid;gap:18px">
+          <div class="card">
+            <div class="set ro"><div class="l">Адрес</div><div class="ctl"><span class="v">sema@203.0.113.12:22</span><button class="btn">Изменить…</button></div></div>
+            <div class="set ro"><div class="l">Ключ</div><div class="h">из хранилища; публичную часть кладёте на сервер вы</div><div class="ctl"><span class="v">Microtik · ключ SSH</span><button class="btn">Публичная часть</button></div></div>
+            <div class="set ro"><div class="l">Отпечаток сервера</div><div class="h">целиком, чтобы сверить с <span class="m">ssh-keygen -lf</span></div><div class="ctl"><span class="fp">SHA256:Zq8LmN2pR5tV7xY1aC3eG6iK9oS4uW0bD2fH5jM8nP1r</span><button class="btn">Скопировать</button></div></div>
+            <div class="set"><div class="l">Род</div><div class="h">угадывается по ответу на uname; от рода зависят скилл осмотра и наборы правил</div><div class="ctl"><div class="seg small"><button class="on">Linux</button><button>RouterOS</button></div></div></div>
+            <div class="set"><div class="l">Команды с sudo</div><div class="h more">выключено — команды с sudo, doas и su отклоняются совсем, даже с вашей кнопкой; включено — они всё равно идут на подтверждение, но root становится достижим</div><div class="ctl"><button class="tog on" role="switch" aria-checked="true"></button></div></div>
+            <div class="set ro"><div class="l">Последняя команда</div><div class="ctl"><span class="v">ps aux --sort=-%cpu | head -n 8 · сегодня 02:30 · ночная смена</span></div></div>
+          </div>
+          <div class="sec danger"><h2>Опасное</h2><div class="card"><div class="set"><div class="l">Удалить сервер</div><div class="h">ключ в хранилище останется; правила и журнал команд — нет</div><div class="ctl"><button class="btn danger">Удалить…</button></div></div></div></div>
+        </div>
+
+        <div data-pane="au" hidden style="display:grid;gap:18px">
+          <div class="card">
+            <div class="set"><div class="l">Уровень</div>
+              <div class="h"><div class="lvl-ex"><span><b>Ручное</b> — изменяющая команда ждёт вашей кнопки.</span><span><b>Под судом</b> — в окне изменяющая команда идёт на суд двух моделей; «Спросить» и sudo остаются вам.</span><span class="cur"><b>Полная</b> — Сёма сам находит работу ночной сменой; правило «Спросить» идёт на суд, но только со страховкой возврата. Не даётся «хозяину», серверу без sudo и когда суд не собран.</span></div></div>
+              <div class="ctl"><div class="seg small"><button>ручное</button><button>под судом</button><button class="on warn">полная</button></div></div></div>
+            <div class="set"><div class="l">Окно</div><div class="h">вне окна изменяющие команды ждут вашей кнопки; пусто — круглые сутки</div><div class="ctl"><input class="inp time" value="02:00" aria-label="с"><span class="unit">–</span><input class="inp time" value="06:00" aria-label="до"><button class="btn link">круглые сутки</button></div></div>
+            <div class="set"><div class="l">Не больше изменений в час</div><div class="ctl"><input class="num" value="3"></div></div>
+            <div class="set ro"><div class="l">Суд</div><div class="h">модели разные, как требуется</div><div class="ctl"><span class="v">gpt-6.1-sol → gpt-6-sol</span></div></div>
+            <div class="set ro"><div class="l">Страховка возврата</div><div class="h">общий срок для всех серверов — в «Тонкой настройке» раздела</div><div class="ctl"><span class="v">5 минут</span></div></div>
+            <div class="set ro"><div class="l">Остановка</div><div class="h">первая несошедшаяся проба останавливает сервер до вас и говорит, к какому времени он вернёт себя сам</div><div class="ctl"><span class="v ok-text">не остановлен</span></div></div>
+          </div>
+          <div class="card"><div class="row lvl-warn"><div class="body"><div class="t">Окно и время команд не совпадают</div><div class="c">задача «Утренняя проверка серверов» присылает команды в 08:00, а окно 02:00–06:00 — шесть команд так и будут ждать вас. Поменяйте окно или час задачи</div></div><div class="right"><button class="btn">Задачи →</button></div></div></div>
+          <div class="savebar" hidden><span data-count></span><div class="right"><button class="btn tall" data-undo>Отменить</button><button class="btn primary" data-save>Сохранить</button></div></div>
+        </div>
+
+        <div data-pane="ru" hidden style="display:grid;gap:14px">
+          <div class="card pad" style="display:grid;gap:8px">
+            <div style="font-size:11px;color:var(--text-3)">Проверить команду — что Сёма с ней сделает</div>
+            <input class="inp m" id="tester" value="sudo apt-get upgrade -y" style="width:100%;height:32px;font-size:13px" aria-label="Команда">
+            <div class="verdict" id="verdict"></div>
+          </div>
+          <div class="cols3" id="cols"></div>
+          <div class="row" style="border:0;padding:0"><div class="body"><div class="c">Не подошло ни одно правило — <b>запрещено</b>. sudo выполняется только по правилу «Спросить» и всегда с вашей кнопкой. Запрет сильнее разрешения. У «Полной» самостоятельности «Спросить» уходит на суд со страховкой, «Запретить» не меняется никогда.</div></div><div class="right"><button class="btn">Взять набор Linux</button></div></div>
+          <div class="savebar" hidden><span data-count></span><div class="right"><button class="btn tall" data-undo>Отменить</button><button class="btn primary" data-save>Сохранить</button></div></div>
+        </div>
+
+        <div data-pane="lg" hidden style="display:grid;gap:14px">
+          <div class="card">
+            <div class="row"><div class="body"><div class="cmd">ps aux --sort=-%cpu | head -n 8</div><div class="c">ночная смена · сегодня 02:30 · код 0 · 0,4 с · 1,2 КБ</div></div><div class="right"><span class="pill ok">выполнена</span><button class="btn link">Вывод</button></div></div>
+            <div class="row"><div class="body"><div class="cmd">df -h</div><div class="c">ночная смена · сегодня 02:30 · код 0 · 0,3 с</div></div><div class="right"><span class="pill ok">выполнена</span><button class="btn link">Вывод</button></div></div>
+            <div class="row"><div class="body"><div class="cmd">rm -rf /var/log/old</div><div class="c">чат «Уведомление · srv-vpn» · вчера 23:41 · правило «Запретить»: rm -rf</div></div><div class="right"><span class="pill alert">отказ</span></div></div>
+            <div class="row"><div class="body"><div class="cmd">journalctl -p err -S -1d --no-pager | tail -n 40</div><div class="c">модуль «Серверы под присмотром» · вчера 08:00 · код 0 · 1,1 с · 6,0 КБ</div></div><div class="right"><span class="pill ok">выполнена</span><button class="btn link">Вывод</button></div></div>
+            <div class="tail">Показать ещё · 20 из 312</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ДОБАВИТЬ СЕРВЕР: свой экран, а не форма под списком -->
+    <section class="scr" id="add">
+      <div class="col read">
+        <button class="crumb" data-back="list">‹ Серверы</button>
+        <div class="head"><div class="ttl"><h1>Добавить сервер</h1><div class="sub">ключ берётся из хранилища, пароли Сёма не хранит и не умеет; публичную часть ключа нужно положить на сервер в ~/.ssh/authorized_keys</div></div></div>
+        <div class="card">
+          <div class="set"><div class="l">Имя</div><div class="h">по нему модель и модули просят сервер: web-3</div><div class="ctl"><input class="inp w" placeholder="web-3"></div></div>
+          <div class="set"><div class="l">Адрес</div><div class="h">IP или хост</div><div class="ctl"><input class="inp w m" placeholder="203.0.113.7"></div></div>
+          <div class="set"><div class="l">Порт</div><div class="ctl"><input class="num" value="22"></div></div>
+          <div class="set"><div class="l">Пользователь</div><div class="ctl"><input class="inp w m" value="root"></div></div>
+          <div class="set"><div class="l">Ключ из хранилища</div><div class="ctl"><span class="sel"><span>Microtik · ключ SSH</span></span></div></div>
+          <div class="set"><div class="l">Разрешить sudo</div><div class="h">по умолчанию выключено: команды с sudo, doas и su отклоняются совсем. Разрешённый sudo всё равно идёт на ваше подтверждение</div><div class="ctl"><button class="tog" role="switch" aria-checked="false"></button></div></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary">Добавить и проверить связь</button><button class="btn tall" data-back="list">Отмена</button></div>
+        <div class="card"><div class="row"><span class="av sq" style="background:#2E9A5B">⌂</span><div class="body"><div class="t">Машина, где работает Сёма</div><div class="c">Сёма заведёт ключ ssh:хозяин и сервер «хозяин» по адресу хозяина; sudo там выключен, пока не разрешите</div></div><div class="right"><button class="btn">Подключить хозяина…</button></div></div></div>
+      </div>
+    </section>
+
+    <div class="tabbar" aria-hidden="true"><div><span class="ic"></span>Меню</div><div><span class="ic"></span>Ждут вас<span class="n">3</span></div><div><span class="ic"></span>Почта</div><div class="on"><span class="ic"></span>Чаты</div></div>
+  </main>
+</div>
+</div>
+
+<div class="legend-note">
+<b>Что показывает этот макет.</b> Список машин — пять тонких строк: имя, род, одно состояние и одна кнопка; то, что ждёт кнопки, стоит полкой над списком. Нажмите строку — откроется экран сервера с четырьмя вкладками: «Обзор» (адрес, ключ, полный отпечаток, род, sudo, удаление внизу), «Самостоятельность» (уровень сегментами с объяснением каждого, окно двумя полями времени вместо текстового вопроса «02:00-06:00», потолок, суд, страховка), «Правила» (согласованный макет трёх колонок с проверкой команды — впишите <span class="m">rm -rf /tmp/x</span> или <span class="m">df -h</span>) и «Журнал». Семь действий строки и восемь пар «Подробнее» разошлись по этим вкладкам. Вкладка раздела «Самостоятельность» держит общее: ночная смена, стоп-кран, суд — и «Тонкую настройку» с одиннадцатью пределами, которых на экране не было вовсе.
+</div>
+
+<script>
+/* Поведение макета: переходы, вкладки, переключатели, полоса сохранения,
+   режим «телефон» и тема. Это макет — ничего никуда не отправляется. */
+(function () {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const frame = $('.frame');
+
+  /* --- полоска макета --- */
+  $$('[data-mode]').forEach(b => b.addEventListener('click', () => {
+    frame.classList.toggle('phone', b.dataset.mode === 'phone');
+    $$('[data-mode]').forEach(x => x.classList.toggle('on', x === b));
+    frame.scrollTop = 0;
+  }));
+  $$('[data-theme-pick]').forEach(b => b.addEventListener('click', () => {
+    const v = b.dataset.themePick;
+    if (v === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', v);
+    $$('[data-theme-pick]').forEach(x => x.classList.toggle('on', x === b));
+  }));
+  if (location.search.includes('phone')) { const b = $('[data-mode="phone"]'); b && b.click(); }
+
+  /* --- переходы между экранами макета: стек, как на телефоне --- */
+  const stack = [];
+  function show(id, push = true) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const cur = $('.scr.on');
+    if (cur && push && cur !== target) stack.push(cur.id);
+    $$('.scr').forEach(s => s.classList.toggle('on', s === target));
+    $$('.column .li').forEach(li => li.classList.toggle('on', li.dataset.go === id || li.dataset.owns === id));
+    frame.scrollTop = 0; window.scrollTo({ top: 0 });
+    updateSave();
+  }
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (go && !e.target.closest('.tog, .seg, .btn:not([data-go]), .sel, input')) { e.preventDefault(); show(go.dataset.go); return; }
+    const back = e.target.closest('[data-back]');
+    if (back) { e.preventDefault(); const prev = stack.pop() || back.dataset.back; show(prev, false); return; }
+  });
+
+  /* --- внутренние вкладки --- */
+  document.addEventListener('click', e => {
+    const t = e.target.closest('.subtab[data-tab]');
+    if (!t) return;
+    const set = t.closest('[data-tabset]') || document;
+    $$('.subtab[data-tab]', t.parentElement).forEach(x => x.classList.toggle('on', x === t));
+    $$('[data-pane]', set).forEach(p => { if (p.closest('[data-tabset]') === set) p.hidden = p.dataset.pane !== t.dataset.tab; });
+    (frame.classList.contains('phone') ? frame : window).scrollTo({ top: 0 });
+  });
+
+  /* --- тумблеры, сегменты, числа: отметка «изменено» и полоса сохранения --- */
+  function markChanged(el) {
+    const host = el.closest('.set, .row, tr');
+    if (!host) return;
+    if (el.dataset.instant !== undefined) { flash(host); return; }
+    host.classList.toggle('changed', host.dataset.initial !== snapshot(host));
+    updateSave();
+  }
+  function snapshot(host) {
+    return $$('.tog, .seg button.on, .num, .inp, .sel', host).map(x => x.classList.contains('tog') ? x.classList.contains('on') : x.classList.contains('on') ? x.textContent : x.value ?? x.textContent).join('|');
+  }
+  $$('.set, .row, tr').forEach(h => h.dataset.initial = snapshot(h));
+  document.addEventListener('click', e => {
+    const tog = e.target.closest('.tog');
+    if (tog) { tog.classList.toggle('on'); tog.setAttribute('aria-checked', tog.classList.contains('on')); markChanged(tog); return; }
+    const sb = e.target.closest('.seg button');
+    if (sb) { $$('button', sb.parentElement).forEach(x => x.classList.toggle('on', x === sb)); markChanged(sb); return; }
+    const h = e.target.closest('.set .h.more');
+    if (h) h.classList.toggle('open');
+    const tail = e.target.closest('.tail[data-reveal]');
+    if (tail) { $$(tail.dataset.reveal).forEach(r => r.hidden = false); tail.remove(); }
+  });
+  document.addEventListener('input', e => { if (e.target.matches('.num, .inp')) markChanged(e.target); });
+
+  function updateSave() {
+    const scr = $('.scr.on') || document;
+    const bar = $('.savebar', scr) || $('.savebar');
+    if (!bar) return;
+    const changed = $$('.changed', scr);
+    bar.hidden = changed.length === 0;
+    const what = $('[data-count]', bar);
+    if (what) {
+      const names = changed.map(c => ($('.l', c) || $('.t', c) || $('td.who b', c) || c).textContent.trim().replace(/\s+/g, ' ')).slice(0, 2);
+      what.innerHTML = `Изменено <b>${changed.length}</b>: ${names.map(n => '«' + n + '»').join(', ')}${changed.length > 2 ? ' и ещё ' + (changed.length - 2) : ''}`;
+    }
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-save]')) { $$('.changed').forEach(c => { c.classList.remove('changed'); c.dataset.initial = snapshot(c); }); updateSave(); toast('Сохранено. Сёма живёт по новым настройкам с этой секунды.'); }
+    if (e.target.closest('[data-undo]')) { location.reload(); }
+  });
+  function flash(el) { el.classList.remove('hl'); void el.offsetWidth; el.classList.add('hl'); }
+  function toast(text) {
+    let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.append(t); }
+    t.textContent = text; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600);
+  }
+  window.sema = { show, flash, toast, updateSave };
+  updateSave();
+})();
+
+(function () {
+  const $ = (s, r = document) => r.querySelector(s); const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RULES = {
+    allow: ['uptime', 'df', 'free', 'journalctl', 'tail', 'head', 'cat', 'ls', 'ps', 'top -b -n 1', 'docker ps', 'docker logs', 'systemctl status', 'systemctl list-units', 'ss', 'du', 'who', 'uname', 'hostname', 'date', 'grep', 'find', 'apt list', 'dpkg -l', 'last', 'ufw status', 'iptables -L', 'ip', 'getent', 'lsblk', 'mount', 'crontab -l', 'timedatectl', 'vmstat', 'dmesg', 'docker images', 'docker inspect', 'cat /var/run/reboot-required'],
+    ask: ['apt-get upgrade', 'apt-get install', 'systemctl restart', 'systemctl stop', 'kill', 'docker restart', 'reboot-required', 'userdel', 'adduser', 'useradd', 'usermod', 'passwd', 'authorized_keys', 'sshd_config', 'ufw', 'iptables -F', 'ip route', 'netplan', 'apt-get remove', 'apt purge', 'drop database', 'truncate', 'fdisk'],
+    deny: ['rm -rf', 'rm -r /', 'mkfs', 'dd', 'shutdown', 'reboot', 'halt', 'poweroff', 'chmod -R 777', '> /dev/sd', 'sh -c', 'bash -c', 'eval', ':(){', 'curl | sh', 'wget -O- | sh'],
+  };
+  const TXT = { allow: ['Разрешить', 'команда начинается с образца — выполняется сразу'], ask: ['Спросить', 'образец встречается в команде — ждёт вашей кнопки; sudo — только здесь'], deny: ['Запретить', 'слово-образец в команде — отказ без вопроса'] };
+  const word = (c, p) => { const i = c.indexOf(p); return i >= 0 && (i === 0 || /[\s;|&(]/.test(c[i - 1])); };
+  function classify(cmd) {
+    const c = cmd.trim().replace(/\s+/g, ' '); if (!c) return null;
+    for (const p of RULES.deny) if (word(c, p)) return ['deny', p];
+    for (const p of RULES.ask) if (c.includes(p)) return ['ask', p];
+    const sudo = /(^|\s)(sudo|doas|su)\s/.test(c + ' ');
+    if (!sudo) for (const p of RULES.allow) if (c === p || c.startsWith(p + ' ') || c.startsWith(p)) return ['allow', p];
+    return ['deny', sudo ? 'sudo без правила «Спросить» — запрещено' : 'ни одно правило не подошло — запрещено'];
+  }
+  function render() {
+    const v = classify($('#tester').value); const out = $('#verdict'); out.innerHTML = '';
+    if (v) { out.innerHTML = `<span class="pill ${v[0] === 'allow' ? 'ok' : v[0] === 'ask' ? 'warn' : 'alert'}">${TXT[v[0]][0]}</span><span>по правилу: ${v[1]}</span>`; }
+    const cols = $('#cols'); cols.innerHTML = '';
+    for (const k of ['allow', 'ask', 'deny']) {
+      const box = document.createElement('div'); box.className = 'colbox ' + k;
+      box.innerHTML = `<h3><span>${TXT[k][0]}</span><span class="pill ${k === 'allow' ? 'ok' : k === 'ask' ? 'warn' : 'alert'}">${RULES[k].length}</span></h3><p class="ex">${TXT[k][1]}</p>`;
+      const pats = document.createElement('div'); pats.className = 'pats';
+      RULES[k].forEach(p => { const s = document.createElement('span'); s.className = 'pat' + (v && v[1] === p ? ' hit' : ''); s.innerHTML = `<span>${p}</span><i aria-label="убрать">×</i>`; pats.append(s); });
+      const add = document.createElement('div'); add.style.cssText = 'display:flex;gap:6px'; add.innerHTML = `<input class="inp m" placeholder="образец команды" style="flex:1"><button class="btn">Добавить</button>`;
+      box.append(pats, add); cols.append(box);
+    }
+  }
+  $('#tester').addEventListener('input', render); render();
+  document.addEventListener('click', e => { const r = e.target.closest('.row[data-host]'); if (r) { $('#host-name').textContent = r.dataset.host; $('#host-av').textContent = r.dataset.host[0].toUpperCase(); } });
+})();
+</script>
+</body>
+</html>

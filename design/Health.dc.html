@@ -1,0 +1,346 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 1500px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .subitem .badge-count { font-size: 10px; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+    .setrow { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .setrow:last-child { border-bottom: none; }
+    .radio { width: 16px; height: 16px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.25); flex-shrink: 0; box-sizing: border-box; }
+    .radio-on { border: 5px solid #007AFF; background: #FFFFFF; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; }
+    .box { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 8px; }
+    .pick { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 12px; color: #1D1D1F; flex-shrink: 0; }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; }
+    .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 4px 6px 4px; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px"></span>
+        Все ящики
+        <span class="badge-count">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>
+        owner@example.org
+        <span class="badge-count">38</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FC3F1D; flex-shrink: 0"></span>
+        me@example.com
+        <span class="badge-count">23</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+      </div>
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8h3l1.5-4 3 8 1.5-4h4"/></svg>
+        Здоровье
+        <span style="margin-left: auto; width: 8px; height: 8px; border-radius: 4px; background: #FEBC2E"></span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h4V3h2v2h4v4h-2v2h2v3H9v-2H7v2H3z"/></svg>
+        Модули
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 10:46
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; background: #F7F6F4; overflow: hidden; display: flex; justify-content: center">
+    <div style="width: 820px; display: flex; flex-direction: column; gap: 20px; padding: 28px 0">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 8px"><div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">Здоровье</div><span class="tag" style="background: rgba(255,188,46,0.22); color: #9A6B00">одно предупреждение</span></div>
+          <span class="meta">Что с Сёмой и кто сколько съел: каждый вызов модели и запуск кода записан по потребителю. Пороги жёлтого и красного — настройки ниже.</span>
+        </div>
+        <div style="margin-left: auto"><div style="display: flex; height: 26px; border-radius: 7px; background: rgba(0,0,0,0.05); padding: 2px"><span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">сегодня</span><span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F; font-weight: 500; background: #FFFFFF; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.12)">неделя</span><span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">месяц</span></div></div>
+      </div>
+
+      <div style="display: flex; gap: 10px">
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: center; justify-content: space-between"><span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">Сервер</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">в норме</span></div>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">3 дн. 7 ч</div>
+          <span class="meta">аптайм · 184 МБ памяти · 41 горутина · CPU 3%</span>
+        </div>
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: center; justify-content: space-between"><span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">Модели</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">в норме</span></div>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">412 вызовов</div>
+          <span class="meta">отказов 6 · 1,5% · DeepseekPro не отвечал 2 раза</span>
+        </div>
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: center; justify-content: space-between"><span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">Очередь событий</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">в норме</span></div>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">0</div>
+          <span class="meta">обработано 96 · упало 1 · в среднем 4,2 с</span>
+        </div>
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: center; justify-content: space-between"><span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">База и диск</span><span class="tag" style="background: rgba(255,188,46,0.22); color: #9A6B00">мало места</span></div>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">74 МБ</div>
+          <span class="meta">файлы 22 МБ · свободно 3,1 ГБ из 32 · порог 5 ГБ</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Кто сколько съел · неделя · всего ≈ 1,2 млн токенов · 1,84 $</div>
+        <div class="card">
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Чаты</span></div>
+              <span class="meta">47 ответов · DeepseekPro, qwen-27b · 28 мин модели</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden"><div style="width: 46%; height: 100%; background: #007AFF"></div></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">≈ 560 тыс. · 1,12 $</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Модуль «Чеки»</span><span class="tag" style="background: rgba(0,122,255,0.14); color: #0058B0; flex-shrink: 0">module</span></div>
+              <span class="meta">96 событий · 96 вызовов роли «Модули» · qwen-4b</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden"><div style="width: 24%; height: 100%; background: #007AFF"></div></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">≈ 290 тыс. · бесплатно</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Ядро · фильтр писем</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75); flex-shrink: 0">core</span></div>
+              <span class="meta">1 661 письмо · роль «Фильтр писем» · qwen-4b</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden"><div style="width: 18%; height: 100%; background: #007AFF"></div></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">218 тыс. · бесплатно</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Сведение памяти</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75); flex-shrink: 0">core</span></div>
+              <span class="meta">7 запусков роли «Память» · кристаллы, граф, слияние</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden"><div style="width: 9%; height: 100%; background: #007AFF"></div></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">≈ 110 тыс. · бесплатно</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Модуль «Требует внимания»</span><span class="tag" style="background: rgba(0,122,255,0.14); color: #0058B0; flex-shrink: 0">module</span></div>
+              <span class="meta">3 события · 2 вызова · 1 напоминание в чат</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden"><div style="width: 1%; height: 100%; background: #007AFF"></div></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">≈ 6 тыс. · бесплатно</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Claude Code · память по MCP</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75); flex-shrink: 0">mcp</span></div>
+              <span class="meta">5 сессий · 31 обращение · сэкономлено 40 тыс. токенов</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden"><div style="width: 1%; height: 100%; background: #007AFF"></div></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">4 тыс. · 0,72 $</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Скрипт «Напоминание» · #2</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75); flex-shrink: 0">script</span></div>
+              <span class="meta">3 запуска · 0,01 с</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden"><div style="width: 0%; height: 100%; background: #007AFF"></div></div><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">—</span></div>
+          </div>
+        </div>
+        <div class="meta" style="padding: 6px 4px 0 4px">«≈» — токены оценены по длине текста: провайдер не вернул usage. Деньги — по цене за миллион токенов из настроек модели; локальные модели бесплатны.</div>
+      </div>
+
+      <div>
+        <div class="grouptitle">По моделям</div>
+        <div class="card">
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">qwen-4b</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32; flex-shrink: 0">локально</span></div>
+              <span class="meta">1 810 вызовов · медиана 2,1 с · отказов 0</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">624 тыс. · бесплатно</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">DeepseekPro</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75); flex-shrink: 0">облако · 0,55 $/млн</span></div>
+              <span class="meta">52 вызова · медиана 9,4 с · отказов 2 (401 до смены ключа)</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">≈ 560 тыс. · 1,12 $</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">qwen-27b</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32; flex-shrink: 0">локально</span></div>
+              <span class="meta">9 вызовов · медиана 74 с · 1 таймаут (120 с, поднят до 300)</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">31 тыс. · бесплатно</span></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">claude (CLI)</span><span class="tag" style="background: rgba(0,0,0,0.06); color: rgba(60,60,67,0.75); flex-shrink: 0">подписка</span></div>
+              <span class="meta">5 вызовов · медиана 6 с · usage не отдаёт</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #1D1D1F; width: 150px; text-align: right">≈ 4 тыс. · 0,72 $</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Отказы и медленное · за неделю</div>
+        <div class="card">
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">DeepseekPro · чат #46</span><span class="tag" style="background: rgba(255,59,48,0.14); color: #C4271C; flex-shrink: 0">отказ</span></div>
+              <span class="meta">HTTP 401 Authentication Fails · 3 сен 06:46 · модуль «Курсы валют» не собрался</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Чат</a></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">qwen-27b · чат #49</span><span class="tag" style="background: rgba(255,59,48,0.14); color: #C4271C; flex-shrink: 0">таймаут</span></div>
+              <span class="meta">дольше 120 с · 3 сен 10:03 · сработала запасная? нет — «нет»</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Роли</a></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Модуль «Чеки» · событие file.added #9</span><span class="tag" style="background: rgba(255,188,46,0.22); color: #9A6B00; flex-shrink: 0">медленно</span></div>
+              <span class="meta">48 с · qwen-4b · извлечение из PDF на 3 страницы</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Модуль</a></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Скрипт «Проба» · #7</span><span class="tag" style="background: rgba(255,59,48,0.14); color: #C4271C; flex-shrink: 0">ошибка</span></div>
+              <span class="meta">строка 4: sema.data.find: недопустимое имя поля · 2 сен</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><a href="#" style="font-size: 12px; color: #007AFF">Скрипт</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Процесс · сутки</div>
+        <div class="card">
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Память процесса</span></div>
+              <span class="meta">сейчас 184 МБ · максимум за сутки 312 МБ (сведение памяти в 03:00)</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><svg width="160" height="28" viewBox="0 0 160 28" fill="none"><polyline points="0,20 15,18 30,19 45,14 60,15 75,9 90,11 105,8 120,12 135,6 150,9 160,7" stroke="#007AFF" stroke-width="1.5"/><rect x="0" y="0" width="160" height="28" fill="url(#g)" opacity="0"/></svg></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">CPU</span></div>
+              <span class="meta">сейчас 3% · пики до 85% при OCR страниц PDF</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><svg width="160" height="28" viewBox="0 0 160 28" fill="none"><polyline points="0,20 15,18 30,19 45,14 60,15 75,9 90,11 105,8 120,12 135,6 150,9 160,7" stroke="#007AFF" stroke-width="1.5"/><rect x="0" y="0" width="160" height="28" fill="url(#g)" opacity="0"/></svg></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">База</span></div>
+              <span class="meta">74 МБ · WAL 2 МБ · сжата 3 сен</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><svg width="160" height="28" viewBox="0 0 160 28" fill="none"><polyline points="0,20 15,18 30,19 45,14 60,15 75,9 90,11 105,8 120,12 135,6 150,9 160,7" stroke="#007AFF" stroke-width="1.5"/><rect x="0" y="0" width="160" height="28" fill="url(#g)" opacity="0"/></svg></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Очередь событий</span></div>
+              <span class="meta">ждёт 0 · максимум за сутки 14 (после включения модуля «Чеки»)</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><svg width="160" height="28" viewBox="0 0 160 28" fill="none"><polyline points="0,20 15,18 30,19 45,14 60,15 75,9 90,11 105,8 120,12 135,6 150,9 160,7" stroke="#007AFF" stroke-width="1.5"/><rect x="0" y="0" width="160" height="28" fill="url(#g)" opacity="0"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Пороги · когда точка в меню жёлтая и красная</div>
+        <div class="card">
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Свободно на диске</span></div>
+              <span class="meta">жёлтая ниже · красная ниже</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div class="pick" style="width: 80px">5 ГБ</div><div class="pick" style="width: 80px">1 ГБ</div></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Отказы модели за час</span></div>
+              <span class="meta">доля вызовов с ошибкой</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div class="pick" style="width: 80px">5%</div><div class="pick" style="width: 80px">20%</div></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Очередь событий</span></div>
+              <span class="meta">ждёт дольше</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div class="pick" style="width: 80px">2 мин</div><div class="pick" style="width: 80px">15 мин</div></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Почта не проверялась</span></div>
+              <span class="meta">с последнего удачного опроса</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div class="pick" style="width: 80px">30 мин</div><div class="pick" style="width: 80px">3 ч</div></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Медленная операция</span></div>
+              <span class="meta">попадает в ленту, если дольше</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div class="pick" style="width: 80px">30 с</div><div class="pick" style="width: 80px">—</div></div>
+          </div>
+          <div class="setrow" style="">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Хранить журнал расхода</span></div>
+              <span class="meta">построчно, потом сворачивать по дням</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0"><div class="pick" style="width: 80px">90 дн.</div><div class="pick" style="width: 80px">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{display:flex;flex-direction:column;gap:16px;padding:26px 28px 30px}
+  .cap{display:flex;flex-direction:column;gap:6px;max-width:1080px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em;line-height:1.2}
+  .cap p{margin:0;font-size:13px;line-height:1.5;color:#5B5849;max-width:1000px}
+  .cap b{font-weight:600;color:var(--ink)}
+  .screen{width:1180px;background:var(--paper);border:1px solid #D8D3C6;border-radius:14px;
+    overflow:hidden;box-shadow:0 8px 26px rgba(40,34,20,.10)}
+
+  .top{padding:20px 28px 0;display:flex;align-items:center;gap:18px;position:relative}
+  .h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em}
+  .addr{font-size:11px;color:var(--ink3);padding:2px 7px;border-radius:5px;background:var(--sunk)}
+  .searchwrap{margin-left:auto;position:relative;width:360px}
+  .search{height:32px;border-radius:8px;border:1px solid var(--accent);background:var(--panel);
+    display:flex;align-items:center;gap:8px;padding:0 11px;font-size:13px;
+    box-shadow:0 0 0 3px var(--accent-soft)}
+  .search .cursor{width:1px;height:15px;background:var(--ink)}
+  .drop{position:absolute;left:0;right:0;top:38px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;box-shadow:0 10px 26px rgba(40,34,20,.16);padding:5px;z-index:9}
+  .dhd{font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--ink3);padding:6px 9px 4px}
+  .dit{display:flex;flex-direction:column;gap:1px;padding:7px 9px;border-radius:7px}
+  .dit.on{background:var(--accent-soft)}
+  .dit b{font-size:13px;font-weight:500}
+  .dit span{font-size:11px;color:var(--ink3)}
+  .dit em{font-style:normal;background:#FDF1C8;border-radius:3px;padding:0 1px}
+
+  .tabs{display:flex;gap:2px;padding:12px 28px 0;border-bottom:1px solid var(--line);margin-top:12px}
+  .tab{height:36px;padding:0 14px;display:inline-flex;align-items:center;gap:7px;position:relative;top:1px;
+    font-size:13px;font-weight:600;color:var(--ink2);border-bottom:2px solid transparent}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+  .tab .n{display:inline-flex;align-items:center;justify-content:center;height:16px;min-width:16px;padding:0 4px;
+    border-radius:5px;font-size:10px;font-weight:700;background:var(--alert-soft);color:var(--alert)}
+
+  .body{padding:20px 28px 30px;display:flex;flex-direction:column;gap:24px;max-width:1000px}
+
+  .blk{display:flex;flex-direction:column}
+  .blk-hd{display:flex;align-items:center;gap:10px;padding-bottom:8px}
+  .blk-hd h2{margin:0;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)}
+  .blk-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .blk-hd .n{font-size:11px;color:var(--ink3)}
+
+  /* полка «ждут решения» */
+  .shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:12px;overflow:hidden}
+  .sit{display:flex;align-items:flex-start;gap:12px;padding:12px 15px;border-top:1px solid var(--shelf-line)}
+  .sit:first-child{border-top:0}
+  .sit .dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;margin-top:5px}
+  .sit .txt{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:2px}
+  .sit .txt b{font-size:13px;font-weight:600;line-height:1.35}
+  .sit .txt span{font-size:11px;line-height:1.45;color:var(--ink2)}
+  .sit .act{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-top:1px}
+  .sfoot{padding:10px 15px;border-top:1px solid var(--shelf-line);font-size:12px;color:var(--accent);font-weight:600}
+
+  /* бумажные строки подключений */
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;align-items:flex-start;gap:13px;padding:12px 4px;border-bottom:1px solid var(--line2)}
+  .row:last-child{border-bottom:0}
+  .row .dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;margin-top:5px}
+  .row .txt{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:3px}
+  .row .txt b{font-size:13px;font-weight:600;line-height:1.3}
+  .row .st{font-size:12px;line-height:1.4;color:var(--ink2)}
+  .row .st.warn{color:var(--warn);font-weight:500}
+  .row .st.alert{color:var(--alert);font-weight:500}
+  .facts{display:flex;flex-wrap:wrap;gap:0 18px;margin-top:2px}
+  .fact{display:flex;gap:5px;align-items:baseline}
+  .fact u{text-decoration:none;font-size:11px;color:var(--ink3)}
+  .fact b{font-size:11px;font-weight:600}
+  .row .act{flex:0 0 auto;margin-top:1px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:29px;padding:0 12px;
+    border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);white-space:nowrap}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--accent);padding:0 6px}
+
+  /* недавние изменения */
+  .log{display:flex;flex-direction:column}
+  .lrow{display:flex;align-items:baseline;gap:12px;padding:9px 4px;border-bottom:1px solid var(--line2)}
+  .lrow:last-child{border-bottom:0}
+  .lrow .when{flex:0 0 118px;font-size:11px;color:var(--ink3)}
+  .lrow .who{flex:0 0 62px;font-size:11px;font-weight:600;color:var(--ink2)}
+  .lrow .what{flex:1 1 auto;font-size:13px;line-height:1.4}
+  .lrow .what span{color:var(--ink3);font-size:11px}
+  .lrow .go{flex:0 0 auto}
+
+  .quiet{font-size:11px;line-height:1.55;color:var(--ink3);max-width:720px}
+
+  .notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:1180px}
+  .note{background:var(--panel);border:1px solid #DDD8CA;border-radius:11px;padding:12px 14px}
+  .note b{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+  .note span{font-size:11px;line-height:1.5;color:#5B5849}
+  .note.q{background:#FFF9EE;border-color:var(--shelf-line)}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">ВКЛАДКА «ГЛАВНОЕ» · ЧИСЛА С ЖИВОГО СЕРВЕРА 11 СЕНТЯБРЯ 2026, 10:40</div>
+    <h1>Четыре блока, а не каталог из семнадцати ссылок</h1>
+    <p>Первый экран настроек обычно делают оглавлением — и он бесполезен: человек приходит сюда не «посмотреть
+      список разделов», а потому что <b>что-то перестало работать</b> или он хочет проверить, всё ли цело.
+      Поэтому «Главное» отвечает ровно на три вопроса: что сломано и что с этим сделать; кто сейчас подключён и
+      жив ли; что менялось за последние дни. Оглавление не нужно — его роль играют пять вкладок сверху.
+      <b>У каждой проблемы ровно одна кнопка, и она ведёт прямо к настройке, которая беду устраняет</b> —
+      не «в раздел», где её ещё надо найти глазами.</p>
+  </div>
+
+  <div class="screen">
+    <div class="top">
+      <h1 class="h1">Настройки</h1>
+      <span class="addr m">#settings/main</span>
+      <div class="searchwrap">
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+          частн<span class="cursor"></span>
+        </div>
+        <div class="drop">
+          <div class="dhd">НАЙДЕНО 3</div>
+          <div class="dit on"><b>Своей считается и <em>частн</em>ая сеть</b>
+            <span>Безопасность → Доверенная сеть → Кого пускать без входа</span></div>
+          <div class="dit"><b>Скрипт не ходит в <em>частн</em>ые сети</b>
+            <span>Система → Интеграции → Сетевые инструменты модулей</span></div>
+          <div class="dit"><b>Имена сервера из своей сети</b>
+            <span>Безопасность → Доверенная сеть · sema.home.arpa</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <span class="tab" role="tab" aria-selected="true">Главное <span class="n">4</span></span>
+      <span class="tab" role="tab" aria-selected="false">Каналы</span>
+      <span class="tab" role="tab" aria-selected="false">Поведение</span>
+      <span class="tab" role="tab" aria-selected="false">Система</span>
+      <span class="tab" role="tab" aria-selected="false">Безопасность</span>
+    </div>
+
+    <div class="body">
+
+      <div class="blk">
+        <div class="blk-hd"><h2>Ждут решения</h2><div class="rule"></div>
+          <span class="n">4 · кнопка открывает саму настройку</span></div>
+        <div class="shelf">
+
+          <div class="sit">
+            <span class="dot" style="background:var(--alert)"></span>
+            <div class="txt">
+              <b>Эмбеддера больше нет среди подключённых моделей</b>
+              <span><span class="m">text-embedding-bge-m3</span> в списке не значится. Пока не выберете другой,
+                поиск по письмам, похожесть и память отвечают отказом.</span>
+            </div>
+            <div class="act"><span class="btn pri">Модели → Служебные →</span></div>
+          </div>
+
+          <div class="sit">
+            <span class="dot" style="background:var(--alert)"></span>
+            <div class="txt">
+              <b>Роль «Арбитр» не отвечает, а запасной у неё нет</b>
+              <span><span class="m">claude-fable-5-1</span> · нет связи с сетью · последний ответ 07.09 18:26. Изменяющие команды
+                на серверах не судятся и целиком идут к вам.</span>
+            </div>
+            <div class="act"><span class="btn pri">Выбрать запасную</span></div>
+          </div>
+
+          <div class="sit">
+            <span class="dot" style="background:var(--alert)"></span>
+            <div class="txt">
+              <b>4 сервера из 5 не отвечают</b>
+              <span>Microtik, WireGuard, srv-vpn, srv-bots — <span class="m">connect: network is unreachable</span>,
+                сегодня 10:18. Утренняя проверка серверов не сделана третий день.</span>
+            </div>
+            <div class="act"><span class="btn">Проверить связь со всеми</span></div>
+          </div>
+
+          <div class="sit">
+            <span class="dot" style="background:var(--warn)"></span>
+            <div class="txt">
+              <b>11 входов из 12 молчат больше суток</b>
+              <span>забытые вкладки: ключи «MacBookSafari» (6 входов, последний запрос 08.09 14:05) и «MAcBook»
+                (4 входа, 06.09 12:18). Они ничего не делают, но живут до своего срока.</span>
+            </div>
+            <div class="act"><span class="btn">Выйти везде</span></div>
+          </div>
+
+          <div class="sfoot">Ещё 3 замечания попроще: у 50 моделей не названа цена · зеркало Яндекс.Диска пусто (0 из 260)
+            · Сёма разбирает 5 папок-ярлыков Gmail</div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-hd"><h2>Подключения</h2><div class="rule"></div>
+          <span class="n">состояние на 10:40, без захода в разделы</span></div>
+        <div class="rows">
+
+          <div class="row">
+            <span class="dot" style="background:var(--ok)"></span>
+            <div class="txt">
+              <b>Почта</b>
+              <div class="st">2 ящика, оба личные · Сёма читает их и наводит порядок</div>
+              <div class="facts">
+                <span class="fact"><u>Gmail</u><b class="m">15 папок</b></span>
+                <span class="fact"><u>Яндекс</u><b class="m">9 папок</b></span>
+                <span class="fact"><u>Писем в архиве</u><b class="m">2 277</b></span>
+                <span class="fact"><u>Непрочитанных</u><b class="m">41</b></span>
+              </div>
+            </div>
+            <div class="act"><span class="btn ghost">Открыть →</span></div>
+          </div>
+
+          <div class="row">
+            <span class="dot" style="background:var(--ok)"></span>
+            <div class="txt">
+              <b>Мессенджеры</b>
+              <div class="st">Telegram и MAX на связи, оба от вашего имени</div>
+              <div class="facts">
+                <span class="fact"><u>Telegram</u><b class="m">14 чатов, права у 5</b></span>
+                <span class="fact"><u>MAX</u><b class="m">93 чата, выбран 1</b></span>
+                <span class="fact"><u>Заход</u><b class="m">раз в 1 мин</b></span>
+              </div>
+            </div>
+            <div class="act"><span class="btn ghost">Открыть →</span></div>
+          </div>
+
+          <div class="row">
+            <span class="dot" style="background:var(--warn)"></span>
+            <div class="txt">
+              <b>Модели</b>
+              <div class="st warn">54 модели у 3 провайдеров, но у 50 не названа цена — их расход считается нулём</div>
+              <div class="facts">
+                <span class="fact"><u>Ролей занято</u><b class="m">9</b></span>
+                <span class="fact"><u>Провайдеры</u><b class="m">Perplexity 50 · DeepSeek 3 · свой 2</b></span>
+                <span class="fact"><u>Отправок за сутки</u><b class="m">916</b></span>
+              </div>
+            </div>
+            <div class="act"><span class="btn ghost">Открыть →</span></div>
+          </div>
+
+          <div class="row">
+            <span class="dot" style="background:var(--alert)"></span>
+            <div class="txt">
+              <b>Серверы</b>
+              <div class="st alert">4 из 5 не отвечают с сегодняшнего утра</div>
+              <div class="facts">
+                <span class="fact"><u>Отвечает</u><b class="m">хозяин (без sudo)</b></span>
+                <span class="fact"><u>Сам решает</u><b class="m">4 машины, окно 02:00–04:00</b></span>
+                <span class="fact"><u>Последние команды</u><b class="m">3 отклонены, 4 с ошибкой</b></span>
+              </div>
+            </div>
+            <div class="act"><span class="btn ghost">Открыть →</span></div>
+          </div>
+
+          <div class="row">
+            <span class="dot" style="background:var(--warn)"></span>
+            <div class="txt">
+              <b>Хранилища</b>
+              <div class="st warn">зеркало заведено, но пусто: 0 из 260 файлов уехали на Яндекс.Диск</div>
+              <div class="facts">
+                <span class="fact"><u>Основное</u><b class="m">папка сервера · 262 файла · 31,9 МБ</b></span>
+                <span class="fact"><u>Зеркало</u><b class="m">вход есть, свободно 1 431,4 ГБ</b></span>
+              </div>
+            </div>
+            <div class="act"><span class="btn ghost">Открыть →</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-hd"><h2>Последняя активность</h2><div class="rule"></div>
+          <span class="n">что известно из журналов — это не история правок</span></div>
+        <div class="log">
+          <div class="lrow"><span class="when m">сегодня 10:37</span><span class="who">Сёма</span>
+            <span class="what">Взял секрет <b class="m">YaWebDav</b> для хранилища «яндекс-диск» <span>· записано в журнал секрета</span></span>
+            <span class="go"><span class="btn ghost">Журнал →</span></span></div>
+          <div class="lrow"><span class="when m">сегодня 10:28</span><span class="who">Сёма</span>
+            <span class="what">Проверил Яндекс.Диск: вход есть, запись и чтение работают <span>· занято 626,6 ГБ из 2 058,0 ГБ</span></span>
+            <span class="go"><span class="btn ghost">Хранилища →</span></span></div>
+          <div class="lrow"><span class="when m">07.09 20:12</span><span class="who">вы</span>
+            <span class="what">Отозвали 3 токена: <b class="m">claude-code</b>, <b class="m">codex-hooks</b>, <b class="m">проба MCP</b>
+              <span>· память теперь ходит проводом агента</span></span>
+            <span class="go"><span class="btn ghost">Токены →</span></span></div>
+          <div class="lrow"><span class="when m">06.09</span><span class="who">вы</span>
+            <span class="what">Завели ключ устройства <b class="m">mac1</b> <span>· ключей стало 3</span></span>
+            <span class="go"><span class="btn ghost">Вход →</span></span></div>
+          <div class="lrow"><span class="when m">05.09 17:54</span><span class="who">вы</span>
+            <span class="what">Приняли скилл, написанный из работы <span>· за неделю принято 2, отклонено 0</span></span>
+            <span class="go"><span class="btn ghost">Развитие →</span></span></div>
+        </div>
+        <div class="quiet" style="padding-top:9px">Собрано из журнала доступа, журнала секретов и решений по
+          скиллам — то есть из того, что Сёма действительно пишет. <b style="font-weight:600;color:var(--ink)">Истории
+          изменений настроек здесь нет и обещать её нельзя</b>: настоящий аудит (кто, когда, какой параметр,
+          старое и новое значение; значения секретов в журнал не попадают) — отдельный этап работы, последний
+          в порядке реализации.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>Зачем «Подключения» ровно пять строк</b>
+      <span>Почта, мессенджеры, модели, серверы, хранилища — это всё, что у Сёмы есть снаружи. Строка
+        отвечает «живо / не живо» точкой и одной фразой, а числа идут парами «подпись — значение»,
+        а не склейкой через точку.</span></div>
+    <div class="note"><b>Проблема без кнопки — не проблема, а обои</b>
+      <span>Сегодня на «Моделях» четыре замечания занимают весь первый экран и <b>ни у одного нет действия</b>:
+        человек читает «выберите другую в строке роли ниже» и идёт искать её глазами. Здесь кнопка ведёт
+        прямо в поле, которое чинит.</span></div>
+    <div class="note"><b>«Последняя активность», а не «Недавние изменения»</b>
+      <span>Блок обещает ровно столько, сколько может отдать: последние события из журналов доступа,
+        секретов и скиллов. Слово «изменения» обещало бы аудит правок, которого в ядре нет, — и человек
+        решил бы, что «здесь пусто» значит «никто ничего не менял».</span></div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

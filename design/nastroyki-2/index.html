@@ -1,0 +1,104 @@
+<title>Настройки без портянок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Обложка к макетам настроек Сёмы: одна читаемая колонка, пять входов в макеты,
+   решения и вопросы владельцу. Токены — из веб-клиента Сёмы. */
+:root {
+  --bg: #FBFAF7; --card: #FFFFFF; --surface: #EFEDE6; --text: #17181C; --text-2: #585B64; --text-3: #686B74;
+  --border: #E3E0D8; --border-2: #EFECE4; --accent: #1F4FD8; --accent-bg: #E8EDFC;
+  --warn: #9C6100; --warn-bg: #FBF0DC; --ok: #2E7D4F; --ok-bg: #E4F1E9;
+  --font: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131417; --card: #1B1D21; --surface: #212429; --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --warn: #E2A54C; --warn-bg: #282016; --ok: #5FC98D; --ok-bg: #16261D; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #131417; --card: #1B1D21; --surface: #212429; --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --warn: #E2A54C; --warn-bg: #282016; --ok: #5FC98D; --ok-bg: #16261D; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--text); font: 14px/1.5 var(--font); margin: 0 }
+.page { max-width: 760px; margin: 0 auto; padding-inline: 20px; padding-block: 32px 56px; display: grid; gap: 26px }
+.eyebrow { font-size: 11px; color: var(--text-3); letter-spacing: .03em }
+h1 { font-size: 24px; font-weight: 600; margin: 4px 0 0; letter-spacing: -.01em; text-wrap: balance }
+.lead { color: var(--text-2); margin: 8px 0 0; max-width: 62ch }
+h2 { font-size: 11px; font-weight: 600; color: var(--text-2); letter-spacing: .05em; text-transform: uppercase; margin: 0 0 8px }
+.list { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 2px 16px }
+a.item { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 2px 14px; padding: 12px 0; border-bottom: 1px solid var(--border-2); color: inherit; text-decoration: none; align-items: center }
+a.item:last-child { border-bottom: 0 }
+a.item b { font-weight: 600 }
+a.item span { grid-column: 1; color: var(--text-2); font-size: 13px }
+a.item i { grid-row: 1 / span 2; grid-column: 2; font-style: normal; color: var(--accent); font-size: 18px }
+a.item:hover b { color: var(--accent) }
+a.item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px }
+.first { font-size: 10px; font-weight: 600; background: var(--accent-bg); color: var(--accent); border-radius: 5px; padding: 2px 6px; margin-left: 6px; vertical-align: 1px }
+ol, ul { margin: 0; padding-left: 20px; display: grid; gap: 8px }
+li { max-width: 66ch }
+li b { font-weight: 600 }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px }
+.fact { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px }
+.fact b { display: block; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.2 }
+.fact span { font-size: 12px; color: var(--text-2) }
+.q { background: var(--warn-bg); border-radius: 10px; padding: 14px 16px }
+.q h2 { color: var(--warn) }
+.note { font-size: 12px; color: var(--text-3); margin: 0; max-width: 66ch }
+code { font-family: var(--mono); font-size: 12px; background: var(--surface); padding: 0 4px; border-radius: 4px }
+@media (max-width: 560px) { .facts { grid-template-columns: minmax(0,1fr) } .page { padding-inline: 16px } }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Сёма · макеты на согласование · 1 октября 2026</div>
+    <h1>Настройки без портянок</h1>
+    <p class="lead">Меняется устройство экранов, а не вид: цвета, шрифт и размеры — нынешние. Всё, что настраивается сейчас, остаётся настраиваемым, только редкое уходит глубже. Макеты кликабельны, в каждом сверху переключатель «Десктоп / Телефон 390» и тема.</p>
+  </header>
+
+  <section>
+    <h2>Макеты</h2>
+    <div class="list">
+      <a class="item" href="Karkas.html"><b>Каркас и Обзор <span class="first">начать отсюда</span></b><span>Одна колонка разделов вместо пяти вкладок, поиск по настройкам, корень на телефоне, «Уведомления» как пример раздела</span><i>›</i></a>
+      <a class="item" href="Servers.html"><b>Серверы</b><span>Список машин тонкими строками, экран сервера: Обзор · Самостоятельность · Правила · Журнал; одиннадцать пределов в «Тонкой настройке»</span><i>›</i></a>
+      <a class="item" href="Predely.html"><b>Интеграции и пределы</b><span>Пятнадцать пределов одной свёрнутой строкой, экран сервера MCP с правилами, «Поиск» тем же приёмом</span><i>›</i></a>
+      <a class="item" href="Modeli.html"><b>Модели и роли</b><span>Роли таблицей, 173 модели с поиском и фильтрами, экран модели и провайдера с ценами и остатком</span><i>›</i></a>
+      <a class="item" href="Pochta.html"><b>Почта</b><span>Ящики · Спам · Общее; экран ящика с пятью вкладками, «Опасное» отдельной карточкой</span><i>›</i></a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что нашлось в нынешних настройках</h2>
+    <div class="facts">
+      <div class="fact"><b>9 из 19</b><span>экранов длиннее двух высот окна; «Секреты» — 4,3, «Агенты» — 4,1</span></div>
+      <div class="fact"><b>14</b><span>настроек правятся текстовым вопросом, а не полем: окно, потолок, цена, тихие часы</span></div>
+      <div class="fact"><b>190 px</b><span>навигации над содержимым на телефоне: четыре полосы подряд</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Главные решения</h2>
+    <ol>
+      <li><b>Одна колонка вместо пяти вкладок.</b> Слова «Каналы», «Поведение», «Система», «Безопасность» остаются заголовками групп. На телефоне колонка — это корень настроек, раздел открывается целым экраном с кнопкой назад.</li>
+      <li><b>У сущности свой экран.</b> Сервер, модель, провайдер, ящик, сервер MCP открываются нажатием на строку; строка в списке тонкая: имя, две капсулы, одна кнопка.</li>
+      <li><b>Пределы — в «Тонкую настройку».</b> Свёрнутая строка внизу вкладки, приезжает по раскрытию; строка настройки вместо поля формы.</li>
+      <li><b>Значение — полем, а не вопросом.</b> Окно, потолок, цена, тихие часы правятся на месте.</li>
+      <li><b>Поиск находит настройку, а не раздел.</b> Результат показывает путь и открывает экран с подсветкой строки.</li>
+      <li><b>Журнал — последняя вкладка.</b> На Обзоре вместо служебных отметок — «Вы меняли» и «Под рукой».</li>
+      <li><b>Переезды.</b> Провод, опрос и часовой пояс — в «Работу Сёмы»; цены и остаток — на экран провайдера; правила доступа — на экран сервера.</li>
+    </ol>
+  </section>
+
+  <section class="q">
+    <h2>Вопросы к вам</h2>
+    <ol>
+      <li>Пять вкладок убираем в заголовки одной колонки везде — или только на телефоне, а на десктопе оставить вкладки?</li>
+      <li>«Под рукой» на Обзоре — пять настроек, которые вы меняли чаще всего, с живыми переключателями — нужно?</li>
+      <li>«Самонаблюдение» становится «Работой Сёмы» и забирает провод, опрос, чаты команд и часовой пояс из «Уведомлений» — согласны?</li>
+      <li>Цена модели четырьмя полями: нужен ли ручной ввод, если проверка цен приносит их карточкой?</li>
+      <li>Служебные отметки <code>chat.read.*</code> в журнале настроек: перестать писать или писать, но прятать?</li>
+    </ol>
+  </section>
+
+  <p class="note">Цифры и имена в макетах — примеры в реальном масштабе, не ваши данные: адреса почты и серверов заменены. Разбор по каждому экрану и план переноса в код лежат рядом с макетами: <code>design/nastroyki-2/RAZBOR.md</code> и <code>README.md</code>.</p>
+</div>

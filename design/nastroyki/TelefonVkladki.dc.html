@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{padding:24px 26px 28px;display:flex;flex-direction:column;gap:14px;width:470px}
+  .cap{display:flex;flex-direction:column;gap:5px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h2{margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+  .cap p{margin:0;font-size:11px;line-height:1.55;color:#5B5849}
+  .cap b{font-weight:600;color:var(--ink)}
+
+  .phone{width:390px;height:844px;position:relative;overflow:hidden;background:var(--paper);
+    display:flex;flex-direction:column;border:1px solid #D8D3C6;border-radius:22px;
+    box-shadow:0 10px 30px rgba(40,34,20,.14)}
+
+  .hd{padding:18px 16px 8px;flex:0 0 auto}
+  .hd h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em}
+  .search{margin:10px 16px 0;height:40px;border-radius:10px;background:var(--sunk);display:flex;
+    align-items:center;gap:9px;padding:0 12px;color:var(--ink3);font-size:13px;flex:0 0 auto}
+
+  /* вкладки вбок */
+  .tabwrap{position:relative;margin-top:12px;flex:0 0 auto}
+  .tabstrip{display:flex;gap:4px;padding:0 16px 9px;overflow:hidden;white-space:nowrap}
+  .tb{height:34px;padding:0 14px;border-radius:9px;display:inline-flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:600;color:var(--ink2);background:var(--sunk);flex:0 0 auto}
+  .tb[aria-selected="true"]{background:var(--ink);color:#fff}
+  .tb .n{display:inline-flex;align-items:center;justify-content:center;height:16px;min-width:16px;padding:0 4px;
+    border-radius:5px;font-size:10px;font-weight:700;background:var(--alert-soft);color:var(--alert)}
+  .fadeL,.fadeR{position:absolute;top:0;bottom:9px;width:40px;pointer-events:none}
+  .fadeL{left:0;background:linear-gradient(90deg,var(--paper) 12%,rgba(251,250,247,0))}
+  .fadeR{right:0;background:linear-gradient(270deg,var(--paper) 12%,rgba(251,250,247,0))}
+  .tabline{height:1px;background:var(--line);margin:0 0 0 0}
+
+  /* кнопка раздела */
+  .picker{margin:12px 16px 0;height:46px;border-radius:11px;border:1px solid var(--line);background:var(--panel);
+    display:flex;align-items:center;gap:10px;padding:0 14px;box-shadow:var(--lift);flex:0 0 auto}
+  .picker .lbl{font-size:15px;font-weight:600}
+  .picker .n{font-size:11px;color:var(--ink3)}
+  .picker .caret{margin-left:auto;color:var(--ink3);font-size:12px}
+  .picker .warn{width:7px;height:7px;border-radius:50%;background:var(--warn);display:block}
+
+  /* закреплённый ящик */
+  .obj{margin:10px 16px 0;display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:10px;
+    background:var(--sunk);flex:0 0 auto}
+  .obj .av{width:26px;height:26px;border-radius:7px;background:#D93025;color:#fff;display:flex;
+    align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 26px}
+  .obj .who{font-size:13px;font-weight:600;line-height:1.2}
+  .obj .meta{font-size:10px;color:var(--ink3)}
+  .obj .caret{margin-left:auto;color:var(--ink3);font-size:11px}
+
+  /* внутренние вкладки вбок */
+  .subwrap{position:relative;margin-top:10px;flex:0 0 auto}
+  .substrip{display:flex;gap:3px;padding:0 16px 2px;overflow:hidden;white-space:nowrap}
+  .st{height:30px;padding:0 11px;border-radius:8px;display:inline-flex;align-items:center;gap:5px;
+    font-size:12px;font-weight:600;color:var(--ink2);background:var(--sunk);flex:0 0 auto}
+  .st[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--lift);
+    border:1px solid var(--line)}
+  .subfadeR{position:absolute;right:0;top:0;bottom:2px;width:36px;pointer-events:none;
+    background:linear-gradient(270deg,var(--paper) 12%,rgba(251,250,247,0))}
+
+  .body{flex:1 1 auto;overflow:hidden;padding:12px 0 0}
+  .shelf{margin:0 16px 12px;background:var(--shelf);border:1px solid var(--shelf-line);border-radius:11px;padding:10px 12px}
+  .shelf .kick{font-size:10px;font-weight:700;color:var(--warn);letter-spacing:.04em;margin-bottom:3px}
+  .shelf .t{font-size:13px;font-weight:600;line-height:1.35}
+  .shelf .n{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.4}
+  .shelf .b{margin-top:9px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--panel);
+    display:inline-flex;align-items:center;padding:0 13px;font-size:12px;font-weight:600}
+
+  .sechd{padding:4px 16px 5px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)}
+  .srow{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line2);min-height:52px}
+  .srow .lab{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .srow .lab b{font-size:13px;font-weight:500;line-height:1.3}
+  .srow .lab span{font-size:11px;line-height:1.4;color:var(--ink3)}
+  .tog{width:44px;height:26px;border-radius:13px;background:#CFCBC1;position:relative;flex:0 0 44px;display:block}
+  .tog i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;display:block;
+    box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .tog.on{background:var(--accent)} .tog.on i{left:21px}
+  .seg{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk);flex:0 0 auto}
+  .seg span{height:30px;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink2);
+    display:inline-flex;align-items:center}
+  .seg span.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+  .chg{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:0 0 7px}
+
+  .savebar{position:absolute;left:0;right:0;bottom:0;height:74px;background:rgba(251,250,247,.96);
+    border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 16px;
+    box-shadow:0 -4px 14px rgba(40,34,20,.07)}
+  .savebar .what{font-size:11px;color:var(--ink2);flex:1 1 auto;line-height:1.35}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:11px;
+    font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink);flex:0 0 auto}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  .flag{position:absolute;z-index:6;background:var(--accent);color:#fff;font-size:10px;font-weight:700;
+    border-radius:5px;padding:2px 6px;box-shadow:0 2px 6px rgba(0,0,0,.22);white-space:nowrap}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">ТЕЛЕФОН 390×844 · ВКЛАДКИ ВБОК, ВЫБРАННАЯ В ЦЕНТРЕ</div>
+    <h2>Пять вкладок не помещаются в 390 px — и не должны</h2>
+    <p>Полоса вкладок прокручивается вбок, край <b>растворяется в бумаге</b>: видно, что слева и справа
+      есть ещё. Выбранная вкладка всегда встаёт в середину — так на любом шаге видно обоих соседей.
+      Левый список разделов на телефоне превращается в одну кнопку <b>«Почта ▾»</b> с точкой замечания;
+      она открывает нижнюю шторку (соседняя доска). Ниже — закреплённый ящик и внутренние вкладки почты,
+      тоже вбок. Полоса «Сохранить» приклеена снизу и появилась потому, что тумблер тронули.</p>
+  </div>
+
+  <div class="phone">
+    <div class="flag" style="left:14px;top:150px">выбранная — в центре</div>
+    <div class="flag" style="right:10px;top:186px">край растворяется</div>
+    <div class="flag" style="left:150px;top:250px">левый список → одна кнопка</div>
+
+    <div class="hd"><h1>Настройки</h1></div>
+
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+      Поиск по настройкам
+    </div>
+
+    <div class="tabwrap">
+      <div class="tabstrip" role="tablist">
+        <span class="tb" role="tab" aria-selected="false">Главное <span class="n">4</span></span>
+        <span class="tb" role="tab" aria-selected="true">Каналы</span>
+        <span class="tb" role="tab" aria-selected="false">Поведение</span>
+        <span class="tb" role="tab" aria-selected="false">Система</span>
+        <span class="tb" role="tab" aria-selected="false">Безопасность</span>
+      </div>
+      <div class="fadeL"></div>
+      <div class="fadeR"></div>
+    </div>
+    <div class="tabline"></div>
+
+    <div class="picker">
+      <span class="warn"></span>
+      <span class="lbl">Почта</span>
+      <span class="n">1 из 5 разделов</span>
+      <span class="caret">▾</span>
+    </div>
+
+    <div class="obj">
+      <span class="av">O</span>
+      <div style="display:flex;flex-direction:column;gap:1px;min-width:0">
+        <span class="who">owner@example.org</span>
+        <span class="meta m">личный · 15 папок · Google OAuth</span>
+      </div>
+      <span class="caret">▾</span>
+    </div>
+
+    <div class="subwrap">
+      <div class="substrip" role="tablist">
+        <span class="st" role="tab" aria-selected="false">Ящики</span>
+        <span class="st" role="tab" aria-selected="true">Обработка</span>
+        <span class="st" role="tab" aria-selected="false">Подключение</span>
+        <span class="st" role="tab" aria-selected="false">Отправка</span>
+      </div>
+      <div class="subfadeR"></div>
+    </div>
+
+    <div class="body">
+      <div class="shelf">
+        <div class="kick">СТОИТ ПОСМОТРЕТЬ</div>
+        <div class="t">Сёма разбирает 5 папок, где разбирать нечего</div>
+        <div class="n">Ярлыки Gmail: перенести из них нельзя, только потеряется пометка.</div>
+        <div class="b">Выключить все 5</div>
+      </div>
+
+      <div class="sechd">Что Сёма делает с этим ящиком</div>
+
+      <div class="srow">
+        <div class="lab"><b>Назначение</b><span>рабочий закрыт для облачной модели</span></div>
+        <span class="seg"><span class="on">личный</span><span>рабочий</span></span>
+      </div>
+
+      <div class="srow">
+        <div class="lab"><b>Считать чеки и счета</b><span>получатель, сумма и категория у файлов</span></div>
+        <span class="tog on"><i></i></span>
+      </div>
+
+      <div class="srow">
+        <div class="lab"><b>Заводить уведомления из писем</b><span>сроки оплаты, приглашения, письма без ответа</span></div>
+        <span class="tog on"><i></i></span>
+      </div>
+
+      <div class="srow">
+        <div class="lab"><b>Показывать облачной модели</b><span>выключено — письма видит только модель на этой машине</span></div>
+        <span class="chg"></span>
+        <span class="tog"><i></i></span>
+      </div>
+
+      <div class="srow">
+        <div class="lab"><b>Смотреть «Входящие» за</b><span>что старше — разбирает отдельная задача</span></div>
+        <span class="seg"><span class="on">7 дней</span></span>
+      </div>
+    </div>
+
+    <div class="savebar">
+      <span class="chg"></span>
+      <span class="what">Изменено 1: «Показывать облачной модели»</span>
+      <span class="btn">Отменить</span>
+      <span class="btn pri">Сохранить</span>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

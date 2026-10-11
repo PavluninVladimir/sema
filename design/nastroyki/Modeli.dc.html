@@ -1,0 +1,349 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --ok-soft:#E4F1E9; --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .sheet{display:flex;flex-direction:column;gap:16px;padding:26px 28px 30px}
+  .cap{display:flex;flex-direction:column;gap:6px;max-width:1120px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em;line-height:1.2}
+  .cap p{margin:0;font-size:13px;line-height:1.5;color:#5B5849;max-width:1060px}
+  .cap b{font-weight:600;color:var(--ink)}
+  .screen{width:1180px;background:var(--paper);border:1px solid #D8D3C6;border-radius:14px;
+    overflow:visible;box-shadow:0 8px 26px rgba(40,34,20,.10)}
+
+  .top{padding:18px 26px 0;display:flex;align-items:center;gap:16px}
+  .h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em}
+  .addr{font-size:11px;color:var(--ink3);padding:2px 7px;border-radius:5px;background:var(--sunk)}
+  .tabs{display:flex;gap:2px;padding:12px 26px 0;border-bottom:1px solid var(--line)}
+  .tab{height:34px;padding:0 13px;display:inline-flex;align-items:center;gap:6px;position:relative;top:1px;
+    font-size:13px;font-weight:600;color:var(--ink2);border-bottom:2px solid transparent}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+  .cols{display:flex}
+  .local{width:196px;flex:0 0 196px;border-right:1px solid var(--line2);padding:14px 9px 18px 18px;
+    display:flex;flex-direction:column;gap:1px}
+  .lcap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;padding:0 8px 5px}
+  .li{display:flex;align-items:center;gap:8px;height:31px;padding:0 10px;border-radius:8px;font-size:13px;color:var(--ink2)}
+  .li.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+  .li i{width:7px;height:7px;border-radius:50%;display:block;flex:0 0 7px;background:transparent}
+  .content{flex:1 1 auto;min-width:0;padding:14px 26px 26px;display:flex;flex-direction:column;gap:14px}
+
+  .subtabs{display:flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk);width:max-content}
+  .subtab{height:26px;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink2);
+    display:inline-flex;align-items:center;gap:6px}
+  .subtab[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+  .subtab .n{display:inline-flex;align-items:center;justify-content:center;height:15px;min-width:15px;padding:0 4px;
+    border-radius:5px;font-size:10px;font-weight:700;background:var(--alert-soft);color:var(--alert)}
+
+  .hint{font-size:11px;line-height:1.5;color:var(--ink3);max-width:760px}
+
+  .thead{display:flex;align-items:flex-end;gap:12px;padding:2px 3px 5px;border-bottom:1px solid var(--line)}
+  .thead .c1{flex:1 1 auto;min-width:0;font-size:11px;font-weight:700;letter-spacing:.03em;
+    text-transform:uppercase;color:var(--ink3)}
+  .thead .c2,.thead .c3{flex:0 0 216px;font-size:11px;font-weight:700;letter-spacing:.03em;
+    text-transform:uppercase;color:var(--ink3)}
+  .thead .c4{flex:0 0 92px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink3)}
+
+  .rrow{display:flex;align-items:flex-start;gap:12px;padding:11px 3px;border-bottom:1px solid var(--line2);position:relative}
+  .rrow.hot{background:var(--alert-soft);border-radius:9px;border-bottom-color:transparent;padding-left:11px;padding-right:11px}
+  .rrow .c1{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .rrow .c1 b{font-size:13px;font-weight:600;line-height:1.3}
+  .rrow .c1 span{font-size:11px;line-height:1.4;color:var(--ink3)}
+  .rrow .c1 .bad{color:var(--alert);font-weight:500}
+  .rrow .c2,.rrow .c3{flex:0 0 216px}
+  .rrow .c4{flex:0 0 92px}
+
+  .pick{height:30px;border:1px solid var(--line);border-radius:8px;background:var(--panel);
+    display:flex;align-items:center;gap:7px;padding:0 8px 0 10px;font-size:12px;font-weight:500}
+  .pick .caret{margin-left:auto;color:var(--ink3);font-size:10px}
+  .pick.empty{color:var(--ink3);font-weight:400}
+  .pick.bad{border-color:var(--alert);color:var(--alert);font-weight:600}
+  .pick.open{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .pick .prov{font-size:10px;color:var(--ink3);font-weight:500}
+
+  .pop{position:absolute;top:44px;width:330px;background:var(--panel);border:1px solid var(--line);
+    border-radius:11px;box-shadow:0 14px 34px rgba(40,34,20,.20);padding:6px;z-index:20}
+  .psearch{height:30px;border-radius:7px;background:var(--sunk);display:flex;align-items:center;gap:7px;
+    padding:0 10px;font-size:12px;margin-bottom:4px}
+  .psearch .cursor{width:1px;height:14px;background:var(--ink)}
+  .pgrp{font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--ink3);padding:7px 9px 3px}
+  .pit{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px}
+  .pit.on{background:var(--accent-soft)}
+  .pit .nm{font-size:12px;font-weight:500}
+  .pit .nm em{font-style:normal;background:#FDF1C8;border-radius:3px;padding:0 1px}
+  .pit .tags{margin-left:auto;display:flex;gap:5px}
+  .pfoot{border-top:1px solid var(--line2);margin-top:4px;padding:8px 9px 4px;font-size:11px;color:var(--ink3);
+    display:flex;align-items:center;gap:8px}
+  .pfoot b{color:var(--accent);font-weight:600}
+
+  .chip{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:5px;font-size:10px;font-weight:600}
+  .chip.ok{background:var(--ok-soft);color:var(--ok)}
+  .chip.warn{background:var(--warn-soft);color:var(--warn)}
+  .chip.alert{background:var(--alert-soft);color:var(--alert)}
+  .chip.info{background:var(--accent-soft);color:var(--accent)}
+  .chip.grey{background:var(--sunk);color:var(--ink3)}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:29px;padding:0 12px;
+    border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.sm{height:25px;padding:0 9px;font-size:11px}
+
+  .notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:1180px}
+  .note{background:var(--panel);border:1px solid #DDD8CA;border-radius:11px;padding:12px 14px}
+  .note b{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+  .note span{font-size:11px;line-height:1.5;color:#5B5849}
+  .note.q{background:#FFF9EE;border-color:var(--shelf-line)}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">ПОВЕДЕНИЕ → МОДЕЛИ И РОЛИ · ВКЛАДКА «РОЛИ» · ДАННЫЕ С ЖИВОГО СЕРВЕРА 11.09.2026</div>
+    <h1>Роль — это три подписанных поля, а не три безымянных списка по 54 строки</h1>
+    <p>Сегодня в каждой строке роли стоят три выпадающих списка без подписей, и <b>каждый из них несёт все 54
+      модели</b>. Девять ролей — это 1 458 элементов &lt;option&gt; на одном экране; всего на экране
+      <b>3 597 узлов и 319 КБ разметки</b>. Выбрать модель при этом всё равно тяжело: имена вроде
+      <span class="m">perplexity/nemotron-3.5-lightning-30b-a3b</span> глазами не ищутся.
+      Замена — <b>один общий поисковый popup на все строки сразу</b>: в строке остаётся только выбранная
+      модель, а список создаётся в момент открытия и показывает найденное. Повторяющегося DOM больше нет —
+      1 458 элементов <span class="m">&lt;option&gt;</span> исчезают, и это можно сделать <b>первым шагом,
+      до всей остальной переделки</b>. Поля подписаны: Основная, Запасная, Тайм-аут. Ролей девять — столько,
+      сколько их на самом деле; эмбеддер не роль и живёт на вкладке «Модели → Служебные модели» (ниже).</p>
+  </div>
+
+  <div class="screen">
+    <div class="top">
+      <h1 class="h1">Настройки</h1>
+      <span class="addr m">#settings/behavior/models?tab=roles</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <span class="tab" role="tab" aria-selected="false">Главное</span>
+      <span class="tab" role="tab" aria-selected="false">Каналы</span>
+      <span class="tab" role="tab" aria-selected="true">Поведение</span>
+      <span class="tab" role="tab" aria-selected="false">Система</span>
+      <span class="tab" role="tab" aria-selected="false">Безопасность</span>
+    </div>
+
+    <div class="cols">
+      <nav class="local">
+        <div class="lcap">Поведение</div>
+        <div class="li on"><i style="background:var(--alert)"></i>Модели и роли</div>
+        <div class="li"><i></i>Поиск</div>
+        <div class="li"><i></i>Скиллы</div>
+        <div class="li"><i></i>Развитие</div>
+      </nav>
+
+      <div class="content">
+        <div class="subtabs" role="tablist">
+          <span class="subtab" role="tab" aria-selected="true">Роли</span>
+          <span class="subtab" role="tab" aria-selected="false">Модели <span class="chip grey">54</span></span>
+          <span class="subtab" role="tab" aria-selected="false">Провайдеры и цены</span>
+          <span class="subtab" role="tab" aria-selected="false">Проблемы <span class="n">4</span></span>
+        </div>
+
+        <div class="hint">Роль — это работа, а не модель: «Чаты», «Память», «Арбитр». Не ответила основная —
+          работу доделает запасная; нет запасной — работа просто не делается.
+          <b style="font-weight:600;color:var(--ink)">Четыре замечания переехали на вкладку «Проблемы»</b>
+          и больше не занимают первый экран — счётчик у названия вкладки скажет, что там есть что чинить.</div>
+
+        <div class="thead">
+          <span class="c1">Роль</span><span class="c2">Основная</span><span class="c3">Запасная</span><span class="c4">Тайм-аут</span>
+        </div>
+
+        <div class="rrow">
+          <div class="c1"><b>Фильтр писем</b>
+            <span>решает, спам ли письмо — работает на каждом новом письме · ещё не спрашивали</span></div>
+          <div class="c2"><div class="pick"><span class="m">deepseek-flash</span><span class="prov">DeepSeek</span><span class="caret">▾</span></div></div>
+          <div class="c3"><div class="pick"><span class="m">qwen3</span><span class="prov">на этой машине</span><span class="caret">▾</span></div></div>
+          <div class="c4"><div class="pick">120 с<span class="caret">▾</span></div></div>
+        </div>
+
+        <div class="rrow" style="z-index:5">
+          <div class="c1"><b>Чаты</b>
+            <span>ответы по письмам и файлам · последний раз ответил <span class="m">deepseek-flash</span>, сегодня 09:00</span></div>
+          <div class="c2">
+            <div class="pick open"><span class="m">deepseek-flash</span><span class="prov">DeepSeek</span><span class="caret">▾</span></div>
+            <div class="pop">
+              <div class="psearch">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"
+                  style="color:var(--ink3)"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+                deep<span class="cursor"></span>
+              </div>
+              <div class="pgrp">DEEPSEEK · КЛЮЧ ЗАДАН</div>
+              <div class="pit on"><span class="nm m"><em>deep</em>seek-flash</span>
+                <span class="tags"><span class="chip ok">доверена</span><span class="chip grey">$0.15 / $0.6</span></span></div>
+              <div class="pit"><span class="nm m"><em>deep</em>seek-v4-pro</span>
+                <span class="tags"><span class="chip ok">доверена</span><span class="chip grey">$0.15 / $0.6</span></span></div>
+              <div class="pgrp">PERPLEXITY · 50 МОДЕЛЕЙ</div>
+              <div class="pit"><span class="nm m"><em>deep</em>seek-v4-flash-0731</span>
+                <span class="tags"><span class="chip warn">цены нет</span></span></div>
+              <div class="pit"><span class="nm m"><em>deep</em>seek-v4-pro-0813</span>
+                <span class="tags"><span class="chip warn">цены нет</span></span></div>
+              <div class="pfoot">4 из 54 · <b>Показать все</b> · только доверенные · только ходящие в сеть</div>
+              <div style="border-top:1px solid var(--line2);margin-top:4px;padding:7px 9px 3px;font-size:10px;
+                line-height:1.45;color:var(--accent)">Это один и тот же popup для всех строк: он создаётся в
+                момент открытия и умирает при закрытии. В разметке экрана списка моделей нет вовсе.</div>
+            </div>
+          </div>
+          <div class="c3"><div class="pick"><span class="m">gpt-5.6-sol</span><span class="prov">Perplexity</span><span class="caret">▾</span></div></div>
+          <div class="c4"><div class="pick">300 с<span class="caret">▾</span></div></div>
+        </div>
+
+        <div class="rrow" style="margin-top:232px">
+          <div class="c1"><b>Память</b>
+            <span>извлекает факты и граф из сессий, сводит дубли · последний раз ответил
+              <span class="m">gpt-5.6-luna</span>, сегодня 10:32</span></div>
+          <div class="c2"><div class="pick"><span class="m">gpt-5.6-luna</span><span class="prov">Perplexity</span><span class="caret">▾</span></div></div>
+          <div class="c3"><div class="pick"><span class="m">deepseek-flash</span><span class="prov">DeepSeek</span><span class="caret">▾</span></div></div>
+          <div class="c4"><div class="pick">300 с<span class="caret">▾</span></div></div>
+        </div>
+
+        <div class="rrow">
+          <div class="c1"><b>Арбитр</b>
+            <span class="bad">не отвечает: нет связи с сетью · запасной нет — изменяющие команды целиком идут к вам</span></div>
+          <div class="c2"><div class="pick"><span class="m">claude-fable-5-1</span><span class="prov">Perplexity</span><span class="caret">▾</span></div></div>
+          <div class="c3"><div class="pick empty" style="border-color:var(--alert);color:var(--alert);font-weight:600">нет<span class="caret">▾</span></div></div>
+          <div class="c4"><div class="pick">120 с<span class="caret">▾</span></div></div>
+        </div>
+
+        <div class="rrow">
+          <div class="c1"><b>Судья</b>
+            <span>выносит вердикт по разбору арбитра · должен отличаться от арбитра — сейчас отличается</span></div>
+          <div class="c2"><div class="pick"><span class="m">gpt-6-astra</span><span class="prov">Perplexity</span><span class="caret">▾</span></div></div>
+          <div class="c3"><div class="pick empty">нет<span class="caret">▾</span></div></div>
+          <div class="c4"><div class="pick">120 с<span class="caret">▾</span></div></div>
+        </div>
+
+        <div class="rrow">
+          <div class="c1"><b>Поиск</b>
+            <span>нужна модель, которая ходит в сеть · последний раз ответил <span class="m">gpt-5.6-luna</span>, 04.09 23:20</span></div>
+          <div class="c2"><div class="pick"><span class="m">gpt-5.6-luna</span><span class="prov">Perplexity</span><span class="caret">▾</span></div></div>
+          <div class="c3"><div class="pick empty">нет<span class="caret">▾</span></div></div>
+          <div class="c4"><div class="pick">120 с<span class="caret">▾</span></div></div>
+        </div>
+
+        <div class="rrow" style="border-bottom:0">
+          <div class="c1" style="color:var(--ink3);font-size:12px">Ещё 4 роли: Чтение картинок · Модули · Перевод · Чаты Telegram</div>
+          <div class="c2"></div><div class="c3"></div><div class="c4"></div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;padding-top:4px">
+          <span class="chip ok">суд собран</span>
+          <span class="hint" style="flex:1 1 auto">Арбитр и судья — разные модели, значит изменяющая команда на
+            сервере в окне 02:00–04:00 может пройти без вас. Сделай их одинаковыми — суд не соберётся и всё пойдёт вам.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" style="margin-top:22px">
+    <div class="top">
+      <h1 class="h1">Настройки</h1>
+      <span class="addr m">#settings/behavior/models?tab=models&amp;to=embed</span>
+      <span class="chip info" style="height:20px">сюда ведёт кнопка «Модели → Служебные →» с «Главного»</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <span class="tab" role="tab" aria-selected="false">Главное</span>
+      <span class="tab" role="tab" aria-selected="false">Каналы</span>
+      <span class="tab" role="tab" aria-selected="true">Поведение</span>
+      <span class="tab" role="tab" aria-selected="false">Система</span>
+      <span class="tab" role="tab" aria-selected="false">Безопасность</span>
+    </div>
+
+    <div class="cols">
+      <nav class="local">
+        <div class="lcap">Поведение</div>
+        <div class="li on"><i style="background:var(--alert)"></i>Модели и роли</div>
+        <div class="li"><i></i>Поиск</div>
+        <div class="li"><i></i>Скиллы</div>
+        <div class="li"><i></i>Развитие</div>
+      </nav>
+
+      <div class="content">
+        <div class="subtabs" role="tablist">
+          <span class="subtab" role="tab" aria-selected="false">Роли</span>
+          <span class="subtab" role="tab" aria-selected="true">Модели <span class="chip grey">54</span></span>
+          <span class="subtab" role="tab" aria-selected="false">Провайдеры и цены</span>
+          <span class="subtab" role="tab" aria-selected="false">Проблемы <span class="n">4</span></span>
+        </div>
+
+        <div class="thead"><span class="c1">Служебные модели · их выбирает не роль, а сама работа</span>
+          <span class="c2">Модель</span><span class="c3">Доверие</span><span class="c4"></span></div>
+
+        <div class="rrow hot">
+          <div class="c1"><b>Эмбеддинги</b>
+            <span class="bad">подключённых эмбеддеров нет: <span class="m">text-embedding-bge-m3</span> в списке
+              не значится. Поиск по письмам, похожесть для авторешений и память отвечают отказом.</span></div>
+          <div class="c2"><div class="pick bad"><span class="m">text-embedding-bge-m3</span><span class="caret">▾</span></div></div>
+          <div class="c3"><div class="pick">доверенный<span class="caret">▾</span></div></div>
+          <div class="c4"><span class="btn sm">Проверить</span></div>
+        </div>
+
+        <div class="rrow">
+          <div class="c1"><b>Чтение кодов и картинок без модели</b>
+            <span>tesseract на этой машине · запасной путь, когда модель картинки не умеет</span></div>
+          <div class="c2"><div class="pick">Модель, затем tesseract<span class="caret">▾</span></div></div>
+          <div class="c3"><div class="pick empty">на этой машине<span class="caret">▾</span></div></div>
+          <div class="c4"><span class="btn sm">Проверить</span></div>
+        </div>
+
+        <div class="rrow" style="border-bottom:0">
+          <div class="c1"><b>Картинка без распознанного текста</b>
+            <span>наш OCR не нашёл ни слова — значит о содержимом ничего не известно</span></div>
+          <div class="c2"><div class="pick">Спрашивать<span class="caret">▾</span></div></div>
+          <div class="c3"></div>
+          <div class="c4"></div>
+        </div>
+
+        <div class="hint" style="padding-top:8px">Сегодня эти три строки живут на вкладке «Инструменты», а
+          замечание про пропавший эмбеддер приходит на «Модели» — и человек ищет строку не там, где ему
+          сказали. Служебные модели переехали к моделям; на «Инструментах» остаётся то, что моделью не
+          является: <span class="m">pdftotext</span>, распознавание кодов, офисные файлы, песочница, IMAP.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>Почему поиск, а не длинный список</b>
+      <span>У одного ключа Perplexity сегодня 50 моделей, и завтра их будет больше — список нельзя «сделать
+        покороче», его можно только перестать рисовать целиком. Поле открывается пустым, три буквы дают
+        четыре кандидата.</span></div>
+    <div class="note"><b>Подписи у полей — половина дела</b>
+      <span>«Основная», «Запасная», «Тайм-аут» стоят заголовками колонок и повторяются в мобильной раскладке
+        подписями над полями. Сегодня подписей нет вовсе, и третий список с числами 15…300 читается как загадка.</span></div>
+    <div class="note"><b>Эмбеддер — не роль</b>
+      <span>Ролей девять, и десятой быть не должно: у роли есть основная, запасная и тайм-аут, а у эмбеддера
+        ничего этого нет. Он лежит в «Модели → Служебные модели» вместе с доверием — там же, где его беда,
+        и туда же ведёт кнопка с «Главного». Предметная модель не искажена.</span></div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

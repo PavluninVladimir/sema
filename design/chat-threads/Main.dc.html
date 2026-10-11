@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+    a { color: #0071e3; } a:hover { color: #0058b0; }
+    .win { width: 1200px; height: 780px; display: flex; background: #f5f5f7; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+    .меню { width: 200px; flex: 0 0 200px; border-right: 1px solid rgba(0,0,0,0.10); padding: 12px 0; font-size: 13px; }
+    .группа { font-size: 10px; letter-spacing: 0.6px; text-transform: uppercase; color: #8e8e93; padding: 14px 16px 4px; }
+    .пункт { display: flex; align-items: center; gap: 8px; padding: 6px 16px; }
+    .пункт.выбран { background: #0071e3; color: #fff; font-weight: 600; }
+    .вложенный { padding-left: 30px; }
+    .вложенный2 { padding-left: 44px; }
+    .счётчик { margin-left: auto; font-size: 11px; color: #6e6e73; }
+    .выбран .счётчик, .выбран .мелко { color: #fff; opacity: .9; }
+    .панель { width: 260px; flex: 0 0 260px; border-right: 1px solid rgba(0,0,0,0.10); overflow: hidden; font-size: 13px; }
+    .панель .шапка-панели { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 6px; font-weight: 600; }
+    .чат { display: flex; flex-direction: column; gap: 2px; padding: 7px 16px; }
+    .чат .имя { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+    .чат .мелко { font-size: 11px; color: #6e6e73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .чат .время { margin-left: auto; font-size: 11px; color: #8e8e93; font-weight: 400; }
+    .контейнер { color: #6e6e73; font-weight: 600; }
+    .шеврон { width: 12px; height: 12px; flex: 0 0 12px; }
+    .тред { padding-left: 34px; position: relative; }
+    .тред::before { content: ""; position: absolute; left: 22px; top: 0; bottom: 0; border-left: 2px solid rgba(0,113,227,0.35); }
+    .экран { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .шапка { padding: 12px 18px; border-bottom: 1px solid rgba(0,0,0,0.10); }
+    .шапка h1 { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.2px; }
+    .подпись { font-size: 11px; color: #6e6e73; margin-top: 2px; }
+    .кнопки { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .действие { height: 26px; padding: 0 10px; border-radius: 7px; border: 1px solid rgba(0,0,0,0.10); background: #fff; font-size: 12px; display: flex; align-items: center; }
+    .лента { flex: 1; overflow: hidden; padding: 18px; max-width: 760px; width: 100%; box-sizing: border-box; margin: 0 auto; display: flex; flex-direction: column; gap: 2px; }
+    .день { font-size: 11px; color: #6e6e73; text-align: center; margin: 4px 0 8px; }
+    .пузырь { display: flex; margin: 6px 0; position: relative; }
+    .пузырь .текст { padding: 9px 13px; border-radius: 16px; max-width: 72%; font-size: 13px; line-height: 1.35; white-space: pre-wrap; }
+    .пузырь .мета { font-size: 11px; color: #8e8e93; margin: 2px 0 0 8px; }
+    .пузырь.собеседник .текст { background: rgba(40,200,64,0.14); }
+    .пузырь.ушло { justify-content: flex-end; } .пузырь.ушло .текст { background: rgba(0,113,227,0.12); border: 1px solid #0071e3; }
+    .пузырь.свой { justify-content: flex-end; } .пузырь.свой .текст { background: #0071e3; color: #fff; }
+    .троеточие { position: absolute; top: 4px; font-size: 14px; color: #8e8e93; }
+    .выпадашка { position: absolute; top: 24px; background: #fff; border: 1px solid rgba(0,0,0,0.10); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 4px; font-size: 12px; z-index: 2; }
+    .выпадашка div { padding: 6px 10px; border-radius: 5px; white-space: nowrap; }
+    .строка-треда { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 10px 0 4px; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; background: #fff; font-size: 13px; }
+    .строка-треда .пояснение { font-size: 11px; color: #6e6e73; }
+    .ввод { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-top: 1px solid rgba(0,0,0,0.10); }
+    .поле { flex: 1; height: 34px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.10); background: #fff; display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: #8e8e93; }
+    .кому { font-size: 11px; color: #6e6e73; }
+    .отправить { height: 30px; padding: 0 12px; border-radius: 8px; background: #0071e3; color: #fff; font-size: 12px; display: flex; align-items: center; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="меню">
+    <div class="группа">Сегодня</div>
+    <div class="пункт">Уведомления<span class="счётчик">2</span></div>
+    <div class="пункт">Почта<span class="счётчик">1</span></div>
+    <div class="пункт выбран">Чаты</div>
+    <div class="пункт">Файлы</div>
+    <div class="группа">Сёма сам</div>
+    <div class="пункт">Задачи</div>
+    <div class="пункт">Скрипты</div>
+    <div class="пункт">Память</div>
+    <div class="пункт">Здоровье</div>
+  </div>
+  <div class="панель">
+    <div class="шапка-панели"><span>Чаты</span><span class="действие" style="height: 22px; padding: 0 8px">+</span></div>
+    <div class="группа">Telegram · 1</div>
+    <div class="чат"><div class="имя контейнер"><svg class="шеврон" viewBox="0 0 12 12" fill="none" stroke="#8e8e93" stroke-width="1.5"><path d="M3 4.5l3 3 3-3"></path></svg>Дом · группа<span class="время">3 топика</span></div></div>
+    <div class="чат вложенный"><div class="имя">Общий<span class="время">вчера</span></div><div class="мелко">Петя: приду в семь</div></div>
+    <div class="чат вложенный" style="background: #0071e3; color: #fff; border-radius: 8px; margin: 0 8px; padding-left: 22px"><div class="имя">Заявки<span class="время" style="color: #fff">10:32</span></div><div class="мелко" style="color: #fff; opacity: .9">Митя: батарея в спальне не греет</div></div>
+    <div class="чат тред"><div class="имя"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5h9v6H5l-3 2.5z"></path><path d="M11 6.5h3v6l-2-1.5H7"></path></svg>Сёма<span class="время">10:33</span></div><div class="мелко">Сёма: дам мастеру адрес, когда подтвердите</div></div>
+    <div class="чат вложенный"><div class="имя">Оффтоп<span class="время">05.09</span></div><div class="мелко">Анна: фото с дачи</div></div>
+    <div class="чат"><div class="имя">Иван<span class="время">09:54</span></div><div class="мелко">Посмотри ещё раз файл #302: это чек…</div></div>
+    <div class="чат тред"><div class="имя"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5h9v6H5l-3 2.5z"></path><path d="M11 6.5h3v6l-2-1.5H7"></path></svg>Сёма<span class="время">10:32</span></div><div class="мелко">Сёма: Чек #302 — 06.04.2026, Петрова О.</div></div>
+    <div class="чат"><div class="имя контейнер"><svg class="шеврон" viewBox="0 0 12 12" fill="none" stroke="#8e8e93" stroke-width="1.5"><path d="M4.5 3l3 3-3 3"></path></svg>Новости города · канал<span class="время">12 постов</span></div></div>
+    <div class="группа">MAX</div>
+    <div class="чат"><div class="имя">Соседи<span class="время">05.09</span></div><div class="мелко">Привет</div></div>
+    <div class="группа">Мои чаты</div>
+    <div class="чат"><div class="имя">Выключать vpn на микротике…<span class="время">вчера</span></div><div class="мелко">По текущим данным статус «провода» не виден</div></div>
+    <div class="чат тред"><div class="имя"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5h9v6H5l-3 2.5z"></path><path d="M11 6.5h3v6l-2-1.5H7"></path></svg>По сообщению · «блокировать только по…»<span class="время">19:05</span></div><div class="мелко">Сёма: правило записано в инструкцию</div></div>
+  </div>
+  <div class="экран">
+    <div class="шапка">
+      <h1>Заявки</h1>
+      <div class="подпись">топик группы «Дом» · написанное уходит в топик · «Сёма, …» позовёт Сёму в ветку</div>
+      <div class="кнопки"><span class="действие">Отвечать вместо меня: выключено</span><span class="действие">Настройки «Дом»</span></div>
+    </div>
+    <div class="лента">
+      <div class="день">сегодня</div>
+      <div class="пузырь собеседник"><div class="текст">Батарея в спальне не греет, вызовите кого-нибудь на завтра</div><span class="троеточие" style="left: 74%">⋯</span></div>
+      <div class="мета" style="font-size: 11px; color: #8e8e93; margin-left: 8px">Митя · 10:31</div>
+      <div class="пузырь ушло"><div class="текст">Вызову, напишу время</div></div>
+      <div class="мета" style="font-size: 11px; color: #8e8e93; text-align: right; margin-right: 8px">Вы · 10:34</div>
+      <div class="пузырь собеседник" style="margin-top: 14px"><div class="текст">Только не раньше двенадцати, я до обеда на работе</div><span class="троеточие" style="left: 74%">⋯</span>
+        <div class="выпадашка" style="left: 62%"><div style="background: rgba(0,0,0,0.04)">Обсудить с Сёмой</div><div>Копировать</div></div>
+      </div>
+      <div class="мета" style="font-size: 11px; color: #8e8e93; margin-left: 8px">Митя · 10:36</div>
+      <div class="строка-треда">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5h9v6H5l-3 2.5z"></path><path d="M11 6.5h3v6l-2-1.5H7"></path></svg>
+        <div><div>Тред «Сёма» · 4 реплики</div><div class="пояснение">Сёма: дам мастеру адрес, когда подтвердите · 10:33</div></div>
+        <span class="действие" style="margin-left: auto">Открыть</span>
+      </div>
+    </div>
+    <div class="ввод">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8e8e93" stroke-width="1.5" stroke-linecap="round"><path d="M10.5 5.5l-4.6 4.6a1.6 1.6 0 002.3 2.3l5-5a3 3 0 00-4.3-4.3l-5 5"></path></svg>
+      <div class="поле">Написать в «Заявки» · «Сёма, …» позовёт Сёму</div>
+      <span class="отправить">Отправить</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --ok-soft:#E4F1E9;
+    --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .app{display:flex;min-height:100%}
+  .rail{width:240px;flex:0 0 240px;background:var(--rail);border-right:1px solid var(--line);
+    padding:18px 12px;display:flex;flex-direction:column;gap:14px}
+  .mark{display:flex;align-items:center;gap:8px;padding:2px 6px}
+  .mark b{font-size:17px;font-weight:800}
+  .pinned{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--warn-soft)}
+  .pinned .lbl{font-size:14px;font-weight:600;color:var(--warn)}
+  .pinned .cnt{margin-left:auto;font-size:15px;font-weight:700;color:var(--warn)}
+  .nav{display:flex;align-items:center;gap:9px;height:34px;padding:0 10px;border-radius:8px;
+    font-size:14px;font-weight:500;color:var(--ink2)}
+  .nav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+  .nav .n{margin-left:auto;font-size:11px;color:var(--ink3)}
+  .grp .cap{font-size:11px;font-weight:600;color:var(--ink3);padding:8px 10px 4px}
+  .main{flex:1 1 auto;min-width:0;padding:26px 32px 40px;display:flex;flex-direction:column;gap:20px}
+  .h1{font-size:28px;line-height:1.1;font-weight:700;letter-spacing:-.015em;margin:0}
+  .head-meta{font-size:13px;line-height:1.4;color:var(--ink2);margin:0}
+  .head-top{display:flex;align-items:flex-end;gap:16px}
+  .head-tools{margin-left:auto;display:flex;gap:8px}
+  .toolbar{display:flex;align-items:center;gap:10px}
+  .inp{height:36px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    font-size:14px;color:var(--ink3);flex:0 0 270px;display:flex;align-items:center;gap:8px}
+  .seg{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk)}
+  .seg span{height:26px;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink2);
+    display:inline-flex;align-items:center}
+  .seg span.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+  .sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:8px}
+  .sec-hd h2{margin:0;font-size:13px;font-weight:700}
+  .sec-hd .n{font-size:12px;color:var(--ink3)}
+  .sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;align-items:flex-start;gap:12px;padding:11px 8px;border-radius:9px;
+    border-bottom:1px solid var(--line2)}
+  .row:last-child{border-bottom:0}
+  .cb{flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);margin-top:6px}
+  .av{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-top:1px}
+  .body{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:2px}
+  .line1{display:flex;align-items:baseline;gap:8px}
+  .who{font-size:15px;font-weight:600;line-height:1.3}
+  .addr{font-size:11px;color:var(--ink3)}
+  .subj{font-size:15px;line-height:1.35;color:var(--ink2)}
+  .why{font-size:12px;line-height:1.4;color:var(--ink3);margin-top:2px}
+  .why b{font-weight:500}
+  .act{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-top:1px}
+  .chip{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:5px;
+    font-size:11px;font-weight:600}
+  .chip.warn{color:var(--warn)}
+  .chip.warn::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:6px}
+  .chip.alert{background:var(--alert-soft);color:var(--alert)}
+  .chip.grey{color:var(--ink3)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 9px;
+    border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);white-space:nowrap}
+  .btn.big{height:32px;padding:0 13px;font-size:13px}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--accent)}
+  .dots{width:28px;height:28px;border-radius:7px;color:var(--ink3);font-size:16px;
+    display:inline-flex;align-items:center;justify-content:center}
+  .shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:12px;padding:12px 14px;
+    display:flex;flex-direction:column;gap:8px}
+  .shelf .hd{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--warn)}
+  .shelf .hd .n{font-weight:500;color:var(--ink2);font-size:12px}
+  /* группа отправителя */
+  .grpbox{border:1px solid var(--line);background:var(--panel);border-radius:12px;
+    display:flex;flex-direction:column;overflow:hidden}
+  .grow{display:flex;align-items:flex-start;gap:12px;padding:12px 14px}
+  .grow + .grow{border-top:1px solid var(--line2)}
+  .gact{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 0 auto}
+  .foot{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line2);
+    background:var(--paper)}
+  .note{background:var(--ok-soft);border-left:3px solid var(--ok);padding:9px 12px;
+    border-radius:0 8px 8px 0;font-size:12px;line-height:1.5;margin:2px 0}
+  .note b{font-weight:700}
+  .lead{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    font-size:13px;line-height:1.55}
+  .lead b{font-weight:700}
+  </style>
+</helmet>
+
+<div class="app">
+  <aside class="rail">
+    <div class="mark"><b>Сёма</b></div>
+    <div class="pinned"><span class="lbl">Ждут вас</span><span class="cnt">7</span></div>
+    <div class="grp">
+      <div class="nav on">Почта <span class="n">89</span></div>
+      <div class="nav" style="padding-left:26px;font-size:13px">Все ящики <span class="n">89</span></div>
+      <div class="nav" style="padding-left:26px;font-size:13px">owner@example…</div>
+      <div class="nav" style="padding-left:26px;font-size:13px">me@example.c… <span class="n">89</span></div>
+      <div class="nav">Чаты</div>
+      <div class="nav">Файлы</div>
+    </div>
+    <div class="grp"><div class="cap">Сёма сам</div>
+      <div class="nav">Задачи</div><div class="nav">Скрипты</div><div class="nav">Модули</div>
+      <div class="nav">Память</div><div class="nav">Здоровье</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="head-top">
+      <div>
+        <h1 class="h1">Почта</h1>
+        <p class="head-meta">сегодня · 4 письма · 89 ждут решения · me@example.com</p>
+      </div>
+      <div class="head-tools"><span class="btn big">Проверить сейчас</span></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="inp">Поиск</div>
+      <div class="seg"><span class="on">сегодня</span><span>с прошлого захода</span><span>неделя</span></div>
+    </div>
+
+    <div class="shelf">
+      <div class="hd">Ждут вас<span class="n">к сведению: 1</span></div>
+      <div class="row" style="border:0;padding:0">
+        <div class="body">
+          <div class="who">Пополнить баланс на 449,00 руб. для продления сервера</div>
+          <div class="why m">1 запись ждёт решения · срок 15 сентября · от VPS-Хост</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ГЛАВНОЕ: спам вверху и раскрыт -->
+    <div>
+      <div class="sec-hd">
+        <h2>Похоже на спам — подтвердите</h2><span class="n">89 писем · 6 отправителей</span>
+        <span class="rule"></span>
+        <span class="btn">Свернуть</span>
+      </div>
+
+      <div class="grpbox">
+        <div class="grow">
+          <div class="cb"></div>
+          <div class="av" style="background:#8E24AA">М</div>
+          <div class="body">
+            <div class="line1"><span class="who">Маркет</span><span class="addr m">noreply@market.example</span></div>
+            <div class="subj">41 письмо · «Ваш чек + (1) подарок» и ещё 2 темы</div>
+            <div class="why m"><b>Почему</b> подозрительная тема с обещанием подарка и адрес,
+              имитирующий Маркет · с 7 июля по 26 августа</div>
+          </div>
+          <div class="gact">
+            <span class="chip warn">спам 85%</span>
+            <span class="btn">Показать письма</span>
+            <span class="btn">Не спам — все 41</span>
+            <span class="dots">···</span>
+          </div>
+        </div>
+
+        <div class="grow">
+          <div class="cb"></div>
+          <div class="av" style="background:#C2185B">О</div>
+          <div class="body">
+            <div class="line1"><span class="who">Обувь</span><span class="addr m">info@shop.example</span></div>
+            <div class="subj">18 писем · «Вас ждёт розыгрыш промокода на скидку 99%» и ещё 5 тем</div>
+            <div class="why m"><b>Почему</b> рекламные рассылки от неизвестного отправителя · с 12 июня по 5 сентября</div>
+          </div>
+          <div class="gact">
+            <span class="chip alert">спам 98%</span>
+            <span class="btn">Показать письма</span>
+            <span class="btn">Не спам — все 18</span>
+            <span class="dots">···</span>
+          </div>
+        </div>
+
+        <div class="grow">
+          <div class="cb"></div>
+          <div class="av" style="background:#00897B">З</div>
+          <div class="body">
+            <div class="line1"><span class="who">ООО «ЗАПРАВКИ»</span><span class="addr m">noreply@check.example</span></div>
+            <div class="subj">9 писем · «Чек + (1) подарок 💌🎁»</div>
+            <div class="why m"><b>Почему</b> подозрительный отправитель и тема с обещанием подарка · с 2 по 14 августа</div>
+          </div>
+          <div class="gact">
+            <span class="chip alert">спам 95%</span>
+            <span class="btn">Показать письма</span>
+            <span class="btn">Не спам — все 9</span>
+            <span class="dots">···</span>
+          </div>
+        </div>
+
+        <div class="grow">
+          <div class="cb"></div>
+          <div class="av" style="background:#D32F2F">С</div>
+          <div class="body">
+            <div class="line1"><span class="who">Сервис заправок</span><span class="addr m">support@fuel.example</span></div>
+            <div class="subj">7 писем · «Возвращаем сдачу на карту» и ещё 1 тема</div>
+            <div class="why m"><b>Почему</b> фишинговое письмо от поддельного адреса о возврате денег на карту · с 3 по 14 августа</div>
+          </div>
+          <div class="gact">
+            <span class="chip warn">спам 85%</span>
+            <span class="btn">Показать письма</span>
+            <span class="btn">Не спам — все 7</span>
+            <span class="dots">···</span>
+          </div>
+        </div>
+
+        <div class="foot">
+          <span class="btn">Ещё 2 отправителя · 14 писем</span>
+          <span class="why m" style="margin:0">выбрано: 0 · действия появятся, когда отметите строки</span>
+          <span style="margin-left:auto"></span>
+          <span class="btn">В спам всё · 89</span>
+        </div>
+      </div>
+
+      <div class="note"><b>Что изменилось.</b> Секция стоит выше сводки и раскрыта: 89 решений важнее,
+        чем четыре сегодняшних письма. Строка — <b>отправитель</b>, а не письмо: сорок одинаковых
+        «Ваш чек + (1) подарок» стали одной строкой с числом и разбросом дат. «Почему» сказано
+        один раз на отправителя. Решение — тоже одно на отправителя: «Не спам — все 41».
+        Кнопка «Ещё 2 отправителя · 14 писем» стоит <b>внутри</b> списка и говорит, сколько
+        добавится, а не сколько показано.</div>
+    </div>
+
+    <div>
+      <div class="sec-hd"><h2>Счета и чеки</h2><span class="n">1</span><span class="rule"></span></div>
+      <div class="rows"><div class="row">
+        <div class="av" style="background:#8E24AA">М</div>
+        <div class="body">
+          <div class="line1"><span class="who">Маркет</span><span class="addr m">noreply@market.example · 08:19</span></div>
+          <div class="subj">Ваш чек + (1) подарок</div>
+        </div>
+      </div></div>
+    </div>
+
+    <div>
+      <div class="sec-hd"><h2>Уведомления</h2><span class="n">3 · свёрнуто</span><span class="rule"></span>
+        <span class="btn">Развернуть</span></div>
+      <div class="rows"><div class="row">
+        <div class="body">
+          <div class="who">DeepSeek 1 · Обувь 1 · Яндекс ID 1</div>
+          <div class="why m">свёрнуто: три письма от трёх отправителей</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

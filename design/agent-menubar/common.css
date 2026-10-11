@@ -1,0 +1,18 @@
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+.сцена { width: 720px; height: 460px; background: linear-gradient(160deg, #6f7f95 0%, #47566b 60%, #2f3a49 100%); position: relative; overflow: hidden; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.строка-меню { position: absolute; top: 0; left: 0; right: 0; height: 26px; background: rgba(245,245,247,.72); backdrop-filter: blur(20px); display: flex; align-items: center; gap: 16px; padding: 0 12px; font-size: 12px; color: #1c1c1e; }
+.строка-меню .яблоко { font-size: 13px; }
+.строка-меню .право { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.значок { display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 5px; }
+.значок.открыт { background: rgba(0,0,0,.10); }
+.меню { position: absolute; top: 30px; width: 262px; background: rgba(246,246,248,.96); backdrop-filter: blur(30px); border: .5px solid rgba(0,0,0,.14); border-radius: 10px; box-shadow: 0 14px 40px rgba(0,0,0,.28); padding: 5px 0; font-size: 13px; }
+.пункт { display: flex; align-items: center; gap: 8px; height: 22px; padding: 0 12px; }
+.пункт .ярлык { margin-left: auto; color: #8e8e93; font-size: 12px; }
+.пункт.тихо { color: #8e8e93; font-size: 12px; }
+.пункт.выбран { background: #0071e3; color: #fff; border-radius: 5px; margin: 0 5px; padding: 0 7px; }
+.пункт.выбран .ярлык { color: rgba(255,255,255,.85); }
+.разделитель { height: 1px; background: rgba(0,0,0,.10); margin: 5px 12px; }
+.точка { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
+.зелёная { background: #2f9e44; } .красная { background: #c4271c; } .серая { background: #8e8e93; }
+.подпись { position: absolute; left: 20px; bottom: 16px; right: 20px; color: rgba(255,255,255,.92); font-size: 12px; line-height: 1.45; }
+.подпись b { font-weight: 600; }

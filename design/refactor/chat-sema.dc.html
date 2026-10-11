@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    .win { width: 1280px; height: 1180px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 16px 8px; }
+    .tdot { width: 12px; height: 12px; border-radius: 6px; }
+    .sgroup { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.5); padding: 12px 9px 5px; }
+    .sgroup:first-of-type { padding-top: 0; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem.sel { background: rgba(0,0,0,0.07); font-weight: 600; }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
+    .count { font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .right { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+    .foot { margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; gap: 7px; font-size: 11px; color: rgba(60,60,67,0.6); }
+
+    .panel { width: 240px; flex-shrink: 0; background: #FAFAF9; border-right: 1px solid rgba(0,0,0,0.08); padding: 10px; box-sizing: border-box; display:flex; flex-direction:column; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 12px 0 6px; }
+    .pitem { padding: 8px 10px; border-radius: 7px; display: flex; gap: 8px; align-items: flex-start; }
+    .pitem.on { background: rgba(0,122,255,0.11); }
+    .pitem .t { font-size: 12px; font-weight: 600; }
+    .pitem .s { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 1px; }
+    .pitem .when { font-size: 10px; color: rgba(60,60,67,0.45); margin-left: auto; white-space: nowrap; }
+
+    .conv { flex: 1; background: #F5F4F2; display: flex; flex-direction: column; min-width: 0; }
+    .chead { display:flex; align-items:center; gap:12px; padding: 12px 18px; border-bottom: 1px solid rgba(0,0,0,0.07); background:#FFF; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+    .facts { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 3px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .pick { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 6px; background: #FFF; border: 1px solid rgba(0,0,0,0.15); font-size: 11px; color: #1D1D1F; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .btn { font-size: 12px; padding: 4px 11px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.15); background: #FFF; white-space: nowrap; }
+    .btn.pri { background: #007AFF; border-color: #007AFF; color: #FFF; font-weight: 500; }
+
+    .msgs { flex: 1; padding: 16px 18px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+    .lane { width: 760px; max-width: 100%; display: flex; flex-direction: column; gap: 10px; }
+    .day { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; }
+    .day .line { flex: 1; height: 1px; background: rgba(0,0,0,0.08); }
+    .day .t { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.5); }
+    .bub { font-size: 13px; line-height: 1.5; padding: 9px 13px; border-radius: 15px; max-width: 560px; box-sizing: border-box; }
+    .me { background: #007AFF; color: #FFF; align-self: flex-end; }
+    .him { background: rgba(0,0,0,0.055); align-self: flex-start; }
+    .bmeta { font-size: 11px; color: rgba(60,60,67,0.45); }
+    .cmd { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.45; background: rgba(0,0,0,0.045); border-radius: 7px; padding: 8px 10px; white-space: pre-wrap; word-break: break-word; }
+    .tool { background: #FFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 12px 14px; align-self: stretch; }
+    .toolhead { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .thumb { width: 260px; height: 168px; border-radius: 12px; overflow: hidden; display: block; }
+    .comp { display:flex; align-items:flex-end; gap:10px; padding: 10px 18px; border-top: 1px solid rgba(0,0,0,0.07); background:#FFF; }
+    .field { flex: 1; min-height: 32px; border-radius: 16px; background: rgba(0,0,0,0.05); display:flex; align-items:center; padding: 7px 13px; font-size: 13px; color: rgba(60,60,67,0.45); }
+    .circle { width: 30px; height: 30px; border-radius: 15px; background: #007AFF; color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .clip { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: rgba(60,60,67,0.55); font-size: 15px; flex-shrink: 0; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); line-height: 1.55; }
+    .note b { color: #1D1D1F; }
+    .note.bad { color: #9A6B00; }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .rail { width: 320px; flex-shrink: 0; padding: 22px 20px; box-sizing: border-box; background: #FFFDF7; border-left: 1px solid rgba(0,0,0,0.08); }
+    .rail h3 { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.55); margin: 18px 0 6px; }
+    .rail h3:first-child { margin-top: 0; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic"><div class="tdot" style="background:#FF5F57"></div><div class="tdot" style="background:#FEBC2E"></div><div class="tdot" style="background:#28C840"></div></div>
+    <div class="sgroup">Сегодня</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem">Уведомления<div class="right"><div class="ndot" style="background:#FEBC2E"></div><span class="count">6</span></div></div>
+      <div class="navitem">Почта<div class="right"><span class="count">19</span></div></div>
+      <div class="navitem sel">Чаты<div class="right"><div class="ndot" style="background:#FEBC2E"></div><span class="count">2</span></div></div>
+      <div class="navitem">Файлы<div class="right"><span class="count">131</span></div></div>
+    </div>
+    <div class="sgroup">Сёма сам</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem">Задачи<div class="right"><span class="count">22</span></div></div>
+      <div class="navitem">Память<div class="right"><span class="count">142</span></div></div>
+      <div class="navitem">Здоровье<div class="right"><div class="ndot" style="background:#FEBC2E"></div></div></div>
+    </div>
+    <div class="foot"><div class="ndot" style="background:#28C840"></div>Проверено в 11:43 · qwen-4b</div>
+  </div>
+
+  <div class="panel">
+    <div style="display:flex; align-items:center">
+      <div class="grouptitle" style="margin:0">Чаты</div>
+      <div style="margin-left:auto" class="link">+ Новый</div>
+    </div>
+    <div class="grouptitle">Мои чаты</div>
+    <div class="pitem on"><div style="flex:1"><div class="t">Обновления на srv-vpn</div><div class="s">Сёма печатает…</div></div><div class="when">11:47</div></div>
+    <div class="grouptitle">Telegram · 2</div>
+    <div class="pitem"><div class="ndot" style="background:#FEBC2E; margin-top:4px"></div><div style="flex:1"><div class="t">Анна Смирнова</div><div class="s">не надо пусть сам пишет</div></div><div class="when">11:38</div></div>
+    <div class="pitem"><div style="flex:1"><div class="t">Мила Соколова</div><div class="s">Вы: Привет</div></div><div class="when">11:41</div></div>
+    <div class="grouptitle">Разбор уведомлений</div>
+    <div class="pitem"><div style="flex:1"><div class="t">srv-vpn · обновления доступны</div><div class="s">Вопрос закрыт</div></div><div class="when">08:03</div></div>
+  </div>
+
+  <div class="conv">
+    <div class="chead">
+      <div style="flex:1; min-width:0">
+        <div class="h1">Обновления на srv-vpn</div>
+        <div class="facts">
+          <span class="fact">Модель <b>DeepseekPro</b></span>
+          <span class="fact">Думает <b>обычно</b></span>
+          <span class="fact">Скилл <b>Linux-сервер</b></span>
+          <span class="fact">Живёт ещё <b>21 ч</b></span>
+        </div>
+      </div>
+      <div class="pick">DeepseekPro · обычно ⌄</div>
+      <div class="more">⋯</div>
+    </div>
+
+    <div class="msgs">
+      <div class="lane">
+        <div style="align-self:center" class="link">↑ Показать предыдущие 24 сообщения</div>
+        <div class="day"><div class="line"></div><div class="t">Сегодня</div><div class="line"></div></div>
+
+        <div class="bub me">Посмотри, что с srv-vpn — вчера в отчёте было про обновления</div>
+        <div class="bmeta" style="align-self:flex-end">11:02</div>
+
+        <div class="bub him">Ошибка из-за прав: <span style="font-family:'SF Mono',ui-monospace,Menlo,monospace">apt update</span> выполнен без root, пользователь <span style="font-family:'SF Mono',ui-monospace,Menlo,monospace">sema</span> не может открыть файл блокировки. Нужна команда с sudo — она будет ждать подтверждения.</div>
+        <div class="bmeta">11:03 · DeepseekPro · 4,1 с · 2 340 токенов</div>
+
+        <div class="tool">
+          <div class="toolhead"><div class="dot" style="background:#28C840"></div><div class="ttl" style="flex:1">Выполнено на srv-vpn</div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">код 0 · 11,5 с</span><div class="more">⋯</div></div>
+          <div class="cmd">sudo apt-get update &amp;&amp; sudo apt-get -y upgrade</div>
+          <div class="facts" style="margin-top:7px">
+            <span class="fact">Круг <b>подтверждение</b></span>
+            <span class="fact">Решил <b>человек, 08:03</b></span>
+            <span class="fact">Ключ взяло <b>ядро</b></span>
+            <span class="fact">Вывод <b>1 842 знака</b></span>
+          </div>
+          <div class="meta" style="margin-top:7px">▶ Обновлено 2 пакета, 4 отложены — показать вывод</div>
+        </div>
+
+        <div class="bub me">Вот скрин из панели — посмотри, что с диском</div>
+        <svg class="thumb" style="align-self:flex-end" viewBox="0 0 260 168" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2E3B4E"/><stop offset="1" stop-color="#101820"/></linearGradient></defs>
+          <rect width="260" height="168" fill="url(#g1)"/>
+          <rect x="18" y="22" width="120" height="8" rx="4" fill="rgba(255,255,255,0.65)"/>
+          <rect x="18" y="42" width="180" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+          <rect x="18" y="58" width="150" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+          <rect x="18" y="86" width="224" height="14" rx="7" fill="rgba(255,255,255,0.14)"/>
+          <rect x="18" y="86" width="180" height="14" rx="7" fill="#FEBC2E"/>
+          <rect x="18" y="116" width="224" height="14" rx="7" fill="rgba(255,255,255,0.14)"/>
+          <rect x="18" y="116" width="70" height="14" rx="7" fill="#28C840"/>
+        </svg>
+        <div class="bmeta" style="align-self:flex-end">снимок-2026-09-05-11-05.png · 214 КБ · 11:05</div>
+
+        <div class="bub him">На картинке диск занят на 82 %. Проверю, чем именно — команда читающая, спрашивать не буду.</div>
+
+        <div class="tool" style="border-color:rgba(0,122,255,0.4)">
+          <div class="toolhead"><div class="dot" style="background:#007AFF"></div><div class="ttl" style="flex:1">Таймер · вернуться к обновлению ядра</div><span class="tag" style="background:rgba(0,122,255,.14); color:#0058B0">ждёт · 6:12</span><div class="link">Отменить</div></div>
+        </div>
+
+        <div class="bub him" style="display:flex; align-items:flex-end; gap:8px">Смотрю, что занимает место: /var/log — 3,1 ГБ, из них 2,8 ГБ<span style="width:2px; height:15px; background:#1D1D1F; display:inline-block"></span></div>
+        <div class="bmeta">Сёма печатает… <span class="link">Остановить</span></div>
+      </div>
+    </div>
+
+    <div class="comp">
+      <div class="clip">📎</div>
+      <div class="field">Сообщение Сёме… ⌘V — вставить снимок экрана</div>
+      <div class="circle">↑</div>
+    </div>
+  </div>
+
+  <div class="rail">
+    <h3>Что здесь изменилось</h3>
+    <div class="note">
+      <b>Колонка 760.</b> У документа чата сегодня нет поля <b>layout</b>
+      (проверено: <b>GET /api/ui?screen=chat:71</b> его не содержит), а
+      <b>contentWidth</b> без <b>layout</b> возвращает <b>.infinity</b> —
+      переписка растянута во всё окно, реплика Сёмы в 1 686 px становится
+      нитью в одну строку. Чат объявляет <b>layout: "read"</b>, как письмо.
+    </div>
+    <div class="note" style="margin-top:8px">
+      <b>Карточка — не «wide».</b> Все карточки в переписке приходят с
+      <b>Layout: "wide"</b> (screens.go, семь мест). Внутри ленты ширину
+      задаёт колонка, а не строка: <b>wide</b> у карточек чата снимается.
+    </div>
+
+    <h3>Шапка</h3>
+    <div class="note">
+      Два выпадающих списка в шапке (модель — <b>53 пункта</b> живьём, и
+      усилие) заменяются одной капсулой «модель · усилие» с меню: выбор
+      модели в чате нужен раз в неделю, а место занимает всегда.
+      Под заголовком — факты парами, а не строка «помнит контекст чата ·
+      видит письма и файлы», одинаковая у всех шести чатов.
+    </div>
+
+    <h3>Лента</h3>
+    <div class="note">
+      Сервер отдаёт последние <b>50</b> сообщений (screens.go,
+      <b>ChatMsgs(chatID, 50)</b>) и всё: более ранних в интерфейсе нет
+      вовсе. Сверху — <b>$more</b> вверх, размер порции — настройка
+      <b>chats.page</b>.
+    </div>
+    <div class="note" style="margin-top:8px">
+      Разделитель дня: сейчас у сообщения только «11:04», и переписка за
+      три дня выглядит как один день.
+    </div>
+    <div class="note" style="margin-top:8px">
+      <b>Картинка видна.</b> Сервер уже помечает вложение
+      <b>Image: true</b>, но <b>BubbleView</b> рисует всем файлам одинаковый
+      значок «doc.fill»: превью есть только в строках (<b>RowView</b>).
+      Предел стороны превью — настройка, не число в коде.
+    </div>
+
+    <h3>Ответ на глазах</h3>
+    <div class="note">
+      Пузырь «думает» уже показывает частичный ответ (<b>id: "thinking"</b>),
+      но без кнопки «Остановить» и без ленты, которая сама доезжает вниз:
+      <b>ScrollViewReader</b> в клиенте не используется ни разу — при
+      обновлении раз в 5 с человек остаётся там, где стоял.
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

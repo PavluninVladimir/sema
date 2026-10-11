@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+    .win { width: 980px; background: #f5f5f7; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+    .шапка { padding: 14px 20px 12px; border-bottom: 1px solid rgba(0,0,0,0.10); background: #fff; display: flex; align-items: flex-start; gap: 14px; }
+    .шапка h1 { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.2px; }
+    .шапка .подпись { font-size: 11px; color: #6e6e73; margin-top: 3px; max-width: 700px; line-height: 1.45; }
+    .ещё-место { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    .тело { padding: 16px 20px 22px; display: flex; flex-direction: column; gap: 20px; }
+
+    .раздел > h2 { font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #6e6e73; margin: 0 0 8px; }
+    .строка { background: #fff; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 11px 14px; display: flex; gap: 11px; align-items: flex-start; }
+    .строка + .строка { margin-top: 8px; }
+    .точка { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; margin-top: 5px; }
+    .зелёная { background: #2f9e44; } .жёлтая { background: #b25000; } .красная { background: #c4271c; } .серая { background: #8e8e93; }
+    .тело-строки { flex: 1; min-width: 0; }
+    .тело-строки b { font-size: 13px; font-weight: 600; display: block; }
+    .тело-строки .кап { font-size: 11px; color: #6e6e73; line-height: 1.45; margin-top: 2px; }
+    .капсула { display: inline-flex; align-items: center; height: 18px; padding: 0 8px; border-radius: 9px; font-size: 10px; font-weight: 600; margin-left: 8px; }
+    .к-ок { background: rgba(47,158,68,0.14); color: #2f9e44; }
+    .к-жёлт { background: rgba(178,80,0,0.16); color: #b25000; }
+    .к-крас { background: rgba(196,39,28,0.14); color: #c4271c; }
+    .факты { display: grid; grid-template-columns: 230px 1fr; gap: 3px 14px; margin-top: 9px; font-size: 12px; }
+    .факты .п { color: #8e8e93; font-size: 11px; }
+    .факты .з { color: #1c1c1e; }
+    .факты .з.чужой { color: #0058b0; }
+    .факты .з.плохо { color: #c4271c; }
+    .действие { height: 28px; padding: 0 11px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.10); background: #fff; font-size: 12px; display: inline-flex; align-items: center; white-space: nowrap; }
+    .primary { background: #0071e3; color: #fff; border-color: #0071e3; }
+    .ещё { width: 28px; justify-content: center; color: #8e8e93; }
+
+    .форма { background: #fff; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 13px 15px; }
+    .форма h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; }
+    .поле { margin-bottom: 11px; }
+    .поле label { display: block; font-size: 11px; color: #6e6e73; margin-bottom: 4px; }
+    .поле .ввод { height: 32px; border: 1px solid rgba(0,0,0,0.14); border-radius: 8px; background: #fff; display: flex; align-items: center; padding: 0 11px; font-size: 13px; }
+    .поле .ввод.пусто { color: #8e8e93; }
+    .поле .намёк { font-size: 11px; color: #8e8e93; line-height: 1.45; margin-top: 4px; }
+    .сегменты { display: inline-flex; border: 1px solid rgba(0,0,0,0.14); border-radius: 8px; overflow: hidden; }
+    .сегменты span { height: 30px; padding: 0 14px; display: inline-flex; align-items: center; font-size: 12px; background: #fff; }
+    .сегменты span.выбран { background: #0071e3; color: #fff; }
+    .хвост { font-size: 11px; color: #6e6e73; line-height: 1.5; }
+    .хвост b { color: #1c1c1e; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="шапка">
+    <div>
+      <h1>Агенты</h1>
+      <div class="подпись">Агент — житель вашей машины: он делает на месте то, чего Сёма не может издалека. Шлюз — другая роль того же агента: он стоит лицом к интернету, и с жителем не совмещается.</div>
+    </div>
+    <div class="ещё-место"><span class="действие">Отпечаток центра</span><span class="действие ещё">···</span></div>
+  </div>
+
+  <div class="тело">
+
+    <div class="раздел">
+      <h2>Агенты</h2>
+      <div class="строка">
+        <span class="точка зелёная"></span>
+        <div class="тело-строки">
+          <b>мак <span class="капсула к-ок">на связи</span></b>
+          <div class="кап">житель машины · последний раз 17:35 · звонит сам</div>
+          <div class="факты">
+            <span class="п">Роль</span><span class="з">житель</span>
+            <span class="п">Роли положено</span><span class="з">код, память, уведомления</span>
+          </div>
+        </div>
+        <span class="действие ещё">···</span>
+      </div>
+      <div class="строка">
+        <span class="точка зелёная"></span>
+        <div class="тело-строки">
+          <b>край <span class="капсула к-ок">на связи</span></b>
+          <div class="кап">шлюз · последний раз 17:35</div>
+          <div class="факты">
+            <span class="п">Роль</span><span class="з">шлюз</span>
+            <span class="п">Роли положено</span><span class="з">шлюз</span>
+            <span class="п">Кто звонит</span><span class="з">Сёма — по адресу шлюза; дома порт не открыт</span>
+          </div>
+        </div>
+        <span class="действие ещё">···</span>
+      </div>
+    </div>
+
+    <div class="раздел">
+      <h2>Вход из интернета</h2>
+
+      <div class="строка">
+        <span class="точка жёлтая"></span>
+        <div class="тело-строки">
+          <b>Правила доступа не готовы к выходу наружу</b>
+          <div class="кап">вход без пароля из своей сети всё ещё включён («Доступ» → «С этой машины без входа»): запрос через шлюза своим не считается — его выдаёт заголовок с настоящим адресом, — но вся защита держится на этом одном заголовке · доверие заголовкам прокси выключено («Доступ» → «За своим прокси»)</div>
+        </div>
+        <span class="действие primary">Открыть «Доступ»</span>
+      </div>
+
+      <div class="строка">
+        <span class="точка зелёная"></span>
+        <div class="тело-строки">
+          <b>Шлюз «край» <span class="капсула к-ок">провод жив</span></b>
+          <div class="кап">соединение открывает Сёма: дома не нужен ни один открытый порт</div>
+          <div class="факты">
+            <span class="п">Звоним на</span><span class="з">sema.example.org:8767</span>
+            <span class="п">Вносит запросы в</span><span class="з">127.0.0.1:8765</span>
+            <span class="п">Потоков сейчас</span><span class="з">3 из 32</span>
+            <span class="п">Потоков за запуск</span><span class="з">614</span>
+            <span class="п">Домен (у шлюза)</span><span class="з чужой">sema.example.org</span>
+            <span class="п">Край держит</span><span class="з чужой">nginx</span>
+            <span class="п">Публичный сертификат</span><span class="з чужой">за краем — срок смотрите там, где выписан сертификат</span>
+            <span class="п">Браузеров принимает на</span><span class="з чужой">127.0.0.1:8770</span>
+            <span class="п">Пропущено запросов</span><span class="з чужой">1284</span>
+            <span class="п">Отсеяно на краю</span><span class="з чужой">57</span>
+            <span class="п">Адресов закрыто</span><span class="з чужой">2</span>
+            <span class="п">Пропустил, а внести не смог</span><span class="з чужой">4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="форма">
+      <h3>Куда звонить шлюзу</h3>
+      <div class="поле">
+        <label>Публичный адрес шлюза</label>
+        <div class="ввод">sema.example.org:8767</div>
+        <div class="намёк">один порт на всё: и управляющий провод, и каждый поток браузера. Один нарочно: дома наружу открывается ровно одно направление, диапазон открывать не придётся. Пусто — шлюза нет, и Сёма работает как прежде</div>
+      </div>
+      <div class="поле">
+        <label>Куда он вносит запросы внутри Сёмы</label>
+        <div class="ввод пусто">пусто</div>
+        <div class="намёк">пусто — свой же порт по петле (127.0.0.1:8765); этот адрес наружу не ходит никогда</div>
+      </div>
+      <span class="действие primary">Сохранить</span>
+    </div>
+
+    <div class="форма">
+      <h3>Позвать агента</h3>
+      <div class="поле">
+        <label>Как назвать</label>
+        <div class="ввод пусто">мак, рабочая, шлюз</div>
+      </div>
+      <div class="поле">
+        <label>Роль</label>
+        <div class="сегменты"><span class="выбран">житель</span><span>шлюз</span></div>
+        <div class="намёк">житель машины — карточки кода, память и уведомления у часов; шлюз — вход к Сёме из интернета. Роли не совмещаются: житель читает ваши репозитории, шлюз стоит лицом к интернету. Роль закрепляется за агентом, и сменить её можно только новым приглашением</div>
+      </div>
+      <span class="действие primary">Создать код</span>
+    </div>
+
+    <div class="хвост">Адрес шлюза не секрет: подставят чужой — <b>рукопожатие не сойдётся по сертификату</b>, и разговора не будет. Отсев запросов на краю делает сам шлюз: он знает список путей Сёмы, и всё прочее до него не доходит вовсе.</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

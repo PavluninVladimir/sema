@@ -1,0 +1,26 @@
+# двоичные сборки (только в корне: cmd/sema — исходники)
+/sema
+sema-server
+sema-*
+!sema-*.go
+
+# локальные данные разработки
+*.db
+*.db-shm
+*.db-wal
+files/
+data/
+config.yaml
+
+# найденное фаззингом остаётся в репозитории — это регрессии
+!internal/*/testdata/fuzz/**
+# ключ шифрования подаётся окружением: файл с ним не версионируется
+.env
+.claude/
+# сборки утилит и жителя машины; помощник OCR собирается на месте (engine/ocr.go)
+/semacheck
+/semaagent
+/internal/api/tools/semaocr
+# остатки инструментов и правок
+*.bak
+*.dat

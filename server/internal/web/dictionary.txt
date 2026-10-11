@@ -1,0 +1,66 @@
+# Словарь UI-DSL, который умеет веб-клиент. Одна строка — один тип:
+# «component <тип>» для Component.Type, «field <тип>» для Field.Type.
+# Тест api/dictionary_test.go сверяет этот список с тем, что реально
+# отдают экраны: новый тип на сервере без строки здесь — упавший тест,
+# а не пустое место у человека.
+component header
+component text
+component group
+component divider
+component bubble
+component button
+component row
+component section
+component cards
+component card
+component metric
+component alarm
+component figs
+component shelf
+component rowgroup
+component matrix
+# матрица прав чатов (Telegram и MAX): клетка «na» не нажимается — такого права у
+# такого чата не бывает, причина в подсказке; клетка с признаком inherited
+# показывает чужое значение (право группы у её темы); у строки капсулы, полоса
+# уровня, вложенность Style «nested» и меню «···». На телефоне строка матрицы
+# раскладывается названием и рядом чипов прав — у матриц выдачи тоже. Старый клиент «na» нарисует пустой клеткой,
+# поэтому поднимается UIDictVersion; веб-клиент приезжает вместе с сервером
+component table
+# у таблицы ячейка может нести список (поле select у клетки): он применяется
+# сразу, как список в строке; капсулы строки стоят у её названия, уровень строки
+# — полоса слева, а на телефоне строка раскладывается карточкой с подписью
+# колонки. Старый клиент список в ячейке не нарисует — вреда нет, поэтому
+# поднимается только UIDictVersion
+component chipset
+component step
+component crumb
+component thinking
+component toolcard
+component chain
+component classpicker
+component switcher
+# правила сервера тремя колонками с образцами (Разрешить / Спросить / Запретить)
+component patterns
+# картинка в строке: поле image у компонента (адрес). Старый клиент просто
+# её не нарисует — вреда нет, поэтому поднимается только UIDictVersion
+component form
+component graph
+field text
+field secure
+field toggle
+field picker
+field slider
+field stepper
+field chips
+field segments
+field code
+field number
+# окно «с … до …» одной строкой настройки: два поля времени, приходят
+# параметрами <имя>_from и <имя>_to. Старый клиент нарисует обычное текстовое
+# поле — вреда нет, поэтому поднимается только UIDictVersion
+field timespan
+# несколько вариантов из списка чипами («Источники» канала уведомлений): у
+# каждого чипа свой флажок «имя.вариант», список флажков уходит в toggles формы.
+# Старый клиент нарисует обычное текстовое поле — вреда нет, поэтому
+# поднимается только UIDictVersion
+field checks

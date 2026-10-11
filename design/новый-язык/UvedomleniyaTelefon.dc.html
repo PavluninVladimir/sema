@@ -1,0 +1,455 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+  --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+  --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+  --line:#E3E0D8; --line2:#EFECE4;
+  --accent:#1F4FD8; --accent-soft:#E8EDFC;
+  --ok:#2E7D4F; --ok-soft:#E4F1E9;
+  --info:#2A5FCC; --info-soft:#E7EDFB;
+  --warn:#9C6100; --warn-soft:#FBF0DC;
+  --alert:#BE3320; --alert-soft:#FBE7E3;
+  --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+  --lift:0 1px 2px rgba(24,20,12,.07);
+}
+  
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--ink)}
+.m{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* ——— каркас ——— */
+.app{display:flex;min-height:100%;background:var(--paper)}
+.rail{width:240px;flex:0 0 240px;background:var(--rail);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:18px;padding:18px 12px 14px}
+.main{flex:1 1 auto;min-width:0;padding:26px 32px 40px;display:flex;flex-direction:column;gap:22px}
+
+/* ——— шапка экрана ——— */
+.head{display:flex;flex-direction:column;gap:7px}
+.head-top{display:flex;align-items:flex-end;gap:16px}
+.h1{font-size:28px;line-height:1.1;font-weight:700;letter-spacing:-.015em;margin:0}
+.head-meta{font-size:13px;line-height:1.4;color:var(--ink2);margin:0}
+.head-tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ——— меню ——— */
+.mark{display:flex;align-items:center;gap:8px;padding:2px 6px 0}
+.mark b{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.mark span{font-size:11px;color:var(--ink3)}
+.pinned{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px;
+  background:var(--alert-soft);border:1px solid transparent;cursor:pointer}
+.pinned .cnt{margin-left:auto;font-size:15px;font-weight:700;color:var(--alert)}
+.pinned .lbl{font-size:14px;font-weight:600;color:var(--alert)}
+.grp{display:flex;flex-direction:column;gap:1px}
+.grp>.cap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;padding:0 10px 6px}
+.nav{display:flex;align-items:center;gap:9px;height:34px;padding:0 10px;border-radius:8px;
+  font-size:14px;font-weight:500;color:var(--ink2);cursor:pointer}
+.nav:hover{background:rgba(120,116,105,.10);color:var(--ink)}
+.nav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+.nav svg{flex:0 0 16px;color:var(--ink3)}
+.nav.on svg{color:var(--accent)}
+.nav .b{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink3)}
+.nav .b.alert{color:var(--alert)}
+.sub{display:flex;align-items:center;gap:8px;height:28px;padding:0 10px 0 35px;border-radius:8px;
+  font-size:13px;color:var(--ink2);cursor:pointer}
+.sub:hover{background:rgba(120,116,105,.10)}
+.sub .b{margin-left:auto;font-size:11px;color:var(--ink3)}
+.rail-foot{margin-top:auto;padding:10px 10px 0;border-top:1px solid var(--line);
+  font-size:11px;line-height:1.5;color:var(--ink3)}
+
+/* ——— полка «ждут вас» ——— */
+.shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:12px;overflow:hidden}
+.shelf-hd{display:flex;align-items:center;gap:8px;padding:11px 16px 10px}
+.shelf-hd .t{font-size:13px;font-weight:700;color:var(--warn)}
+.shelf-hd .n{font-size:11px;color:var(--ink3)}
+.shelf-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-top:1px solid var(--shelf-line)}
+.shelf-item .txt{min-width:0;display:flex;flex-direction:column;gap:3px}
+.shelf-item .txt b{font-size:15px;font-weight:600;line-height:1.35}
+.shelf-item .txt span{font-size:12px;color:var(--ink2)}
+.shelf-item .act{margin-left:auto;display:flex;gap:8px;flex:0 0 auto}
+
+/* ——— тревога ——— */
+.alarm{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;
+  background:var(--alert-soft);border:1px solid transparent}
+.alarm .t{font-size:15px;font-weight:600;color:var(--alert)}
+.alarm .s{font-size:12px;color:var(--ink2)}
+
+/* ——— раздел ——— */
+.sec{display:flex;flex-direction:column;gap:2px}
+.sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:8px}
+.sec-hd h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.005em}
+.sec-hd .n{font-size:12px;color:var(--ink3)}
+.sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+.sec-hd .act{display:flex;gap:8px}
+
+/* ——— строка списка ——— */
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:flex-start;gap:12px;padding:11px 8px;border-radius:9px;
+  border-bottom:1px solid var(--line2)}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--panel)}
+.mono-av{flex:0 0 30px;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.row .body{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:2px}
+.line1{display:flex;align-items:baseline;gap:8px}
+.who{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.when{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--ink3)}
+.subj{font-size:15px;font-weight:400;line-height:1.35;color:var(--ink2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note{font-size:12px;line-height:1.4;color:var(--ink3)}
+.row .act{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-top:1px}
+
+/* ——— капсулы ——— */
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:5px;
+  font-size:11px;font-weight:600;letter-spacing:.01em}
+.dotmark{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+.dotmark i{width:7px;height:7px;border-radius:50%;display:block}
+
+/* ——— кнопки ——— */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 13px;
+  border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);white-space:nowrap}
+.btn:hover{border-color:var(--ink3)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--accent)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn.dang{background:transparent;border-color:transparent;color:var(--alert)}
+.btn.dang:hover{background:var(--alert-soft)}
+.btn.sm{height:26px;padding:0 9px;font-size:12px}
+.dots{width:28px;height:28px;border-radius:7px;border:0;background:transparent;color:var(--ink3);
+  font-size:16px;line-height:1;cursor:pointer}
+.dots:hover{background:var(--sunk);color:var(--ink)}
+
+/* ——— сегмент ——— */
+.seg{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk)}
+.seg button{height:26px;padding:0 11px;border:0;border-radius:7px;background:transparent;
+  font-family:inherit;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+
+/* ——— поле ——— */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:600;color:var(--ink2)}
+.inp{height:36px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+  font-family:inherit;font-size:14px;color:var(--ink)}
+.inp.ph{color:var(--ink3)}
+.inp.focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sel{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 8px 0 10px;border-radius:7px;
+  border:1px solid var(--line);background:var(--panel);font-size:12px;font-weight:500;color:var(--ink)}
+.sel svg{color:var(--ink3)}
+
+/* ——— тумблер ——— */
+.tog{width:36px;height:20px;border-radius:10px;background:#CFCBC1;position:relative;flex:0 0 36px;display:block}
+.tog i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;
+  display:block;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tog.on{background:var(--accent)}
+.tog.on i{left:18px}
+
+/* ——— плитка-показатель ——— */
+.tiles{display:grid;gap:12px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 15px 13px;
+  display:flex;flex-direction:column;gap:7px;position:relative;overflow:hidden}
+.tile .cap{font-size:12px;font-weight:600;color:var(--ink2)}
+.tile .val{display:flex;align-items:baseline;gap:6px}
+.tile .val b{font-size:32px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.tile .val span{font-size:14px;font-weight:400;color:var(--ink3)}
+.tile .ctx{font-size:12px;line-height:1.45;color:var(--ink3)}
+.tile.small .val b{font-size:21px}
+.tile.small{gap:5px;padding:12px 13px}
+.tile .rule{position:absolute;left:0;top:0;bottom:0;width:3px}
+
+/* ——— панель ——— */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.panel-pad{padding:16px 18px}
+
+/* ——— таблица ——— */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:11px;font-weight:600;color:var(--ink3);text-align:left;padding:0 10px 8px;
+  letter-spacing:.02em;white-space:nowrap}
+.tbl td{padding:9px 10px;border-top:1px solid var(--line2);font-size:14px;vertical-align:middle}
+.tbl tr:hover td{background:var(--panel)}
+.tbl .num{text-align:right}
+
+/* ——— матрица выдачи ——— */
+.mx{border-collapse:separate;border-spacing:0}
+.mx th.area{font-size:11px;font-weight:600;color:var(--ink2);text-align:center;padding:0 4px 9px;width:72px}
+.mx td.cell{text-align:center;padding:5px 0;border-top:1px solid var(--line2)}
+.mx td.who{padding:5px 12px 5px 2px;border-top:1px solid var(--line2);font-size:13px;white-space:nowrap}
+.mx td.who small{display:block;font-size:11px;color:var(--ink3)}
+.cellbox{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;
+  justify-content:center;border:1px solid var(--line);background:transparent}
+.cellbox.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.cellbox.out{background:var(--warn-soft);border-color:var(--shelf-line);color:var(--warn)}
+
+/* ——— полоса доли ——— */
+.bar{height:5px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px}
+
+/* ——— сводка-числа ——— */
+.figs{display:flex;gap:0;align-items:stretch}
+.fig{flex:1 1 0;padding:0 18px;display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--line2)}
+.fig:first-child{padding-left:0;border-left:0}
+.fig b{font-size:22px;font-weight:600;line-height:1;letter-spacing:-.015em}
+.fig span{font-size:12px;color:var(--ink3)}
+
+/* ——— пустое место ——— */
+.empty{display:flex;flex-direction:column;gap:9px;align-items:flex-start;padding:26px 0 22px}
+.empty b{font-size:15px;font-weight:600}
+.empty p{margin:0;font-size:13px;color:var(--ink2);max-width:420px;line-height:1.5}
+
+.quiet{font-size:12px;line-height:1.55;color:var(--ink3)}
+.hr{height:1px;background:var(--line2)}
+
+  
+.ph{max-width:390px;margin:0;background:var(--paper);min-height:100%;
+  display:flex;flex-direction:column}
+.ph-bar{position:sticky;top:0;background:var(--paper);padding:12px 16px 10px;
+  display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line2);z-index:3}
+.ph-bar .tap{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.ph-bar h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.015em}
+.ph-body{padding:14px 16px 28px;display:flex;flex-direction:column;gap:18px}
+.ph-seg{display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--sunk)}
+.ph-seg button{flex:1 1 0;height:38px;border:0;border-radius:8px;background:transparent;
+  font-family:inherit;font-size:13px;font-weight:600;color:var(--ink2)}
+.ph-seg button.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+.ph-row{display:flex;gap:12px;padding:13px 2px;border-bottom:1px solid var(--line2);align-items:flex-start}
+.ph-row:last-child{border-bottom:0}
+.ph-btn{height:44px;border-radius:10px;font-size:14px;font-weight:600;padding:0 16px;
+  display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);
+  background:var(--panel);color:var(--ink);flex:1 1 0}
+.ph-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.ph-btn.dang{background:transparent;border-color:var(--line);color:var(--alert)}
+
+.chatwrap{display:flex;flex:1 1 auto;min-width:0;gap:0}
+.plist{flex:0 0 292px;border-right:1px solid var(--line);display:flex;flex-direction:column;
+  gap:2px;padding:0 14px 0 0}
+.plist-hd{display:flex;align-items:center;gap:10px;padding:2px 8px 10px}
+.plist-hd b{font-size:13px;font-weight:700}
+.pgroup{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;padding:14px 8px 5px}
+.pitem{display:flex;gap:9px;padding:8px;border-radius:9px;cursor:pointer;align-items:flex-start}
+.pitem:hover{background:var(--panel)}
+.pitem.on{background:var(--panel);box-shadow:var(--lift)}
+.pitem .pt{min-width:0;flex:1 1 auto}
+.pitem .pt b{display:block;font-size:13px;font-weight:600;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitem .pt span{display:block;font-size:12px;color:var(--ink3);line-height:1.35;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitem .pw{flex:0 0 auto;font-size:11px;color:var(--ink3);padding-top:1px}
+.pitem.lvl2{margin-left:16px;padding-left:12px;border-left:1px solid var(--line)}
+.pitem.lvl2 .pt b{font-weight:500}
+.pcont{display:flex;align-items:center;gap:8px;padding:8px;border-radius:9px}
+.pcont b{font-size:13px;font-weight:700}
+.pcont span{font-size:11px;color:var(--ink3)}
+
+.feed{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:14px;padding:0 0 0 22px}
+.feed-hd{display:flex;align-items:flex-start;gap:14px;padding-bottom:12px;
+  border-bottom:1px solid var(--line2)}
+.feed-hd h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.feed-hd p{margin:3px 0 0;font-size:12px;color:var(--ink2);line-height:1.4}
+.day{display:flex;align-items:center;gap:12px;padding:6px 0}
+.day i{flex:1 1 auto;height:1px;background:var(--line2);display:block}
+.day span{font-size:11px;font-weight:600;color:var(--ink3)}
+
+.bub{max-width:74%;display:flex;flex-direction:column;gap:4px}
+.bub .who{font-size:11px;font-weight:600;color:var(--ink3);padding:0 2px}
+.bub .txt{padding:9px 13px;border-radius:13px;font-size:15px;line-height:1.45}
+.bub.left{align-self:flex-start}
+.bub.left .txt{background:var(--sunk);border-bottom-left-radius:5px}
+.bub.right{align-self:flex-end;align-items:flex-end}
+.bub.right .txt{background:var(--accent-soft);border-bottom-right-radius:5px}
+.bub.sema .txt{background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:5px}
+.bub.byfima .txt{background:transparent;border:1px dashed var(--accent);
+  border-bottom-right-radius:5px}
+.bub .when{font-size:11px;color:var(--ink3);padding:0 2px}
+.note-line{align-self:center;max-width:78%;text-align:center;font-size:12px;line-height:1.5;
+  color:var(--ink3);padding:6px 12px;border-radius:9px;background:var(--sunk)}
+
+.thinking{align-self:flex-start;display:flex;align-items:center;gap:10px;padding:9px 13px;
+  border-radius:13px;border-bottom-left-radius:5px;background:var(--panel);
+  border:1px solid var(--line)}
+.thinking .dots3{display:flex;gap:4px}
+.thinking .dots3 i{width:6px;height:6px;border-radius:50%;background:var(--ink3);display:block}
+.thinking .dots3 i:nth-child(2){opacity:.6}
+.thinking .dots3 i:nth-child(3){opacity:.3}
+
+.thread-fold{align-self:stretch;border-left:2px solid var(--accent);padding:2px 0 2px 14px;
+  display:flex;flex-direction:column;gap:8px}
+.thread-fold .hd{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;
+  color:var(--accent);cursor:pointer}
+
+.tool{border:1px solid var(--line);border-radius:11px;background:var(--panel);overflow:hidden;
+  align-self:stretch;position:relative}
+.tool .strip{position:absolute;left:0;top:0;bottom:0;width:3px}
+.tool-hd{display:flex;align-items:center;gap:10px;padding:11px 14px 10px}
+.tool-hd .ic{flex:0 0 26px;width:26px;height:26px;border-radius:7px;display:flex;
+  align-items:center;justify-content:center}
+.tool-hd .tt{min-width:0;flex:1 1 auto;display:flex;flex-direction:column;gap:2px}
+.tool-hd b{font-size:13px;font-weight:700;line-height:1.3}
+.tool-hd .sub{font-size:11px;color:var(--ink3)}
+.tool-hd .rt{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tool-body{padding:0 14px 12px;display:flex;flex-direction:column;gap:9px}
+.code{background:var(--sunk);border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.55;
+  white-space:pre-wrap;word-break:break-word}
+.tool-act{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line2);
+  background:var(--paper);flex-wrap:wrap}
+.tool-act .spacer{flex:1 1 auto}
+
+.composer{border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  padding:10px 12px;display:flex;flex-direction:column;gap:9px}
+.composer .top{display:flex;align-items:center;gap:11px}
+.composer .top .ph{flex:1 1 auto;font-size:15px;color:var(--ink3)}
+.composer .hint{font-size:11px;line-height:1.5;color:var(--ink3)}
+.composer .hint svg{vertical-align:-2px;margin-right:5px}
+.composer .hint b{font-weight:600;color:var(--ink2)}
+.clip{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--paper);
+  display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:0 0 32px}
+
+  </style>
+</helmet>
+
+<div class="ph">
+  <div class="ph-bar">
+    <div class="tap"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ><path d="M2.5 4.5h11"/><path d="M2.5 8h11"/><path d="M2.5 11.5h11"/></svg></div>
+    <h1>Ждут вас</h1>
+    <span class="m" style="margin-left:auto;font-size:17px;font-weight:700;
+      color:var(--alert)">13</span>
+  </div>
+
+  <div class="ph-body" style="gap:16px">
+    <p style="margin:0;font-size:14px;line-height:1.45;color:var(--ink2)">
+      Четыре не поедут без вас, пять стоит посмотреть, четыре — к сведению.</p>
+
+    <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px">
+      <span class="ph-btn" style="flex:0 0 auto;height:38px;background:var(--ink);
+        border-color:var(--ink);color:var(--paper);font-size:13px">все · 13</span>
+      <span class="ph-btn" style="flex:0 0 auto;height:38px;font-size:13px">серверы · 5</span>
+      <span class="ph-btn" style="flex:0 0 auto;height:38px;font-size:13px">почта · 4</span>
+      <span class="ph-btn" style="flex:0 0 auto;height:38px;font-size:13px">запросы · 4</span>
+      <span class="ph-btn" style="flex:0 0 auto;height:38px;font-size:13px">сделано</span>
+    </div>
+
+    <section class="sec">
+      <div class="sec-hd"><h2>Не поедет без вас</h2><span class="n m">4</span>
+        <div class="rule"></div></div>
+      <div style="display:flex;flex-direction:column;gap:11px;padding-top:2px">
+        <div class="tool" style="border-radius:12px">
+  <span class="strip" style="background:var(--alert)"></span>
+  <div style="padding:13px 14px 11px 16px">
+    <div style="display:flex;gap:9px;align-items:flex-start">
+      <div style="min-width:0;flex:1 1 auto">
+        <div style="font-size:15px;font-weight:600;line-height:1.35">Ответить Онлайн-школе</div>
+        <div class="note m" style="margin-top:4px">«5 минут, и ты снова в деле» · срок наступил в 09:00 · ждёт 2 дня</div>
+      </div>
+      <div style="flex:0 0 auto"><span class="chip" style="background:var(--sunk);color:var(--ink2)">почта</span></div>
+    </div>
+    
+    <div style="display:flex;gap:9px;margin-top:12px"><span class="ph-btn pri">Открыть письмо</span><span class="ph-btn" style="flex:0 0 auto;padding:0 14px">Ответил</span></div>
+  </div>
+</div>
+        <div class="tool" style="border-radius:12px">
+  <span class="strip" style="background:var(--alert)"></span>
+  <div style="padding:13px 14px 11px 16px">
+    <div style="display:flex;gap:9px;align-items:flex-start">
+      <div style="min-width:0;flex:1 1 auto">
+        <div style="font-size:15px;font-weight:600;line-height:1.35">Ответить Notely Team</div>
+        <div class="note m" style="margin-top:4px">«Town Hall: Rebuilt from the Ground Up» · срок наступил в 09:00</div>
+      </div>
+      <div style="flex:0 0 auto"><span class="chip" style="background:var(--sunk);color:var(--ink2)">почта</span></div>
+    </div>
+    
+    <div style="display:flex;gap:9px;margin-top:12px"><span class="ph-btn pri">Открыть письмо</span><span class="ph-btn" style="flex:0 0 auto;padding:0 14px">Ответил</span></div>
+  </div>
+</div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-hd"><h2>Стоит посмотреть</h2><span class="n m">5</span>
+        <div class="rule"></div></div>
+      <div style="display:flex;flex-direction:column;gap:11px;padding-top:2px">
+        <div class="tool" style="border-radius:12px">
+  <span class="strip" style="background:var(--warn)"></span>
+  <div style="padding:13px 14px 11px 16px">
+    <div style="display:flex;gap:9px;align-items:flex-start">
+      <div style="min-width:0;flex:1 1 auto">
+        <div style="font-size:15px;font-weight:600;line-height:1.35">srv-bots · команда с перенаправлением</div>
+        <div class="note m" style="margin-top:4px">просил модуль «Серверы под присмотром» · 08:02</div>
+      </div>
+      <div style="flex:0 0 auto"><span class="chip" style="background:var(--sunk);color:var(--ink2)">запрос</span></div>
+    </div>
+    <div class="code m" style="margin-top:10px;font-size:11px">getent passwd | awk -F: '$3&gt;=1000 &amp;&amp; $7!~/nologin|false/'</div>
+    <div style="display:flex;gap:9px;margin-top:12px"><span class="ph-btn pri">Выполнить</span><span class="ph-btn dang" style="flex:0 0 auto;padding:0 14px">Отклонить</span></div>
+  </div>
+</div>
+        <div class="tool" style="border-radius:12px">
+  <span class="strip" style="background:var(--warn)"></span>
+  <div style="padding:13px 14px 11px 16px">
+    <div style="display:flex;gap:9px;align-items:flex-start">
+      <div style="min-width:0;flex:1 1 auto">
+        <div style="font-size:15px;font-weight:600;line-height:1.35">WireGuard · непонятный синтаксис</div>
+        <div class="note m" style="margin-top:4px">просил модуль «Серверы под присмотром» · 08:00</div>
+      </div>
+      <div style="flex:0 0 auto"><span class="chip" style="background:var(--sunk);color:var(--ink2)">запрос</span></div>
+    </div>
+    
+    <div style="display:flex;gap:9px;margin-top:12px"><span class="ph-btn pri">Выполнить</span><span class="ph-btn dang" style="flex:0 0 auto;padding:0 14px">Отклонить</span></div>
+  </div>
+</div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-hd"><h2>К сведению</h2><span class="n m">4</span>
+        <div class="rule"></div></div>
+      <div style="display:flex;flex-direction:column;gap:11px;padding-top:2px">
+        <div class="tool" style="border-radius:12px">
+  <span class="strip" style="background:var(--info)"></span>
+  <div style="padding:13px 14px 11px 16px">
+    <div style="display:flex;gap:9px;align-items:flex-start">
+      <div style="min-width:0;flex:1 1 auto">
+        <div style="font-size:15px;font-weight:600;line-height:1.35">srv-bots — входы с разных адресов</div>
+        <div class="note m" style="margin-top:4px">обновления проверить не удалось · нагрузка 1,38 · диск 36 % · 08:02</div>
+      </div>
+      <div style="flex:0 0 auto"><span class="chip" style="background:var(--sunk);color:var(--ink2)">серверы</span></div>
+    </div>
+    
+    <div style="display:flex;gap:9px;margin-top:12px"><span class="ph-btn">Подробнее</span><span class="ph-btn" style="flex:0 0 auto;padding:0 14px">Принято</span></div>
+  </div>
+</div>
+        <div class="tool" style="border-radius:12px">
+  <span class="strip" style="background:var(--info)"></span>
+  <div style="padding:13px 14px 11px 16px">
+    <div style="display:flex;gap:9px;align-items:flex-start">
+      <div style="min-width:0;flex:1 1 auto">
+        <div style="font-size:15px;font-weight:600;line-height:1.35">Показать картинку модели?</div>
+        <div class="note m" style="margin-top:4px">файл «sticker.webp»: текста на картинке не нашлось · 11:57</div>
+      </div>
+      <div style="flex:0 0 auto"><span class="chip" style="background:var(--sunk);color:var(--ink2)">запрос</span></div>
+    </div>
+    
+    <div style="display:flex;gap:9px;margin-top:12px"><span class="ph-btn pri">Показать</span><span class="ph-btn" style="flex:0 0 auto;padding:0 14px">Не надо</span></div>
+  </div>
+</div>
+      </div>
+    </section>
+
+    <div class="hr"></div>
+    <div class="quiet">Старое Сёма чистит сам через 30 дней.</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

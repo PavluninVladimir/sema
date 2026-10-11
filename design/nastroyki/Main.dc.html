@@ -1,0 +1,471 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+  :root{
+    --paper:#FBFAF7; --panel:#FFFFFF; --rail:#F4F2EC; --sunk:#EFEDE6;
+    --ink:#17181C; --ink2:#585B64; --ink3:#8B8E97;
+    --line:#E3E0D8; --line2:#EFECE4;
+    --accent:#1F4FD8; --accent-soft:#E8EDFC;
+    --ok:#2E7D4F; --ok-soft:#E4F1E9;
+    --warn:#9C6100; --warn-soft:#FBF0DC;
+    --alert:#BE3320; --alert-soft:#FBE7E3;
+    --shelf:#FFF9EE; --shelf-line:#EBDCBF;
+    --lift:0 1px 2px rgba(24,20,12,.07);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:#E9E6DE;color:var(--ink);
+    font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:13px}
+  a{color:var(--accent);text-decoration:none} a:hover{color:var(--ink)}
+  .m{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  /* ——— обложка доски ——— */
+  .sheet{display:flex;flex-direction:column;gap:16px;padding:26px 28px 30px}
+  .cap{display:flex;flex-direction:column;gap:6px;max-width:1080px}
+  .kicker{font-size:10px;letter-spacing:.09em;color:#8A8574}
+  .cap h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em;line-height:1.2}
+  .cap p{margin:0;font-size:13px;line-height:1.5;color:#5B5849;max-width:1000px}
+  .cap b{font-weight:600;color:var(--ink)}
+  .screen{width:1440px;background:var(--paper);border:1px solid #D8D3C6;border-radius:14px;
+    overflow:hidden;box-shadow:0 8px 26px rgba(40,34,20,.10)}
+
+  /* ——— каркас приложения ——— */
+  .app{display:flex;height:940px;position:relative}
+  .rail{width:240px;flex:0 0 240px;background:var(--rail);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;gap:16px;padding:16px 10px 12px}
+  .mark{display:flex;align-items:center;gap:8px;padding:2px 8px 0}
+  .mark b{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .mark span{font-size:10px;color:var(--ink3)}
+  .grp{display:flex;flex-direction:column;gap:1px}
+  .grp>.gcap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;padding:0 10px 5px}
+  .nav{display:flex;align-items:center;gap:9px;height:32px;padding:0 10px;border-radius:8px;
+    font-size:13px;font-weight:500;color:var(--ink2)}
+  .nav.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+  .nav .ic{flex:0 0 15px;width:15px;height:15px;border-radius:4px;border:1.5px solid var(--ink3)}
+  .nav.on .ic{border-color:var(--accent)}
+  .nav .b{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink3)}
+  .nav .b.alert{color:var(--alert)}
+  .pinned{display:flex;align-items:center;gap:9px;height:36px;padding:0 10px;border-radius:9px;
+    background:var(--alert-soft)}
+  .pinned .lbl{font-size:13px;font-weight:600;color:var(--alert)}
+  .pinned .cnt{margin-left:auto;font-size:13px;font-weight:700;color:var(--alert)}
+  .rail-foot{margin-top:auto;padding:9px 10px 0;border-top:1px solid var(--line);
+    font-size:11px;line-height:1.5;color:var(--ink3)}
+
+  /* ——— экран настроек ——— */
+  .pane{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;position:relative}
+  .top{padding:20px 28px 0;display:flex;flex-direction:column;gap:12px}
+  .top-row{display:flex;align-items:center;gap:18px}
+  .h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.012em}
+  .addr{font-size:11px;color:var(--ink3);padding:2px 7px;border-radius:5px;background:var(--sunk)}
+  .search{margin-left:auto;width:320px;height:32px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel);display:flex;align-items:center;gap:8px;padding:0 11px;
+    font-size:13px;color:var(--ink3)}
+
+  .tabs{display:flex;gap:2px;padding:0 28px;border-bottom:1px solid var(--line)}
+  .tab{position:relative;height:36px;padding:0 14px;display:inline-flex;align-items:center;gap:7px;
+    font-size:13px;font-weight:600;color:var(--ink2);border-bottom:2px solid transparent;top:1px}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+  .tab .n{display:inline-flex;align-items:center;justify-content:center;height:16px;min-width:16px;
+    padding:0 4px;border-radius:5px;font-size:10px;font-weight:700}
+  .tab .n.alert{background:var(--alert-soft);color:var(--alert)}
+  .tab.focus{outline:2px solid var(--accent);outline-offset:-3px;border-radius:7px}
+
+  .cols{flex:1 1 auto;display:flex;min-height:0}
+  .local{width:212px;flex:0 0 212px;border-right:1px solid var(--line2);padding:16px 10px 16px 20px;
+    display:flex;flex-direction:column;gap:14px}
+  .lcap{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;padding:0 8px}
+  .li{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:8px;
+    font-size:13px;color:var(--ink2)}
+  .li.on{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:var(--lift)}
+  .li i{width:7px;height:7px;border-radius:50%;display:block;flex:0 0 7px;background:transparent}
+  .li .b{margin-left:auto;font-size:11px;color:var(--ink3)}
+
+  .content{flex:1 1 auto;min-width:0;padding:16px 28px 96px;overflow:hidden}
+  .colw{max-width:860px;display:flex;flex-direction:column;gap:18px}
+
+  /* закреплённый ящик */
+  .sticky-obj{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;
+    background:var(--panel);border:1px solid var(--line);box-shadow:var(--lift)}
+  .sticky-obj .av{width:26px;height:26px;border-radius:7px;background:#D93025;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 26px}
+  .sticky-obj .who{font-size:13px;font-weight:600}
+  .sticky-obj .meta{font-size:11px;color:var(--ink3)}
+  .sel{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 9px 0 11px;border-radius:7px;
+    border:1px solid var(--line);background:var(--panel);font-size:12px;font-weight:500;color:var(--ink)}
+  .sel .caret{color:var(--ink3);font-size:10px}
+
+  /* внутренние вкладки */
+  .subtabs{display:flex;gap:2px;padding:2px;border-radius:9px;background:var(--sunk);width:max-content;max-width:100%;flex-wrap:wrap}
+  .subtab{height:26px;padding:0 11px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink2);
+    display:inline-flex;align-items:center;gap:6px}
+  .subtab[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+
+  /* полка «стоит посмотреть» */
+  .shelf{background:var(--shelf);border:1px solid var(--shelf-line);border-radius:11px;padding:11px 14px;
+    display:flex;align-items:center;gap:14px}
+  .shelf .txt{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .shelf .txt b{font-size:13px;font-weight:600}
+  .shelf .txt span{font-size:11px;color:var(--ink2);line-height:1.4}
+  .shelf .kick{font-size:10px;font-weight:700;color:var(--warn);letter-spacing:.05em;margin-bottom:2px}
+
+  /* раздел */
+  .sec{display:flex;flex-direction:column}
+  .sec-hd{display:flex;align-items:center;gap:10px;padding-bottom:6px}
+  .sec-hd h2{margin:0;font-size:11px;font-weight:700;letter-spacing:.03em;color:var(--ink2);text-transform:uppercase}
+  .sec-hd .rule{flex:1 1 auto;height:1px;background:var(--line2)}
+  .sec-hd .n{font-size:11px;color:var(--ink3)}
+
+  /* бумажная строка настройки */
+  .srow{display:flex;align-items:flex-start;gap:16px;padding:11px 2px;border-bottom:1px solid var(--line2)}
+  .srow:last-child{border-bottom:0}
+  .srow .lab{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .srow .lab b{font-size:13px;font-weight:500;line-height:1.35}
+  .srow .lab span{font-size:11px;line-height:1.45;color:var(--ink3)}
+  .srow .ctl{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding-top:1px}
+  .tog{width:34px;height:19px;border-radius:10px;background:#CFCBC1;position:relative;flex:0 0 34px;display:block}
+  .tog i{position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;display:block;
+    box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .tog.on{background:var(--accent)} .tog.on i{left:17px}
+  .seg{display:inline-flex;gap:2px;padding:2px;border-radius:8px;background:var(--sunk)}
+  .seg span{height:24px;padding:0 10px;border-radius:6px;font-size:12px;font-weight:600;color:var(--ink2);
+    display:inline-flex;align-items:center}
+  .seg span.on{background:var(--panel);color:var(--ink);box-shadow:var(--lift)}
+  .step{display:inline-flex;align-items:center;height:28px;border:1px solid var(--line);border-radius:7px;
+    background:var(--panel);overflow:hidden}
+  .step b{font-size:12px;font-weight:600;padding:0 10px;min-width:56px;text-align:center}
+  .step u{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;
+    color:var(--ink3);text-decoration:none;font-size:13px;border-left:1px solid var(--line2)}
+  .step u:first-child{border-left:0;border-right:1px solid var(--line2)}
+  .chg{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:0 0 6px;margin-top:7px}
+
+  /* общий блок */
+  .shared{background:var(--sunk);border-radius:11px;padding:4px 14px 10px;border:1px dashed #D5D0C1}
+  .shared .hd{display:flex;align-items:center;gap:8px;padding:10px 0 4px}
+  .shared .hd b{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)}
+  .shared .hd span{font-size:11px;color:var(--ink3)}
+  .shared .srow{border-bottom-color:#DFDACB}
+
+  .more{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--accent);
+    padding:9px 0 0}
+
+  /* кнопки */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:0 13px;
+    border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);white-space:nowrap}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--accent)}
+
+  /* полоса сохранения */
+  .savebar{position:absolute;left:0;right:0;bottom:0;height:60px;background:rgba(251,250,247,.96);
+    border-top:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 28px;
+    box-shadow:0 -4px 14px rgba(40,34,20,.06)}
+  .savebar .what{font-size:12px;color:var(--ink2)}
+  .savebar .what b{font-weight:600;color:var(--ink)}
+  .savebar .acts{margin-left:auto;display:flex;gap:9px}
+
+  /* выноски */
+  .notes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;width:1440px}
+  .note{background:var(--panel);border:1px solid #DDD8CA;border-radius:11px;padding:12px 14px}
+  .note b{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+  .note span{font-size:11px;line-height:1.5;color:#5B5849}
+  </style>
+</helmet>
+
+<div class="sheet">
+  <div class="cap">
+    <div class="m kicker">КАРКАС · ШИРОКИЙ ЭКРАН 1440 · ПОКАЗАН РАЗДЕЛ «КАНАЛЫ → ПОЧТА → ОБРАБОТКА»</div>
+    <h1>Один пункт в меню, пять вкладок, две колонки, полоса сохранения снизу</h1>
+    <p>Сегодня в боковом меню семнадцать ссылок на настройки, разложенных на четыре группы, — и человек ищет
+      «где включается перевод» глазами по всему меню. Решение: <b>в меню остаётся один пункт «Настройки»</b>,
+      а разбиение уезжает внутрь: пять постоянных вкладок сверху, местный список разделов слева, содержимое справа.
+      Вкладки постоянны — их пять всегда, и мышечная память работает. Левый список меняется вместе с вкладкой и
+      никогда не длиннее пяти-шести строк. <b>Ничего не сохраняется на лету</b>: изменённая строка помечается точкой,
+      снизу выезжает полоса «Отменить · Сохранить», и до нажатия Сёма живёт по-старому.</p>
+  </div>
+
+  <div class="screen">
+  <div class="app">
+
+    <aside class="rail">
+      <div class="mark"><b>Сёма</b><span class="m">11 сентября</span></div>
+      <div class="pinned"><span class="lbl">Ждут вас</span><span class="cnt">1</span></div>
+      <div class="grp">
+        <div class="gcap">Переписка</div>
+        <div class="nav"><span class="ic"></span>Почта<span class="b">41</span></div>
+        <div class="nav"><span class="ic"></span>Чаты</div>
+        <div class="nav"><span class="ic"></span>Файлы</div>
+      </div>
+      <div class="grp">
+        <div class="gcap">Сёма сам</div>
+        <div class="nav"><span class="ic"></span>Задачи</div>
+        <div class="nav"><span class="ic"></span>Скрипты</div>
+        <div class="nav"><span class="ic"></span>Модули</div>
+        <div class="nav"><span class="ic"></span>Память</div>
+        <div class="nav"><span class="ic"></span>Здоровье<span class="b alert">•</span></div>
+      </div>
+      <div class="grp">
+        <div class="gcap">Своё</div>
+        <div class="nav on"><span class="ic"></span>Настройки<span class="b alert">4</span></div>
+        <div class="nav"><span class="ic"></span>Курсы</div>
+      </div>
+      <div class="rail-foot">Было 17 строк на настройки —<br>стала одна со счётчиком проблем.</div>
+    </aside>
+
+    <div class="pane">
+
+      <div class="top">
+        <div class="top-row">
+          <h1 class="h1">Настройки</h1>
+          <span class="addr m">#settings/channels/mail?tab=processing</span>
+          <div class="search">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+            Поиск по настройкам
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <span class="tab" role="tab" aria-selected="false">Главное <span class="n alert">4</span></span>
+        <span class="tab" role="tab" aria-selected="true">Каналы</span>
+        <span class="tab" role="tab" aria-selected="false">Поведение</span>
+        <span class="tab focus" role="tab" aria-selected="false">Система</span>
+        <span class="tab" role="tab" aria-selected="false">Безопасность</span>
+      </div>
+
+      <div class="cols">
+        <nav class="local">
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <div class="lcap">Каналы</div>
+            <div class="li on"><i style="background:var(--warn)"></i>Почта<span class="b">2</span></div>
+            <div class="li"><i></i>Telegram<span class="b">14</span></div>
+            <div class="li"><i></i>MAX<span class="b">93</span></div>
+            <div class="li"><i></i>Уведомления</div>
+            <div class="li"><i></i>Перевод</div>
+          </div>
+          <div style="margin-top:auto;font-size:11px;line-height:1.5;color:var(--ink3);padding:0 8px">
+            Пять строк вместо семнадцати.<br>Точка слева — там есть замечание.
+          </div>
+        </nav>
+
+        <div class="content">
+        <div class="colw">
+
+          <div class="sticky-obj">
+            <span class="av">O</span>
+            <div style="display:flex;flex-direction:column;gap:1px">
+              <span class="who">owner@example.org</span>
+              <span class="meta m">Google OAuth · 15 папок · заходил 01.09 16:46</span>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <span class="sel">Ящик: owner@example.org <span class="caret">▾</span></span>
+              <span class="btn">Добавить ящик</span>
+            </div>
+          </div>
+
+          <div class="subtabs" role="tablist">
+            <span class="subtab" role="tab" aria-selected="false">Ящики</span>
+            <span class="subtab" role="tab" aria-selected="true">Обработка</span>
+            <span class="subtab" role="tab" aria-selected="false">Подключение</span>
+            <span class="subtab" role="tab" aria-selected="false">Отправка</span>
+            <span class="subtab" role="tab" aria-selected="false">Папки и хранение <span style="color:var(--warn);font-weight:700">5</span></span>
+            <span class="subtab" role="tab" aria-selected="false">Спам</span>
+          </div>
+
+          <div class="shelf">
+            <div class="txt">
+              <div class="kick">СТОИТ ПОСМОТРЕТЬ</div>
+              <b>Сёма разбирает 5 папок, где разбирать нечего</b>
+              <span>[Gmail]/Важное, [Gmail]/Помеченные, [Gmail]/Черновики, [Gmail]/Корзина, [Gmail]Корзина —
+                это ярлыки Gmail, перенести из них нельзя, только потеряется пометка.</span>
+            </div>
+            <span class="btn" style="margin-left:auto">Выключить эти папки</span>
+          </div>
+
+          <div class="sec">
+            <div class="sec-hd"><h2>Что Сёма делает с этим ящиком</h2><div class="rule"></div>
+              <span class="n">только owner@example.org</span></div>
+
+            <div class="srow">
+              <div class="lab"><b>Назначение</b>
+                <span>рабочий ящик по умолчанию закрыт для облачной модели и не даёт чеков — это единственная разница</span></div>
+              <div class="ctl"><span class="seg"><span class="on">личный</span><span>рабочий</span></span></div>
+            </div>
+
+            <div class="srow">
+              <div class="lab"><b>Что Сёма делает</b>
+                <span>«только читает» — на сервере не меняется ничего: ни переносов, ни пометок, ни очистки</span></div>
+              <div class="ctl"><span class="seg"><span class="on">читает и наводит порядок</span><span>только читает</span></span></div>
+            </div>
+
+            <div class="srow">
+              <div class="lab"><b>Считать чеки и счета</b>
+                <span>получатель, сумма и категория у файлов из этого ящика</span></div>
+              <div class="ctl"><span class="tog on"><i></i></span></div>
+            </div>
+
+            <div class="srow">
+              <div class="lab"><b>Заводить уведомления из писем</b>
+                <span>сроки оплаты, приглашения, письма без ответа — работает и в режиме «только читает»</span></div>
+              <div class="ctl"><span class="tog on"><i></i></span></div>
+            </div>
+
+            <div class="srow">
+              <div class="lab"><b>Показывать облачной модели</b>
+                <span>выключите — письма увидит только модель на этой машине</span></div>
+              <div class="ctl"><span class="chg"></span><span class="tog"><i></i></span></div>
+            </div>
+
+            <div class="srow">
+              <div class="lab"><b>Смотреть «Входящие» за</b>
+                <span>всё, что старше, разбирает отдельная задача — от свежих писем к старым</span></div>
+              <div class="ctl"><span class="sel">7 дней <span class="caret">▾</span></span></div>
+            </div>
+          </div>
+
+          <div class="shared">
+            <div class="hd"><b>Одинаково для всех ящиков</b><span>2 ящика: owner@example.org, me@example.com</span></div>
+            <div class="srow">
+              <div class="lab"><b>Что делать с готовым ответом</b>
+                <span>«черновик» — ответ ложится в папку черновиков ящика, отправляете вы из своей почты</span></div>
+              <div class="ctl"><span class="sel">черновик <span class="caret">▾</span></span></div>
+            </div>
+            <div class="srow">
+              <div class="lab"><b>Кому Сёма вправе отвечать сам</b>
+                <span>через запятую; можно доменом. Пусто в режиме «сам» значит «никому»</span></div>
+              <div class="ctl"><span class="sel" style="width:210px;color:var(--ink3);justify-content:flex-start">пусто</span></div>
+            </div>
+            <div class="srow">
+              <div class="lab"><b>Заходить в спам и корзину почтового сервера</b>
+                <span>решение там принял не Сёма, и он его не оспаривает: читает на месте, ничего не судит</span></div>
+              <div class="ctl"><span class="tog on"><i></i></span></div>
+            </div>
+          </div>
+
+          <div class="more">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6l4 4 4-4"></path></svg>
+            Дополнительно · перечитать вложения ящика, курсоры папок, срок хранения на сервере
+          </div>
+
+        </div>
+        </div>
+      </div>
+
+      <div class="savebar">
+        <span class="chg" style="margin-top:0"></span>
+        <span class="what">Изменено <b>1</b>: «Показывать облачной модели» — включено → выключено</span>
+        <div class="acts">
+          <span class="btn">Отменить</span>
+          <span class="btn pri">Сохранить</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div>
+
+  <div style="width:1440px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:baseline;gap:10px">
+      <b style="font-size:13px;font-weight:700">Два состояния полосы сохранения</b>
+      <span style="font-size:11px;color:#8A8574">уйти с несохранённым и не сохранилось</span>
+      <span style="flex:1 1 auto;height:1px;background:#DDD8CA"></span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px">
+
+      <div style="background:var(--paper);border:1px solid #D8D3C6;border-radius:12px;overflow:hidden">
+        <div style="padding:9px 14px;border-bottom:1px solid var(--line2);font-size:11px;font-weight:700;
+          letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)">Нажали другую вкладку с несохранённым</div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+          <div class="tabs" style="padding:0;border-bottom:1px solid var(--line)">
+            <span class="tab" aria-selected="true">Каналы</span>
+            <span class="tab focus" aria-selected="false">Поведение</span>
+            <span class="tab" aria-selected="false">Система</span>
+          </div>
+          <div style="background:var(--warn-soft);border:1px solid var(--shelf-line);border-radius:11px;
+            padding:12px 14px;display:flex;align-items:center;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <b style="font-size:13px;font-weight:700;color:var(--warn)">Есть несохранённые изменения</b>
+              <span style="font-size:11px;line-height:1.45;color:#6B4400">«Показывать облачной модели» у
+                owner@example.org. Уйдёте — изменение пропадёт.</span>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px;flex:0 0 auto">
+              <span class="btn">Выйти без сохранения</span>
+              <span class="btn pri">Остаться</span>
+            </div>
+          </div>
+          <div style="font-size:11px;line-height:1.5;color:var(--ink3)">Панель местная — она всплывает
+            над содержимым и не перекрывает экран целиком: видно и вкладку, куда собрались, и то, что осталось
+            несохранённым. Системного диалога браузера нет: он не умеет назвать, что именно потеряется.</div>
+        </div>
+      </div>
+
+      <div style="background:var(--paper);border:1px solid #D8D3C6;border-radius:12px;overflow:hidden">
+        <div style="padding:9px 14px;border-bottom:1px solid var(--line2);font-size:11px;font-weight:700;
+          letter-spacing:.03em;text-transform:uppercase;color:var(--ink2)">Сохранение не прошло</div>
+        <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+
+          <div class="srow" style="border-bottom:0;padding-bottom:4px">
+            <div class="lab"><b>Показывать облачной модели</b>
+              <span>выключите — письма увидит только модель на этой машине</span></div>
+            <div class="ctl"><span class="chg"></span><span class="tog"><i></i></span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:9px;background:var(--alert-soft);
+            border-radius:9px;padding:9px 12px">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--alert);flex:0 0 7px;margin-top:5px"></span>
+            <div style="min-width:0;flex:1 1 auto">
+              <b style="display:block;font-size:12px;font-weight:700;color:var(--alert)">Не сохранилось</b>
+              <span style="font-size:11px;line-height:1.45;color:#7A3A2C">ящик закрыт для облачной модели
+                модулем «Чеки»: он читает эти письма локальной моделью. Снимите право у модуля или оставьте как есть.</span>
+            </div>
+            <span class="btn" style="flex:0 0 auto">Повторить</span>
+          </div>
+
+          <div style="height:1px;background:var(--line2)"></div>
+
+          <div class="savebar" style="position:static;height:auto;padding:10px 0 0;border-top:0;box-shadow:none;
+            background:transparent">
+            <span class="chg" style="margin-top:0"></span>
+            <span class="what">Изменено <b>1</b> · <span style="color:var(--alert);font-weight:600">1 не сохранилось</span></span>
+            <div class="acts"><span class="btn">Отменить</span><span class="btn pri">Сохранить</span></div>
+          </div>
+
+          <div style="font-size:11px;line-height:1.5;color:var(--ink3)">Ошибка стоит у той строки, которая её
+            вызвала, а не общим красным пятном наверху. Нижняя панель <b style="font-weight:600;color:var(--ink)">остаётся
+            открытой</b>: работа не закончена, и «Отменить» должно быть под рукой.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><b>Почему вкладок пять, а не семнадцать</b>
+      <span>Вкладка — постоянная мебель: она на месте всегда, и «Безопасность» лежит в одном и том же
+        углу экрана каждый день. Семнадцать ссылок в меню такого не дают: их порядок читается заново.</span></div>
+    <div class="note"><b>Почему левый список, а не второй ряд вкладок</b>
+      <span>Разделов внутри вкладки пять-шесть, и у них бывают счётчики и точки состояния. В колонке
+        это читается сверху вниз; вторым рядом вкладок — превращается в кашу и не переносится на телефон.</span></div>
+    <div class="note"><b>Общее отделено рамкой, а не заголовком</b>
+      <span>Сегодня «Разбор спама · одинаково для всех ящиков» стоит той же строкой, что и настройки одного
+        ящика. Общее теперь лежит в утопленном блоке с пунктиром и подписью «2 ящика» — перепутать нельзя.</span></div>
+    <div class="note"><b>Клавиатура и адрес</b>
+      <span>role="tablist", aria-selected, стрелки влево-вправо между вкладками, видимый фокус (показан на
+        «Системе»). Адрес хранит и вкладку, и подраздел, и внутреннюю вкладку — ссылку можно прислать.</span></div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; background: #F5F4F2; }
+    .sheet { width: 1160px; min-height: 1280px; box-sizing: border-box; padding: 28px 32px; background: #F5F4F2; color: #1D1D1F; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 4px 0; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 22px 0; line-height: 1.55; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 24px 0 8px 0; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); line-height: 1.5; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 7px; line-height: 1.55; }
+    .note b { color: #1D1D1F; }
+    .bad { color: #C93400; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .box { background: #FFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .cap { font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.75); padding: 10px 14px 0; }
+    .comp { display:flex; align-items:flex-end; gap:10px; padding: 10px 14px; background:#FFF; }
+    .field { flex: 1; min-height: 32px; border-radius: 16px; background: rgba(0,0,0,0.05); display:flex; align-items:center; padding: 7px 13px; font-size: 13px; color: rgba(60,60,67,0.45); }
+    .field.typed { color: #1D1D1F; }
+    .circle { width: 30px; height: 30px; border-radius: 15px; background: #007AFF; color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .circle.off { background: rgba(0,0,0,0.16); color: rgba(255,255,255,0.85); }
+    .clip { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: rgba(60,60,67,0.55); font-size: 15px; flex-shrink: 0; }
+    .attachbar { display: flex; gap: 10px; align-items: flex-end; padding: 10px 14px 0; }
+    .chip { display: flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 9px; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); font-size: 11px; }
+    .x { color: rgba(60,60,67,0.5); font-size: 11px; }
+    .prog { height: 3px; border-radius: 2px; background: rgba(0,0,0,0.08); margin-top: 5px; }
+    .prog i { display: block; height: 3px; border-radius: 2px; background: #007AFF; }
+    .hint { padding: 0 14px 10px; }
+    .bar { display: flex; align-items: center; gap: 9px; padding: 9px 14px; background: rgba(255,188,46,0.10); border-top: 1px solid rgba(0,0,0,0.06); }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+    .btn { font-size: 12px; padding: 4px 11px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.15); background: #FFF; white-space: nowrap; }
+    .btn.pri { background: #007AFF; border-color: #007AFF; color: #FFF; font-weight: 500; }
+    .col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+    .menu { width: 300px; background: #FFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 9px; padding: 5px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .mi { font-size: 12px; padding: 6px 9px; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
+    .mi.off { color: rgba(60,60,67,0.4); }
+    .sep { height: 1px; background: rgba(0,0,0,0.07); margin: 4px 6px; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .thumb { border-radius: 8px; display: block; }
+  </style>
+</helmet>
+<div class="sheet">
+  <div class="h1">Композер и шапка чата</div>
+  <div class="sub">
+    Скрепка и вставка из буфера в клиенте уже есть (<span class="mono">ComposerView</span>): выбор файла,
+    ⌘V со снимком экрана. Не хватает того, что происходит <b>между</b> выбором файла и отправкой.
+  </div>
+
+  <div class="grouptitle">Обычные состояния</div>
+  <div class="col2">
+    <div>
+      <div class="box">
+        <div class="cap">Чат с Сёмой · пусто</div>
+        <div class="comp">
+          <div class="clip">📎</div>
+          <div class="field">Сообщение Сёме… ⌘V — вставить снимок экрана</div>
+          <div class="circle off">↑</div>
+        </div>
+      </div>
+      <div class="note">Подсказка про ⌘V стоит в самом поле и уходит, как только начали печатать: место занимать нечем.</div>
+
+      <div class="box" style="margin-top:14px">
+        <div class="cap">Телеграм-чат · пусто</div>
+        <div class="comp">
+          <div class="clip">📎</div>
+          <div class="field">Написать «Анна Смирнова» · «сёма, …» позовёт Сёму</div>
+          <div class="circle off">↑</div>
+        </div>
+        <div class="hint"><span class="meta">Уйдёт Анне сразу, без модели. Слово вызова меняется в «Настройки → Telegram».</span></div>
+      </div>
+      <div class="note">
+        Подпись поля живая — сервер уже отдаёт её (<span class="mono">composer.placeholder</span>).
+        Строка под полем говорит главное: <b>обычное сообщение уходит человеку сразу</b>.
+      </div>
+
+      <div class="box" style="margin-top:14px">
+        <div class="cap">Телеграм-чат · пишу Сёме</div>
+        <div class="comp">
+          <div class="clip">📎</div>
+          <div class="field typed" style="background:rgba(0,122,255,0.10); border:1px solid rgba(0,122,255,0.45)">сёма, подготовь текст — коротко</div>
+          <div class="circle">↑</div>
+        </div>
+        <div class="hint"><span class="meta">Уйдёт Сёме, Анна этого не увидит — начнётся ветка</span></div>
+      </div>
+      <div class="note">
+        Слово вызова узнаётся на лету: поле меняет обводку на цвет ветки, подпись — на «уйдёт Сёме».
+        Иначе человек узнаёт, кому написал, только после отправки.
+      </div>
+    </div>
+
+    <div>
+      <div class="box">
+        <div class="cap">Вложение выбрано, но ещё не отправлено</div>
+        <div class="attachbar">
+          <div style="position:relative">
+            <svg class="thumb" width="86" height="64" viewBox="0 0 86 64" xmlns="http://www.w3.org/2000/svg">
+              <defs><linearGradient id="t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2E3B4E"/><stop offset="1" stop-color="#101820"/></linearGradient></defs>
+              <rect width="86" height="64" fill="url(#t1)"/>
+              <rect x="8" y="12" width="40" height="5" rx="2" fill="rgba(255,255,255,0.6)"/>
+              <rect x="8" y="34" width="70" height="8" rx="4" fill="rgba(255,255,255,0.15)"/>
+              <rect x="8" y="34" width="52" height="8" rx="4" fill="#FEBC2E"/>
+            </svg>
+            <div class="x" style="position:absolute; top:-6px; right:-6px; width:16px; height:16px; border-radius:8px; background:#FFF; border:1px solid rgba(0,0,0,0.12); text-align:center; line-height:15px">×</div>
+          </div>
+          <div class="chip">📄 акт-2026-08.pdf · 214 КБ <span class="x">×</span></div>
+        </div>
+        <div class="comp">
+          <div class="clip">📎</div>
+          <div class="field typed">Посмотри, что с диском на скрине</div>
+          <div class="circle">↑</div>
+        </div>
+      </div>
+      <div class="note bad">
+        Сегодня файл уходит <b>сразу при выборе</b>: <span class="mono">uploadFiles</span> грузит его и тут
+        же пишет в переписку сообщение «Прикрепил файл «имя» (#id)». Ни подписи к файлу, ни возможности
+        передумать. Вложения ждут в полосе над полем и уходят вместе с текстом одним сообщением.
+      </div>
+
+      <div class="box" style="margin-top:14px">
+        <div class="cap">Файл грузится</div>
+        <div class="attachbar">
+          <div style="flex:1">
+            <div class="chip" style="width:220px; box-sizing:border-box">📄 скан-договора.pdf · 8,4 МБ</div>
+            <div class="prog" style="width:220px"><i style="width:58%"></i></div>
+          </div>
+        </div>
+        <div class="comp">
+          <div class="clip">📎</div>
+          <div class="field">Сообщение Сёме…</div>
+          <div class="circle off">↑</div>
+        </div>
+      </div>
+      <div class="note">Полоса — единственный способ понять, что 8-мегабайтный скан не потерялся. Предел вложения уже настройка (<span class="mono">tg.file_limit_mb</span>), у загрузки в чат должна быть своя.</div>
+
+      <div class="box" style="margin-top:14px">
+        <div class="cap">Писать нельзя</div>
+        <div class="comp" style="opacity:0.6">
+          <div class="clip">📎</div>
+          <div class="field">Отправка от вашего имени выключена</div>
+          <div class="circle off">↑</div>
+        </div>
+        <div class="hint"><span class="meta">Включается в «Настройки → Telegram». Позвать Сёму можно: напишите «сёма, …».</span></div>
+      </div>
+      <div class="note">Погашенное поле объясняет себя и говорит, что всё-таки можно, — как погашенная строка режима у ящика.</div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Полоса «ждёт вас» и ответ на глазах</div>
+  <div class="col2">
+    <div class="box">
+      <div class="bar">
+        <div class="dot" style="background:#FEBC2E"></div>
+        <div style="flex:1"><span class="meta" style="color:#1D1D1F; font-size:12px">Черновик Анне ждёт вашей кнопки</span></div>
+        <div class="btn pri">Отправить</div><div class="btn">Не отправлять</div>
+        <div class="link">Показать</div>
+      </div>
+      <div class="comp">
+        <div class="clip">📎</div>
+        <div class="field">Написать «Анна Смирнова»…</div>
+        <div class="circle off">↑</div>
+      </div>
+    </div>
+    <div class="box">
+      <div class="bar" style="background:rgba(0,122,255,0.07)">
+        <div class="dot" style="background:#007AFF"></div>
+        <div style="flex:1"><span class="meta" style="color:#1D1D1F; font-size:12px">Сёма печатает… 4 с</span></div>
+        <div class="btn">Остановить</div>
+      </div>
+      <div class="comp">
+        <div class="clip">📎</div>
+        <div class="field">Сообщение Сёме…</div>
+        <div class="circle off">↑</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    Ждущее решение уже собирается сервером в раздел «Ждут вашего решения» внизу ленты — полоса над полем
+    делает то же самое, но не уезжает вверх при новых сообщениях. Ответ на глазах в клиенте уже есть
+    (<span class="mono">id: "thinking"</span> с частичным текстом), не хватает кнопки «Остановить»
+    и того, чтобы лента сама доезжала вниз: <span class="mono">ScrollViewReader</span> в клиенте не
+    используется ни разу.
+  </div>
+
+  <div class="grouptitle">Шапка чата: капсула вместо двух списков</div>
+  <div class="col2">
+    <div>
+      <div class="card">
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Было</div>
+            <div class="meta">Два выпадающих списка в шапке каждого чата: модель — <b>53 пункта</b> живьём
+            (проверено на <span class="mono">chat:74</span>), и «думает быстро / обычно / подробно».
+            Стоят даже в телеграм-чате, где выбор модели человеку не нужен.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1">
+            <div class="ttl">Стало</div>
+            <div class="meta">Одна капсула «DeepseekPro · обычно» с меню. Выбор модели в чате нужен раз в
+            неделю, место занимает всегда.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="menu">
+        <div class="mi">Переименовать чат</div>
+        <div class="mi">Модель · DeepseekPro ▸</div>
+        <div class="mi">Думает · обычно ▸</div>
+        <div class="sep"></div>
+        <div class="mi">Сёма отвечает сам <span class="tag" style="margin-left:auto; background:rgba(40,200,64,.15); color:#1E7A32">вкл</span></div>
+        <div class="mi">Открыть в «Настройки → Telegram»</div>
+        <div class="mi">Что ушло по этому чату</div>
+        <div class="sep"></div>
+        <div class="mi off">Свести в память — нечего сводить</div>
+        <div class="mi" style="color:#D70015">Удалить чат…</div>
+      </div>
+      <div class="note">
+        Разрушительное — только в меню и только с подтверждением (оно уже приходит от сервера:
+        <span class="mono">confirm</span> у <span class="mono">delete_chat</span>). Пункт, который сейчас
+        невозможен, показывается погашенным с причиной, а не прячется.
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

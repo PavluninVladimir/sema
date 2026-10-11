@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body style="position: relative">
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 900px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .subitem .badge-count { font-size: 10px; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+    .setrow { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .setrow:last-child { border-bottom: none; }
+    .radio { width: 16px; height: 16px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.25); flex-shrink: 0; box-sizing: border-box; }
+    .radio-on { border: 5px solid #007AFF; background: #FFFFFF; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 4px 6px 4px; }
+  </style>
+</helmet>
+<div style="position: absolute; top: 0; left: 0; right: 0; z-index: 9; display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: #D70015; color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, sans-serif">
+  <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase">Частично устарело</span>
+  <span style="font-size: 12px; opacity: 0.9">Выбор моделей из строк переезжает на артборд «Роли моделей»; остальные инструменты актуальны.</span>
+</div>
+<div class="win" style="margin-top: 34px">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px"></span>
+        Все ящики
+        <span class="badge-count">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>
+        owner@example.org
+        <span class="badge-count">38</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FC3F1D; flex-shrink: 0"></span>
+        me@example.com
+        <span class="badge-count">23</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+      </div>
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 10:46
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; background: #F7F6F4; overflow: hidden; display: flex; justify-content: center">
+    <div style="width: 620px; display: flex; flex-direction: column; gap: 22px; padding: 36px 0">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">Настройки</div>
+        <div style="margin-left: auto; display: flex; height: 26px; border-radius: 7px; background: rgba(0,0,0,0.05); padding: 2px">
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Почта</span>
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">Модели</span>
+          <span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 500; color: #1D1D1F; background: #FFFFFF; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.12)">Инструменты</span>
+        </div>
+      </div>
+      <div>
+        <div class="grouptitle">Инструменты · где нужна модель, она выбирается здесь же</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">Модель-фильтр</span>
+              <span class="meta">Решает, спам ли письмо, и читает чеки</span>
+            </div>
+            <div class="pick" style="width: 210px; justify-content: space-between; flex-shrink: 0">qwen3-4b <span style="color: rgba(60,60,67,0.4)">▾</span></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">Эмбеддинги</span>
+              <span class="meta">Поиск по письмам и похожесть для авторешений</span>
+            </div>
+            <div class="pick" style="width: 250px; justify-content: space-between; flex-shrink: 0">text-embedding-bge-m3 <span style="color: rgba(60,60,67,0.4)">▾</span></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">Распознавание картинок</span>
+              <span class="meta">Чем читать фото и скриншоты чеков — из того, что есть на машине</span>
+            </div>
+            <div class="pick" style="width: 230px; justify-content: space-between; flex-shrink: 0">Модель, затем Vision <span style="color: rgba(60,60,67,0.4)">▾</span></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">Модель для картинок</span>
+              <span class="meta">Какую модель показываем — из настроенных в системе</span>
+            </div>
+            <div class="pick" style="width: 210px; justify-content: space-between; flex-shrink: 0">qwen-27b <span style="color: rgba(60,60,67,0.4)">▾</span></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">pdftotext (poppler)</span>
+              <span class="meta">Читает PDF: чеки, счета, акты · brew install poppler</span>
+            </div>
+            <span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">установлен</span>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">Своё распознавание картинок</span>
+              <span class="meta">Системный Vision · macOS, картинки не покидают компьютер</span>
+            </div>
+            <span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">работает</span>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">Офисные документы</span>
+              <span class="meta">docx, xlsx, pptx — Сёма читает сам, ставить нечего</span>
+            </div>
+            <span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">встроено</span>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">JS-движок (goja)</span>
+              <span class="meta">Скрипты агента · без Node.js, работает и на Raspberry Pi</span>
+            </div>
+            <span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">встроено</span>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">IMAP (go-imap)</span>
+              <span class="meta">Чтение почты, переносы, флаги, папки</span>
+            </div>
+            <span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">встроено</span>
+          </div>
+          <div class="setrow" style="border-bottom: none">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-size: 13px; color: #1D1D1F">Ждут распознавания</span>
+              <span class="meta">33 файла без извлечённого текста · пустыми остаются пиксели и логотипы</span>
+            </div>
+            <div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #007AFF; color: #FFFFFF; font-size: 12px; font-weight: 500; flex-shrink: 0">Перечитать файлы</div>
+          </div>
+        </div>
+        <div class="meta" style="padding: 6px 4px 0 4px">Списки моделей — те же, что на вкладке «Модели»: что настроено в системе, то и предлагается.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

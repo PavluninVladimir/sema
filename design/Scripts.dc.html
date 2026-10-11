@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 780px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .list { width: 230px; flex-shrink: 0; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+    .sitem { padding: 9px 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 2px; }
+    .sname { font-size: 13px; color: #1D1D1F; }
+    .smeta { font-size: 11px; color: rgba(60,60,67,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .code { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.55; color: #1D1D1F; }
+    .kw { color: #9B2393; } .str { color: #C41A16; } .fn { color: #326D74; } .cmt { color: #6E7781; }
+    .btn { height: 28px; padding: 0 12px; border-radius: 6px; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0; }
+    .btn-plain { background: #FFFFFF; color: #1D1D1F; border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 0.5px 1px rgba(0,0,0,0.08); }
+    .btn-primary { background: #007AFF; color: #FFFFFF; font-weight: 500; }
+    .chip { height: 22px; padding: 0 9px; border-radius: 11px; background: #F2F1EF; border: 1px solid rgba(0,0,0,0.07); font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 11px; color: #1D1D1F; display: inline-flex; align-items: center; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">7</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>owner@example.org</div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+        <span class="badge-count">4</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 15:20
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div class="list">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.08)">
+      <span style="font-size: 14px; font-weight: 600; color: #1D1D1F; flex: 1">Скрипты</span>
+      <div class="btn btn-primary" style="height: 24px; width: 24px; padding: 0; border-radius: 6px; font-size: 15px">+</div>
+    </div>
+    <div style="display: flex; flex-direction: column; padding: 6px; gap: 2px">
+      <div class="sitem" style="background: rgba(0,122,255,0.09)">
+        <span class="sname" style="font-weight: 600">Траты за месяц</span>
+        <span class="smeta">Считает чеки по магазинам · 0,3 сек</span>
+      </div>
+      <div class="sitem">
+        <span class="sname">Курс валют в чат</span>
+        <span class="smeta">HTTP-запрос + сообщение · каждый день</span>
+      </div>
+      <div class="sitem">
+        <span class="sname">Счета к оплате</span>
+        <span class="smeta">Ищет неоплаченные счета в письмах</span>
+      </div>
+      <div class="sitem">
+        <span class="sname">Чистка старых файлов</span>
+        <span class="smeta">Удаляет копии больше 90 дней</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid rgba(0,0,0,0.08)">
+      <div style="display: flex; flex-direction: column; gap: 1px; flex: 1">
+        <span style="font-size: 14px; font-weight: 600; color: #1D1D1F">Траты за месяц</span>
+        <span style="font-size: 11px; color: rgba(60,60,67,0.6)">JavaScript · выполняется у вас на Mac, без интернета, если сам не попросит</span>
+      </div>
+      <div class="btn btn-plain">Сделать задачей</div>
+      <div class="btn btn-primary">Запустить</div>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+      <div style="flex: 1; padding: 16px 18px; overflow: hidden; background: #FCFCFC">
+        <div class="code"><span class="cmt">// чеки за текущий месяц, сгруппированные по продавцу</span><br>
+        <span class="kw">const</span> since = <span class="fn">sema.date</span>(<span class="str">'начало месяца'</span>);<br>
+        <span class="kw">const</span> list = <span class="fn">sema.receipts</span>({ since });<br>
+        <span class="kw">const</span> byVendor = {};<br>
+        <span class="kw">for</span> (<span class="kw">const</span> r <span class="kw">of</span> list) byVendor[r.vendor] = (byVendor[r.vendor] || 0) + r.amount;<br>
+        <br>
+        <span style="display: inline-block; background: rgba(255,59,48,0.12); border-left: 3px solid #D70015; margin-left: -12px; padding-left: 9px; width: calc(100% + 3px)"><span class="kw">const</span> rows = <span class="fn">Object.entriez</span>(byVendor).<span class="fn">sort</span>((a, b) =&gt; b[1] - a[1]);</span><br>
+        <span class="kw">const</span> total = rows.<span class="fn">reduce</span>((s, r) =&gt; s + r[1], 0);<br>
+        <br>
+        <span class="fn">sema.chat</span>(<span class="str">'Траты'</span>, <span class="str">`За месяц: ${total} ₽\\n`</span> + rows.<span class="fn">map</span>(r =&gt; <span class="str">`${r[0]} — ${r[1]} ₽`</span>).<span class="fn">join</span>(<span class="str">'\\n'</span>));<br>
+        <span class="kw">return</span> <span class="str">`${rows.length} продавцов, всего ${total} ₽`</span>;</div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(0,0,0,0.08); padding: 10px 18px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center">
+        <span style="font-size: 11px; color: rgba(60,60,67,0.6); margin-right: 4px">Что доступно:</span>
+        <span class="chip">sema.messages()</span>
+        <span class="chip">sema.receipts()</span>
+        <span class="chip">sema.files()</span>
+        <span class="chip">sema.ask()</span>
+        <span class="chip">sema.chat()</span>
+        <span class="chip">sema.http.get()</span>
+        <span class="chip">sema.store</span>
+        <span class="chip">console.log()</span>
+      </div>
+
+      <div style="border-top: 1px solid rgba(0,0,0,0.08); background: #F7F6F4; padding: 10px 18px; display: flex; flex-direction: column; gap: 4px; height: 120px; box-sizing: border-box">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6)">Вывод</span>
+          <span style="font-size: 11px; color: #D70015; font-weight: 600">ошибка на строке 6</span>
+          <span style="margin-left: auto; font-size: 11px; color: rgba(60,60,67,0.5)">остановлено через 0,04 сек</span>
+        </div>
+        <div class="code" style="font-size: 11px; color: rgba(60,60,67,0.75)">Маркет — 12 480 ₽<br>Документы Онлайн — 4 900 ₽<br><span style="color: #D70015">✗ строка 6: Object.entriez is not a function</span><br><span style="color: rgba(60,60,67,0.5)">   const rows = Object.entriez(byVendor).sort(…)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

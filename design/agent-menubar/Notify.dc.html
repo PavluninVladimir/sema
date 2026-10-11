@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; color: #1c1c1e; }
+.сцена { width: 720px; height: 460px; background: linear-gradient(160deg, #6f7f95 0%, #47566b 60%, #2f3a49 100%); position: relative; overflow: hidden; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.строка-меню { position: absolute; top: 0; left: 0; right: 0; height: 26px; background: rgba(245,245,247,.72); backdrop-filter: blur(20px); display: flex; align-items: center; gap: 16px; padding: 0 12px; font-size: 12px; color: #1c1c1e; }
+.строка-меню .яблоко { font-size: 13px; }
+.строка-меню .право { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.значок { display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 5px; }
+.значок.открыт { background: rgba(0,0,0,.10); }
+.значок { position: relative; }
+.значок.с-точкой::after { content: ""; position: absolute; top: 1px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: #c4271c; box-shadow: 0 0 0 1.5px rgba(245,245,247,.9); }
+.меню { position: absolute; top: 30px; width: 262px; background: rgba(246,246,248,.96); backdrop-filter: blur(30px); border: .5px solid rgba(0,0,0,.14); border-radius: 10px; box-shadow: 0 14px 40px rgba(0,0,0,.28); padding: 5px 0; font-size: 13px; }
+.пункт { display: flex; align-items: center; gap: 8px; height: 22px; padding: 0 12px; }
+.пункт .ярлык { margin-left: auto; color: #8e8e93; font-size: 12px; }
+.пункт.тихо { color: #8e8e93; font-size: 12px; }
+.пункт.выбран { background: #0071e3; color: #fff; border-radius: 5px; margin: 0 5px; padding: 0 7px; }
+.пункт.выбран .ярлык { color: rgba(255,255,255,.85); }
+.разделитель { height: 1px; background: rgba(0,0,0,.10); margin: 5px 12px; }
+.точка { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
+.зелёная { background: #2f9e44; } .красная { background: #c4271c; } .серая { background: #8e8e93; }
+.подпись { position: absolute; left: 20px; bottom: 16px; right: 20px; color: rgba(255,255,255,.92); font-size: 12px; line-height: 1.45; }
+.подпись b { font-weight: 600; }
+
+.баннер { position: absolute; top: 40px; right: 18px; width: 344px; background: rgba(250,250,252,.94); backdrop-filter: blur(30px); border-radius: 14px; box-shadow: 0 16px 44px rgba(0,0,0,.32); padding: 12px 14px; display: flex; gap: 10px; }
+.баннер .иконка { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 8px; background: #0071e3; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; }
+.баннер .тело { min-width: 0; }
+.баннер .кто { font-size: 12px; color: #6e6e73; display: flex; gap: 6px; }
+.баннер .кто .время { margin-left: auto; }
+.баннер .заголовок { font-size: 13px; font-weight: 600; margin-top: 1px; }
+.баннер .текст { font-size: 13px; color: #3a3a3c; margin-top: 1px; }
+.вторая { top: 132px; opacity: .96; }
+
+  </style>
+</helmet>
+  <div class="строка-меню">
+    <span class="яблоко">&#63743;</span><b>Finder</b><span>Файл</span><span>Правка</span><span>Вид</span>
+    <span class="право">
+      <span class="значок с-точкой"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4.2h9.2v6.1H5.1L2 12.8z"></path><path d="M11.4 7h2.6v6l-1.9-1.5H7.4"></path></svg></span>
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 5.5a9 9 0 0113 0M4 8a5.5 5.5 0 018 0"></path><circle cx="8" cy="11" r=".9" fill="currentColor" stroke="none"></circle></svg>
+      <svg width="22" height="12" viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="2" width="20" height="10" rx="3"></rect><rect x="3" y="4" width="13" height="6" rx="1.6" fill="currentColor" stroke="none"></rect><path d="M23 5.5v3" stroke-linecap="round"></path></svg>
+      <span>вт 8 сент 13:41</span>
+    </span>
+  </div>
+  <div class="баннер">
+    <div class="иконка">С</div>
+    <div class="тело">
+      <div class="кто"><span>Сёма</span><span class="время">сейчас</span></div>
+      <div class="заголовок">srv-bots · обновлений 68</div>
+      <div class="текст">из них security 41 · нажмите, чтобы разобраться</div>
+    </div>
+  </div>
+  <div class="баннер вторая">
+    <div class="иконка">С</div>
+    <div class="тело">
+      <div class="кто"><span>Сёма</span><span class="время">13:12</span></div>
+      <div class="заголовок">Telegram · Дом › Заявки</div>
+      <div class="текст">Митя: батарея в спальне не греет</div>
+    </div>
+  </div>
+  <div class="подпись"><b>Уведомление.</b> Показывает житель машины, а состав и пороги остаются у Сёмы: уровень, источники и тихие часы правятся на «Настройки → Уведомления». Нажатие открывает эту запись в браузере. Доставленным считается только показанное — если macOS не дала разрешения, Сёма это увидит и скажет в строке канала.</div>
+</x-dc>
+</body>
+</html>

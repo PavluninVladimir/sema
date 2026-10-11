@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    .win { width: 1160px; height: 900px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 200px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 16px 8px; }
+    .tdot { width: 12px; height: 12px; border-radius: 6px; }
+    .brand { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 29px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem.sel { background: rgba(0,0,0,0.07); font-weight: 600; }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px 0 30px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
+    .count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .body { flex: 1; background: #F5F4F2; padding: 22px 24px; box-sizing: border-box; overflow: hidden; display: flex; gap: 18px; }
+    .tabs { width: 146px; flex-shrink: 0; display: flex; flex-direction: column; gap: 1px; }
+    .tabs .cap { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px; }
+    .tab { font-size: 12px; color: #1D1D1F; padding: 5px 9px; border-radius: 6px; }
+    .tab.sel { background: rgba(0,122,255,0.12); color: #0058B0; font-weight: 600; }
+    .col { flex: 1; min-width: 0; max-width: 980px; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 3px; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 14px; line-height: 1.45; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 16px 0 7px; display: flex; align-items: center; gap: 8px; }
+    .grouptitle .sum { text-transform: none; letter-spacing: 0; font-weight: 400; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; margin-top: 5px; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .facts { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 3px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .ok { background: rgba(40,200,64,.15); color: #1E7A32; }
+    .info { background: rgba(0,122,255,.14); color: #0058B0; }
+    .warn { background: rgba(255,188,46,.22); color: #9A6B00; }
+    .alert { background: rgba(255,59,48,.14); color: #D70015; }
+    .neu { background: rgba(0,0,0,.06); color: #6E6E73; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .link.red { color: #D70015; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .fold { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .fold:last-child { border-bottom: none; }
+    .chev { color: rgba(60,60,67,0.45); font-size: 9px; width: 9px; }
+    .sw { width: 32px; height: 19px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; } .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 15px; height: 15px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .pick { display: flex; align-items: center; gap: 5px; height: 23px; padding: 0 8px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 11px; white-space: nowrap; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 7px; line-height: 1.45; }
+    .btn { font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 6px; white-space: nowrap; }
+    .btn-primary { background: #007AFF; color: #FFFFFF; }
+    .btn-plain { border: 1px solid rgba(0,0,0,0.18); color: #1D1D1F; }
+    .sublist { padding: 2px 14px 8px 32px; }
+    .subrow { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+    .dashed { border: 1px dashed rgba(0,0,0,0.22); border-radius: 10px; background: rgba(0,0,0,0.015); padding: 5px; }
+      .win { width: 1160px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 16px 8px; }
+    .tdot { width: 12px; height: 12px; border-radius: 6px; }
+    .sgroup { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.5); padding: 12px 9px 5px; }
+    .sgroup:first-of-type { padding-top: 0; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem.sel { background: rgba(0,0,0,0.07); font-weight: 600; }
+    .navitem svg { flex-shrink: 0; }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 25px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .ndot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
+    .count { font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .right { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+    .foot { margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; gap: 7px; font-size: 11px; color: rgba(60,60,67,0.6); }
+    .body { flex: 1; background: #F5F4F2; padding: 24px; box-sizing: border-box; overflow: hidden; }
+    .win { height: 1000px; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic"><div class="tdot" style="background:#FF5F57"></div><div class="tdot" style="background:#FEBC2E"></div><div class="tdot" style="background:#28C840"></div></div>
+    <div class="sgroup">Сегодня</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2a3.5 3.5 0 0 0-3.5 3.5c0 3-1.3 3.9-1.3 3.9h9.6s-1.3-.9-1.3-3.9A3.5 3.5 0 0 0 8 2.2z"/><path d="M6.7 12a1.5 1.5 0 0 0 2.6 0"/></svg>Уведомления<div class="right"><div class="ndot" style="background:#FF3B30"></div><span class="count" style="color:#D70015">3</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>Почта<div class="right"><span class="count">19</span></div></div>
+      <div class="subitem"><div class="ndot" style="background:#D93025"></div>owner@example.org<span class="right count" style="font-size:10px">12</span></div>
+      <div class="subitem"><div class="ndot" style="background:#FC3F1D"></div>me@example.com<span class="right count" style="font-size:10px">7</span></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>Чаты</div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>Файлы<div class="right"><span class="count">131</span></div></div>
+    </div>
+    <div class="sgroup">Сёма сам</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>Задачи<div class="right"><span class="count">22</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 2.6a2 2 0 0 0-2.4 1.7 2 2 0 0 0-1 3.4 2 2 0 0 0 1.2 3.3 2 2 0 0 0 2.2 2z"/><path d="M8.8 2.6a2 2 0 0 1 2.4 1.7 2 2 0 0 1 1 3.4 2 2 0 0 1-1.2 3.3 2 2 0 0 1-2.2 2z"/></svg>Память<div class="right"><span class="count">142</span></div></div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8h3l1.5-4 3 8 1.5-4h4"/></svg>Здоровье<div class="right"><div class="ndot" style="background:#FEBC2E"></div></div></div>
+    </div>
+    <div class="sgroup">Модули</div>
+    <div style="display:flex; flex-direction:column; gap:1px">
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M6.4 11.6V5.2h2.1a1.7 1.7 0 0 1 0 3.4H5.6"/><path d="M5.6 10h3"/></svg>Чеки</div>
+      <div class="navitem"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.4v7.2"/><path d="M9.9 6.1c-.5-.5-1.2-.8-1.9-.8-1 0-1.8.5-1.8 1.4 0 2 3.7 1.1 3.7 3 0 1-.9 1.5-1.9 1.5-.8 0-1.5-.3-2-.9"/></svg>Курсы</div>
+    </div>
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08)">
+      <div class="navitem sel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>Настройки</div>
+    </div>
+    <div class="foot"><div class="ndot" style="background:#28C840"></div>Проверено в 07:46 · qwen-4b</div>
+  </div>
+
+  <div class="body">
+    <div class="tabs">
+      <div class="cap">Настройки</div>
+      <div class="tab">Почта</div>
+      <div class="tab">Модели</div>
+      <div class="tab">Инструменты</div>
+      <div class="tab">Ключи и секреты</div>
+      <div class="tab">Серверы</div>
+      <div class="tab">Скиллы</div>
+      <div class="tab">Поиск</div>
+      <div class="tab">Развитие</div>
+      <div class="tab">Интеграции</div>
+      <div class="tab">Telegram</div>
+      <div class="tab sel">Агенты</div>
+      <div class="tab">Уведомления</div>
+      <div class="tab">Хранилища</div>
+      <div class="tab">Доступ</div>
+    </div>
+
+    <div class="col">
+      <div class="h1">Агенты</div>
+      <div class="sub">Агент — житель машины: он делает на месте то, чего Сёма не может издалека. Разговор закрыт, и обе стороны предъявляют сертификат: агент знает, что говорит с Сёмой, а Сёма знает, какой это агент. Звонит всегда агент.</div>
+
+      <div class="grouptitle">Удостоверяющий центр</div>
+      <div class="card">
+        <div class="row">
+          <div class="dot" style="background:#28C840"></div>
+          <div style="flex:1; min-width:0">
+            <div class="ttl">Корень Сёмы</div>
+            <div class="meta">им подписаны сертификат самого Сёмы и сертификат каждого агента; чужих он не признаёт</div>
+            <div class="facts">
+              <span class="fact">Отпечаток <b class="mono">3f1a:9c02:7d4e:b815:60aa:2c3d:e4f5:0617</b></span>
+              <span class="fact">Закрытая часть <b>в хранилище, наружу не выдаётся</b></span>
+            </div>
+          </div>
+          <div class="link">Скопировать отпечаток</div>
+          <div class="more">⋯</div>
+        </div>
+      </div>
+
+      <div class="grouptitle">Агенты <span class="sum">· 1 · на связи</span></div>
+      <div class="card">
+        <div class="row">
+          <div class="dot" style="background:#28C840"></div>
+          <div style="flex:1; min-width:0">
+            <div class="ttl">мак</div>
+            <div class="meta">на связи · последний разговор сегодня 07:47 · переподключается сам</div>
+            <div class="facts">
+              <span class="fact">Отпечаток <b class="mono">c4d2:71e9:0a3b:58f6:9e21:4b7c:d803:1f5a</b></span>
+              <span class="fact">Вошёл <b>по приглашению</b></span>
+              <span class="fact">Сэкономил <b>1483 строки за 5 ответов</b></span>
+            </div>
+          </div>
+          <div class="link">Проверить связь</div>
+          <div class="more">⋯</div>
+        </div>
+        <div class="sublist">
+          <div class="meta" style="font-weight:600; text-transform:uppercase; letter-spacing:0.05em; padding-bottom:2px">Способности — что ему разрешено</div>
+          <div class="subrow">
+            <div class="sw sw-on"><div class="knob" style="left:15px"></div></div>
+            <div style="flex:1"><div style="font-size:13px">код</div><div class="meta">символы, контекст, влияние, определение, диагностика, поиск, состояние — семь инструментов, ответ помечен ярусом</div></div>
+            <div class="tag neu">7 инструментов</div>
+          </div>
+          <div class="meta" style="padding-top:4px">Новая способность приходит выключенной: пока тумблер не включён, Сёма её не зовёт вовсе. Отзыв действует сразу, а не со следующего соединения.</div>
+        </div>
+      </div>
+      <div class="note">Было пять кнопок в строке, из них две красные и одна с надписью «Забрать «код»» — надпись описывала действие, а не состояние. Теперь способность — тумблер, отзыв и «забыть» ушли под «⋯».</div>
+
+      <div class="grouptitle">Связь</div>
+      <div class="card">
+        <div class="row" style="align-items:center">
+          <div style="flex:1"><div class="ttl">Где слушать агентов</div><div class="meta">агент звонит сам: ноутбук спит, меняет сеть и стоит за домашним роутером</div></div>
+          <div class="pick mono">0.0.0.0:8766</div>
+          <div class="link">Изменить</div>
+        </div>
+        <div class="row" style="align-items:center">
+          <div style="flex:1"><div class="ttl">Позвать нового агента</div><div class="meta">одноразовый код живёт 15 минут и сгорает при первом же входе — это единственный путь без сертификата</div></div>
+          <div class="btn btn-primary">Создать код</div>
+        </div>
+      </div>
+
+      <div class="grouptitle">Журнал <span class="sum">· 15 записей за сутки · всё в порядке</span></div>
+      <div class="card">
+        <div class="fold"><span class="chev">▶</span><span class="ttl">соединение</span><span class="meta">8 раз · последнее сегодня 07:15 · отпечаток тот же</span><span style="margin-left:auto" class="tag ok">без замечаний</span></div>
+        <div class="fold"><span class="chev">▶</span><span class="ttl">код · экономия</span><span class="meta">5 раз · последнее сегодня 07:48</span><span style="margin-left:auto" class="tag neu">1483 строки</span></div>
+        <div class="fold"><span class="chev">▶</span><span class="ttl">код · agent_status</span><span class="meta">2 раза · последнее сегодня 07:15</span></div>
+      </div>
+      <div class="note">Пятнадцать одинаковых строк «мак · соединение» свернулись в три: журнал отвечает на вопрос «что происходило», а не «сколько было записей».</div>
+
+      <div class="grouptitle">Если отпечаток сменится <span class="sum">· пример состояния, сейчас такого нет</span></div>
+      <div class="dashed">
+        <div class="card" style="border:none">
+          <div class="row" style="background:rgba(255,59,48,0.07)">
+            <div class="dot" style="background:#FF3B30"></div>
+            <div style="flex:1; min-width:0">
+              <div class="ttl">Отпечаток агента «мак» сменился</div>
+              <div class="meta">Сёма не пустил его и ждёт вашего решения. Так бывает при переустановке агента — а бывает, что именем «мак» назвалась чужая машина.</div>
+              <div class="facts">
+                <span class="fact">Было <b class="mono">c4d2:71e9:…:1f5a</b></span>
+                <span class="fact">Стало <b class="mono">другой отпечаток, показан целиком в уведомлении</b></span>
+                <span class="fact">Когда <b>сегодня 07:15</b></span>
+              </div>
+            </div>
+            <div class="btn btn-plain">Принять новый…</div>
+            <div class="more">⋯</div>
+          </div>
+        </div>
+      </div>
+      <div class="note">Тревога выглядит тревогой: красная точка, подсветка строки (единственный случай, когда фон окрашивается) и то же уведомление в меню. Тихого переподключения не бывает.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

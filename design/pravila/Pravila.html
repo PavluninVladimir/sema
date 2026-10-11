@@ -1,0 +1,344 @@
+<title>Правила доступа Сёмы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Макет: одна колонка настроек Сёмы; правила — три части: Разрешить / Спросить / Запретить.
+   Токены — из веб-клиента (internal/web/static/style.css), чтобы макет переносился один в один. */
+:root {
+  --bg: #FBFAF7; --card: #FFFFFF; --surface: #EFEDE6; --text: #17181C;
+  --text-2: #585B64; --text-3: #686B74; --border: #E3E0D8; --border-2: #EFECE4;
+  --accent: #1F4FD8; --accent-bg: #E8EDFC;
+  --ok: #2E7D4F; --ok-bg: #E4F1E9; --warn: #9C6100; --warn-bg: #FBF0DC; --alert: #BE3320; --alert-bg: #FBE7E3;
+  --elev: 0 1px 2px rgba(24,20,12,.07);
+  --font: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --control: 32px; --control-row: 28px; --radius: 8px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131417; --card: #1B1D21; --surface: #212429; --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --ok: #5FC98D; --ok-bg: #16281E; --warn: #E2A54C; --warn-bg: #2B2214; --alert: #FF8874; --alert-bg: #2E1A17;
+  --elev: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #131417; --card: #1B1D21; --surface: #212429; --text: #ECEDEF; --text-2: #A1A4AC; --text-3: #878A93;
+  --border: #2A2D33; --border-2: #232529; --accent: #87A9FF; --accent-bg: #1D2436;
+  --ok: #5FC98D; --ok-bg: #16281E; --warn: #E2A54C; --warn-bg: #2B2214; --alert: #FF8874; --alert-bg: #2E1A17;
+  --elev: 0 1px 2px rgba(0,0,0,.4); color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--text); font: 13px/1.45 var(--font); margin: 0 }
+.page { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 96px; display: grid; gap: 22px }
+h1 { font-size: 20px; margin: 0; font-weight: 600; text-wrap: balance }
+.sub { color: var(--text-2); margin: 4px 0 0; max-width: 68ch }
+.tabs { display: flex; gap: 4px; background: var(--surface); padding: 4px; border-radius: 10px; width: fit-content; max-width: 100%; overflow-x: auto }
+.tabs button { border: 0; background: none; font: inherit; color: var(--text-2); padding: 6px 12px; border-radius: 7px; cursor: pointer; white-space: nowrap }
+.tabs button[aria-selected="true"] { background: var(--card); color: var(--text); box-shadow: var(--elev); font-weight: 500 }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; display: grid; gap: 14px; min-width: 0 }
+.card h2 { font-size: 13px; margin: 0; font-weight: 600 }
+.eyebrow { font-size: 11px; color: var(--text-3); letter-spacing: .02em }
+.legend { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px }
+.legend div { border-radius: var(--radius); padding: 10px 12px; display: grid; gap: 2px }
+.legend b { font-weight: 600 }
+.legend span { color: var(--text-2); font-size: 12px }
+.l-allow { background: var(--ok-bg) } .l-allow b { color: var(--ok) }
+.l-ask { background: var(--warn-bg) } .l-ask b { color: var(--warn) }
+.l-deny { background: var(--alert-bg) } .l-deny b { color: var(--alert) }
+
+.head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between }
+.counts { display: flex; gap: 6px; flex-wrap: wrap }
+.pill { font-size: 11px; border-radius: 999px; padding: 2px 9px; font-variant-numeric: tabular-nums; white-space: nowrap }
+.p-allow { background: var(--ok-bg); color: var(--ok) } .p-ask { background: var(--warn-bg); color: var(--warn) } .p-deny { background: var(--alert-bg); color: var(--alert) }
+.p-new { background: var(--accent-bg); color: var(--accent) }
+
+/* сегментный переключатель — три состояния, цвет только у выбранного */
+.seg { display: inline-flex; background: var(--surface); border-radius: var(--radius); padding: 2px; gap: 2px; flex: none }
+.seg button { border: 0; background: none; font: inherit; font-size: 12px; color: var(--text-2); height: calc(var(--control-row) - 4px); padding: 0 10px; border-radius: 6px; cursor: pointer; white-space: nowrap }
+.seg button:hover { color: var(--text) }
+.seg button:focus-visible, .tabs button:focus-visible, .chip:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+.seg button.on.allow { background: var(--ok-bg); color: var(--ok); font-weight: 500 }
+.seg button.on.ask { background: var(--warn-bg); color: var(--warn); font-weight: 500 }
+.seg button.on.deny { background: var(--alert-bg); color: var(--alert); font-weight: 500 }
+.seg.small button { font-size: 11px; padding: 0 8px }
+
+.default { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-2) }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.search { flex: 1 1 220px; max-width: 320px; height: var(--control); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: inherit; padding: 0 11px }
+.chip { border: 1px solid var(--border); background: var(--card); color: var(--text-2); font: inherit; font-size: 12px; height: var(--control-row); padding: 0 10px; border-radius: 999px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--text); color: var(--card); border-color: var(--text) }
+
+.group { border-top: 1px solid var(--border-2); padding-top: 10px; display: grid; gap: 2px }
+.ghead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between; padding: 2px 0 6px }
+.gtitle { display: flex; align-items: baseline; gap: 8px; min-width: 0 }
+.gtitle b { font-weight: 600 }
+.gtitle span { color: var(--text-3); font-size: 11px }
+.bar { display: flex; height: 4px; width: 80px; border-radius: 2px; overflow: hidden; background: var(--surface) }
+.bar i { display: block } .bar .a { background: var(--ok) } .bar .q { background: var(--warn) } .bar .d { background: var(--alert) }
+.bulk { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 11px }
+.row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 16px; align-items: center; padding: 7px 8px; border-radius: 6px }
+.row:hover { background: var(--bg) }
+.row .name { font-family: var(--mono); font-size: 12.5px; display: flex; align-items: center; gap: 6px; min-width: 0 }
+.row .name .changed { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none }
+.row .desc { grid-column: 1; color: var(--text-2); font-size: 12px; overflow-wrap: anywhere }
+.row .seg { grid-row: 1 / span 2; grid-column: 2 }
+.hint { color: var(--text-3); font-size: 11px }
+.why { font-size: 11px; color: var(--text-3) }
+
+/* правила по образцам (серверы): три колонки */
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px }
+.col { border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: grid; gap: 10px; align-content: start; min-width: 0 }
+.col h3 { margin: 0; font-size: 13px; display: flex; justify-content: space-between; gap: 8px }
+.col.allow h3 { color: var(--ok) } .col.ask h3 { color: var(--warn) } .col.deny h3 { color: var(--alert) }
+.col .explain { color: var(--text-2); font-size: 12px; margin: 0 }
+.pats { display: flex; flex-wrap: wrap; gap: 6px; max-height: 220px; overflow: auto }
+.pat { font-family: var(--mono); font-size: 11.5px; background: var(--surface); border-radius: 6px; padding: 3px 4px 3px 8px; display: inline-flex; align-items: center; gap: 4px; max-width: 100% }
+.pat span { overflow-wrap: anywhere }
+.pat button { border: 0; background: none; color: var(--text-3); cursor: pointer; font: inherit; padding: 0 3px; border-radius: 4px }
+.pat button:hover { color: var(--alert) }
+.pat.hit { outline: 2px solid var(--accent) }
+.add { display: flex; gap: 6px }
+.add input { flex: 1; min-width: 0; height: var(--control-row); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: 12px var(--mono); padding: 0 8px }
+.btn { height: var(--control-row); border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: var(--radius); font: inherit; font-size: 12px; padding: 0 10px; cursor: pointer; white-space: nowrap }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--card); height: var(--control) }
+.tester { display: grid; gap: 8px }
+.tester input { height: var(--control); border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); color: var(--text); font: 13px var(--mono); padding: 0 11px; width: 100% }
+.verdict { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; min-height: 24px }
+.verdict .pill { font-size: 12px; padding: 3px 10px }
+
+.savebar { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 20px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--card); border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: center; align-items: center; box-shadow: 0 -2px 8px rgba(0,0,0,.06) }
+.savebar[hidden] { display: none !important }
+.note { color: var(--text-2); font-size: 12px; max-width: 72ch; margin: 0 }
+.note code, .sub code { font-family: var(--mono); font-size: 11.5px; background: var(--surface); padding: 0 4px; border-radius: 4px }
+
+@media (max-width: 720px) {
+  .legend, .cols { grid-template-columns: minmax(0,1fr) }
+  .row { grid-template-columns: minmax(0,1fr) }
+  .row .seg { grid-row: auto; grid-column: 1; justify-self: start }
+  .page { padding-inline: 16px }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Настройки · Система · Интеграции — макет</div>
+    <h1>Правила доступа</h1>
+    <p class="sub">Правила у каждого сервера свои. Не подошло ни одно правило — выполнение запрещено. Одно правило — три ответа. Так же, как в Claude Code: <code>allow</code>, <code>ask</code>, <code>deny</code>. Один и тот же элемент стоит у серверов MCP, у серверов по SSH и дальше у всего, что Сёма делает от вашего имени.</p>
+  </header>
+
+  <div class="legend" aria-label="Три ответа">
+    <div class="l-allow"><b>Разрешить</b><span>выполняется сразу, без вопроса; видно в журнале</span></div>
+    <div class="l-ask"><b>Спросить</b><span>ждёт вашей кнопки в «Уведомлениях» или в чате</span></div>
+    <div class="l-deny"><b>Запретить</b><span>не выполняется никогда, даже с вашей кнопкой</span></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-mcp" aria-selected="true" data-tab="mcp">Сервер MCP · planner</button>
+    <button role="tab" id="tab-ssh" aria-selected="false" data-tab="ssh">Сервер по SSH · команды</button>
+  </div>
+
+  <!-- MCP: инструменты перечислимы — у каждого своё состояние -->
+  <section class="card" id="pane-mcp">
+    <div class="head">
+      <div>
+        <h2>planner · 52 инструмента</h2>
+        <div class="hint">у каждого инструмента свой ответ; образцы имён больше не нужны</div>
+      </div>
+      <div class="counts" id="mcp-counts"></div>
+    </div>
+    <div class="default">
+      <span>Новый инструмент, которого сервер раньше не называл:</span>
+      <div class="seg small" id="mcp-default" role="radiogroup" aria-label="Ответ для нового инструмента"></div>
+      <span class="hint">по умолчанию «Запретить»: новый инструмент не выполняется, пока вы не решите за него</span>
+    </div>
+    <div class="toolbar">
+      <input class="search" id="mcp-search" type="search" placeholder="Найти инструмент">
+      <div id="mcp-filter" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+    <div id="mcp-groups" style="display:grid;gap:10px"></div>
+  </section>
+
+  <!-- SSH: команды не перечислимы — правила образцами в трёх колонках и проверка команды -->
+  <section class="card" id="pane-ssh" hidden>
+    <div class="head">
+      <div>
+        <h2>Команды · <select id="ssh-host" aria-label="Сервер" style="font:inherit;font-weight:600;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);padding:2px 6px"></select></h2>
+        <div class="hint">у каждого сервера свои правила; команду нельзя перечислить заранее, поэтому здесь образцы</div>
+      </div>
+      <div class="counts" id="ssh-counts"></div>
+    </div>
+    <div class="tester">
+      <label for="ssh-test" class="eyebrow">Проверить команду — что Сёма с ней сделает</label>
+      <input id="ssh-test" value="sudo apt-get upgrade -y" autocomplete="off" spellcheck="false">
+      <div class="verdict" id="ssh-verdict"></div>
+    </div>
+    <div class="cols" id="ssh-cols"></div>
+    <div id="ssh-empty" class="note" hidden></div>
+    <p class="note">Не подошло ни одно правило — <b>запрещено</b>. <code>sudo</code> выполняется только по правилу «Спросить» и всегда с вашей кнопкой. Запрет сильнее разрешения: если команда подходит под оба, она запрещена. У «Полной» самостоятельности «Спросить» уходит на суд двух моделей со страховкой возврата, «Запретить» не меняется никогда.</p>
+  </section>
+</div>
+
+<div class="savebar" id="savebar" hidden>
+  <span id="savetext"></span>
+  <button class="btn" id="undo">Отменить</button>
+  <button class="btn primary" id="save">Сохранить</button>
+</div>
+
+<script>
+const TOOLS = [{"name": "task_list", "desc": "List tasks visible to the user.", "state": "allow"}, {"name": "task_get", "desc": "Get one task by ID.", "state": "allow"}, {"name": "task_create", "desc": "Create a new task.", "state": "ask"}, {"name": "task_update", "desc": "Update an existing task by ID.", "state": "ask"}, {"name": "project_list", "desc": "List projects visible to the user.", "state": "allow"}, {"name": "project_get", "desc": "Get one project by ID.", "state": "allow"}, {"name": "project_create", "desc": "Create a new project.", "state": "ask"}, {"name": "project_update", "desc": "Update an existing project by ID.", "state": "ask"}, {"name": "task_group_list", "desc": "List task group (task sections, subsections and groups)s visible to the user.", "state": "allow"}, {"name": "task_group_get", "desc": "Get one task group (task sections, subsections and groups) by ID.", "state": "allow"}, {"name": "task_group_create", "desc": "Create a new task group (task sections, subsections and groups).", "state": "ask"}, {"name": "task_group_update", "desc": "Update an existing task group (task sections, subsections and groups) by ID.", "state": "ask"}, {"name": "kanban_status_list", "desc": "List kanban statuss visible to the user.", "state": "allow"}, {"name": "kanban_status_get", "desc": "Get one kanban status by ID.", "state": "allow"}, {"name": "kanban_status_create", "desc": "Create a new kanban status.", "state": "ask"}, {"name": "kanban_status_update", "desc": "Update an existing kanban status by ID.", "state": "ask"}, {"name": "habit_list", "desc": "List habits visible to the user.", "state": "allow"}, {"name": "habit_get", "desc": "Get one habit by ID.", "state": "allow"}, {"name": "habit_create", "desc": "Create a new habit.", "state": "ask"}, {"name": "habit_update", "desc": "Update an existing habit by ID.", "state": "ask"}, {"name": "habit_progress_list", "desc": "List habit progresss visible to the user.", "state": "allow"}, {"name": "habit_progress_get", "desc": "Get one habit progress by ID.", "state": "allow"}, {"name": "habit_progress_create", "desc": "Create a new habit progress.", "state": "ask"}, {"name": "habit_progress_update", "desc": "Update an existing habit progress by ID.", "state": "ask"}, {"name": "checklist_item_list", "desc": "List checklist items visible to the user.", "state": "allow"}, {"name": "checklist_item_get", "desc": "Get one checklist item by ID.", "state": "allow"}, {"name": "checklist_item_create", "desc": "Create a new checklist item.", "state": "ask"}, {"name": "checklist_item_update", "desc": "Update an existing checklist item by ID.", "state": "ask"}, {"name": "tag_list", "desc": "List tag (label)s visible to the user.", "state": "allow"}, {"name": "tag_get", "desc": "Get one tag (label) by ID.", "state": "allow"}, {"name": "tag_create", "desc": "Create a new tag (label).", "state": "ask"}, {"name": "tag_update", "desc": "Update an existing tag (label) by ID.", "state": "ask"}, {"name": "time_stat_list", "desc": "List time stat - logging pomodoro time usages visible to the user.", "state": "allow"}, {"name": "time_stat_get", "desc": "Get one time stat - logging pomodoro time usage by ID.", "state": "allow"}, {"name": "time_stat_create", "desc": "Create a new time stat - logging pomodoro time usage.", "state": "ask"}, {"name": "time_stat_update", "desc": "Update an existing time stat - logging pomodoro time usage by ID.", "state": "ask"}, {"name": "task_complete", "desc": "Mark a task as completed.", "state": "ask"}, {"name": "task_uncomplete", "desc": "Move a completed task back to open state.", "state": "ask"}, {"name": "task_cancel", "desc": "Mark a task as cancelled.", "state": "ask"}, {"name": "task_complete_today", "desc": "Track one completion for today on a recurring task. Use for recurring tasks like daily habits. Idempotent with", "state": "ask"}, {"name": "task_archive", "desc": "Archive a task, optionally with a journal date.", "state": "ask"}, {"name": "task_unarchive", "desc": "Restore an archived task.", "state": "ask"}, {"name": "task_move", "desc": "Move a task to another project and optional group.", "state": "ask"}, {"name": "task_change_column", "desc": "Move a task to an explicit Kanban column. Use this for explicit Kanban moves, not for lifecycle completion.", "state": "ask"}, {"name": "project_archive", "desc": "Archive a project, optionally with a journal date.", "state": "ask"}, {"name": "project_unarchive", "desc": "Restore an archived project.", "state": "ask"}, {"name": "checklist_item_check", "desc": "Mark a checklist item as done.", "state": "ask"}, {"name": "checklist_item_uncheck", "desc": "Mark a checklist item as not done.", "state": "ask"}, {"name": "task_list_today", "desc": "List open tasks scheduled for today in the user’s timezone. Requires a `timezone` argument (IANA name like \"Eu", "state": "allow"}, {"name": "task_list_overdue", "desc": "List open overdue tasks relative to the user’s timezone. Requires a `timezone` argument (IANA name like \"Europ", "state": "allow"}, {"name": "task_list_inbox", "desc": "List inbox tasks without project scheduling. Does not require a timezone.", "state": "allow"}, {"name": "get_my_context", "desc": "Use this only if you do not have access to planner:// resources. If your client supports Resources, prefer", "state": "allow"}];
+const SSH = {"read": ["uptime", "df", "free", "journalctl", "tail", "head", "cat", "ls", "ps", "top -b -n 1", "docker ps", "docker logs", "docker stats --no-stream", "systemctl status", "systemctl list-units", "ss", "netstat", "du", "who", "uname", "nproc", "hostname", "date", "id", "env | grep -v", "wc", "grep", "find", "stat", "echo", "apt list", "apt-cache policy", "apt-get -s", "dpkg -l", "dpkg-query", "dpkg -s", "last", "lastb", "lastlog", "w", "wg show", "fail2ban-client status", "needrestart -b", "ufw status", "iptables -L", "iptables -S", "nft list", "ip", "getent", "lsof -i", "lsblk", "mount", "sysctl", "cut", "awk", "sort", "uniq", "sed -n", "tr", "crontab -l", "systemctl is-active", "systemctl list-timers", "systemctl list-unit-files", "debsecan", "checkrestart", "timedatectl", "hostnamectl", "vmstat", "iostat", "dmesg", "swapon --show", "docker images", "docker inspect", "cat /var/run/reboot-required", "ls /var/run/reboot-required", "/* print*", "/system package update check-for-updates", "/system resource print", "/log print", "/export hide-sensitive", "find /home -maxdepth 3 -name authorized_keys -exec md5sum {} + 2>/dev/null"], "human": ["userdel", "adduser", "useradd", "usermod", "passwd", "chpasswd", "authorized_keys", "ssh_host_", "sshd_config", "ufw", "iptables -F", "iptables -X", "nft flush", "firewall", "ip route", "ip addr", "netplan", "resolv.conf", "downgrade", "apt-get remove", "apt remove", "apt purge", "dpkg --purge", "drop database", "drop table", "truncate", "mkswap", "fdisk", "parted", "/user", "/ip firewall", "/ip address", "/system reset", "/certificate"], "never": ["rm -rf", "rm -r /", "mkfs", "dd", "shutdown", "reboot", "halt", "poweroff", "chmod -R 777", "> /dev/sd", "sh -c", "bash -c", "eval", ":(){", "curl | sh", "wget -O- | sh", "reset-configuration", "/file remove", "format-drive", "/system upgrade"]};
+const STATES = [["allow","Разрешить"],["ask","Спросить"],["deny","Запретить"]];
+const GROUPS = [["task_group","Группы задач"],["kanban_status","Канбан"],["habit_progress","Отметки привычек"],["checklist_item","Чек-листы"],["time_stat","Учёт времени"],["project","Проекты"],["habit","Привычки"],["task","Задачи"],["tag","Теги"]];
+const initial = Object.fromEntries(TOOLS.map(t => [t.name, t.state]));
+const state = {...initial};
+let filter = "all", query = "", defaultState = "deny";
+
+function seg(current, onPick, small) {
+  const box = document.createElement("div");
+  box.className = "seg" + (small ? " small" : "");
+  box.setAttribute("role", "radiogroup");
+  for (const [k, label] of STATES) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = label; b.className = k + (current === k ? " on" : "");
+    b.setAttribute("role", "radio"); b.setAttribute("aria-checked", current === k);
+    b.onclick = () => onPick(k);
+    box.append(b);
+  }
+  return box;
+}
+function groupOf(name) {
+  for (const [p, title] of GROUPS) if (name === p || name.startsWith(p + "_")) return title;
+  return "Прочее";
+}
+function pills(el, counts, extra) {
+  el.innerHTML = "";
+  const add = (cls, text) => { const s = document.createElement("span"); s.className = "pill " + cls; s.textContent = text; el.append(s); };
+  add("p-allow", "Разрешить · " + counts.allow);
+  add("p-ask", "Спросить · " + counts.ask);
+  add("p-deny", "Запретить · " + counts.deny);
+  if (extra) add("p-new", extra);
+}
+function count(names) {
+  const c = {allow:0, ask:0, deny:0};
+  for (const n of names) c[state[n]]++;
+  return c;
+}
+function renderMCP() {
+  pills(document.getElementById("mcp-counts"), count(Object.keys(state)));
+  const def = document.getElementById("mcp-default");
+  def.replaceWith(Object.assign(seg(defaultState, k => { defaultState = k; renderMCP(); }, true), {id: "mcp-default"}));
+  const f = document.getElementById("mcp-filter"); f.innerHTML = "";
+  for (const [k, label] of [["all","Все"], ...STATES]) {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = label; b.setAttribute("aria-pressed", filter === k);
+    b.onclick = () => { filter = k; renderMCP(); };
+    f.append(b);
+  }
+  const box = document.getElementById("mcp-groups"); box.innerHTML = "";
+  const byGroup = new Map();
+  for (const t of TOOLS) {
+    if (filter !== "all" && state[t.name] !== filter) continue;
+    if (query && !(t.name + " " + t.desc).toLowerCase().includes(query)) continue;
+    const g = groupOf(t.name);
+    if (!byGroup.has(g)) byGroup.set(g, []);
+    byGroup.get(g).push(t);
+  }
+  if (!byGroup.size) { box.innerHTML = '<p class="note">Под фильтр ничего не подошло.</p>'; }
+  for (const [g, tools] of byGroup) {
+    const sec = document.createElement("div"); sec.className = "group";
+    const head = document.createElement("div"); head.className = "ghead";
+    const c = count(tools.map(t => t.name)), n = tools.length;
+    head.innerHTML = `<div class="gtitle"><b>${g}</b><span>${n}</span><div class="bar" aria-hidden="true"><i class="a" style="width:${c.allow/n*100}%"></i><i class="q" style="width:${c.ask/n*100}%"></i><i class="d" style="width:${c.deny/n*100}%"></i></div></div>`;
+    const bulk = document.createElement("div"); bulk.className = "bulk"; bulk.append("всем в группе:");
+    bulk.append(seg(null, k => { tools.forEach(t => state[t.name] = k); renderMCP(); }, true));
+    head.append(bulk); sec.append(head);
+    for (const t of tools) {
+      const r = document.createElement("div"); r.className = "row";
+      const name = document.createElement("div"); name.className = "name";
+      if (state[t.name] !== initial[t.name]) { const d = document.createElement("i"); d.className = "changed"; d.title = "изменено, не сохранено"; name.append(d); }
+      name.append(t.name);
+      const desc = document.createElement("div"); desc.className = "desc"; desc.textContent = t.desc;
+      r.append(name, seg(state[t.name], k => { state[t.name] = k; renderMCP(); }), desc);
+      sec.append(r);
+    }
+    box.append(sec);
+  }
+  const changed = Object.keys(state).filter(n => state[n] !== initial[n]).length;
+  document.getElementById("savebar").hidden = changed === 0;
+  document.getElementById("savetext").textContent = `Изменено правил: ${changed}`;
+}
+document.getElementById("mcp-search").oninput = e => { query = e.target.value.trim().toLowerCase(); renderMCP(); };
+document.getElementById("undo").onclick = () => { Object.assign(state, initial); renderMCP(); };
+document.getElementById("save").onclick = () => { Object.assign(initial, state); renderMCP(); };
+
+/* SSH: три колонки образцов и живая проверка команды — порядок как у Сёмы: запрет, «только человек», чтение */
+const HOSTS = ["Microtik","srv-vpn","WireGuard","srv-bots","хозяин","новый-сервер"];
+const RO = p => p.startsWith("/");
+const perHost = {};
+for (const h of HOSTS) perHost[h] = h === "новый-сервер" ? {allow: [], ask: [], deny: []} :
+  h === "Microtik" ? {allow: SSH.read.filter(RO), ask: SSH.human.filter(RO), deny: SSH.never} :
+  {allow: SSH.read.filter(p => !RO(p)), ask: SSH.human.filter(p => !RO(p)), deny: SSH.never};
+let host = "WireGuard";
+let rules = perHost[host];
+const COLTEXT = {
+  allow: ["Разрешить", "команда начинается с образца — выполняется сразу"],
+  ask: ["Спросить", "образец встречается в команде — ждёт вашей кнопки; sudo — только здесь"],
+  deny: ["Запретить", "слово-образец в команде — отказ без вопроса"],
+};
+function wordHit(cmd, p) { const i = cmd.indexOf(p); return i >= 0 && (i === 0 || /[\s;|&(]/.test(cmd[i-1])); }
+function classify(cmd) {
+  const c = cmd.trim().replace(/\s+/g, " ");
+  if (!c) return null;
+  for (const p of rules.deny) if (wordHit(c, p)) return ["deny", p];
+  for (const p of rules.ask) if (c.includes(p)) return ["ask", p];
+  const sudo = /(^|\s)(sudo|doas|su)\s/.test(c + " ");
+  if (!sudo) for (const p of rules.allow) if (c === p || c.startsWith(p + " ") || c.startsWith(p)) return ["allow", p];
+  return ["deny", sudo ? "sudo без правила «Спросить» — запрещено" : "ни одно правило не подошло — запрещено"];
+}
+function renderSSH() {
+  const sel = document.getElementById("ssh-host");
+  if (!sel.options.length) { for (const h of HOSTS) sel.add(new Option(h, h)); sel.value = host; sel.onchange = () => { host = sel.value; rules = perHost[host]; renderSSH(); }; }
+  const empty = document.getElementById("ssh-empty");
+  const none = !rules.allow.length && !rules.ask.length && !rules.deny.length;
+  empty.hidden = !none;
+  if (none) empty.innerHTML = '<b>У сервера нет правил — любая команда запрещена.</b> Добавьте правила вручную или возьмите готовый набор: <button class="btn" type="button" id="seed-linux">Набор Linux</button> <button class="btn" type="button" id="seed-ros">Набор RouterOS</button>';
+  pills(document.getElementById("ssh-counts"), {allow: rules.allow.length, ask: rules.ask.length, deny: rules.deny.length});
+  const cmd = document.getElementById("ssh-test").value, v = classify(cmd);
+  const out = document.getElementById("ssh-verdict"); out.innerHTML = "";
+  if (v) {
+    const [k, why] = v;
+    const s = document.createElement("span"); s.className = "pill p-" + k; s.textContent = STATES.find(x => x[0] === k)[1];
+    const w = document.createElement("span"); w.className = "why"; w.textContent = "по правилу: " + why;
+    out.append(s, w);
+  }
+  const cols = document.getElementById("ssh-cols"); cols.innerHTML = "";
+  for (const k of ["allow","ask","deny"]) {
+    const col = document.createElement("div"); col.className = "col " + k;
+    col.innerHTML = `<h3><span>${COLTEXT[k][0]}</span><span class="pill p-${k}">${rules[k].length}</span></h3><p class="explain">${COLTEXT[k][1]}</p>`;
+    const pats = document.createElement("div"); pats.className = "pats";
+    rules[k].forEach((p, i) => {
+      const chip = document.createElement("span"); chip.className = "pat" + (v && v[1] === p ? " hit" : "");
+      const t = document.createElement("span"); t.textContent = p;
+      const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label", "убрать " + p);
+      x.onclick = () => { rules[k].splice(i, 1); renderSSH(); };
+      chip.append(t, x); pats.append(chip);
+    });
+    const add = document.createElement("div"); add.className = "add";
+    const inp = document.createElement("input"); inp.placeholder = "образец команды"; inp.id = "add-" + k;
+    const b = document.createElement("button"); b.className = "btn"; b.textContent = "Добавить"; b.type = "button";
+    b.onclick = () => { const val = inp.value.trim(); if (val && !rules[k].includes(val)) { rules[k].unshift(val); renderSSH(); } };
+    add.append(inp, b);
+    col.append(pats, add); cols.append(col);
+  }
+}
+document.getElementById("ssh-test").oninput = renderSSH;
+document.addEventListener("click", e => {
+  if (e.target.id === "seed-linux") { Object.assign(rules, {allow: SSH.read.filter(p => !RO(p)), ask: SSH.human.filter(p => !RO(p)), deny: [...SSH.never]}); renderSSH(); }
+  if (e.target.id === "seed-ros") { Object.assign(rules, {allow: SSH.read.filter(RO), ask: SSH.human.filter(RO), deny: [...SSH.never]}); renderSSH(); }
+});
+
+for (const b of document.querySelectorAll(".tabs button")) b.onclick = () => {
+  for (const x of document.querySelectorAll(".tabs button")) x.setAttribute("aria-selected", x === b);
+  document.getElementById("pane-mcp").hidden = b.dataset.tab !== "mcp";
+  document.getElementById("pane-ssh").hidden = b.dataset.tab !== "ssh";
+};
+renderMCP(); renderSSH();
+</script>

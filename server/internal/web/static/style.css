@@ -1,0 +1,2757 @@
+/* Оформление Сёмы в браузере — язык «Сводка» (макеты в
+   design/новый-язык/). Шесть ступеней шрифта, каждая за одно назначение;
+   то, что Сёма померил, — моноширинным; норма молчит, заливная капсула
+   только у того, что ждёт человека. Старые имена переменных оставлены и
+   указывают на новые значения: сотни правил ходят через них. */
+
+:root {
+  /* бумага, панель, рельс меню, подложка */
+  --bg: #FBFAF7;
+  --card: #FFFFFF;
+  --menu-bg: #F4F2EC;
+  --surface: #EFEDE6;
+  --selected-bg: #FFFFFF;
+  /* чернила тремя уровнями, а не прозрачностями: прозрачность на цветной
+     подложке даёт грязь, а третий уровень должен читаться и на панели */
+  --text: #17181C;
+  --text-secondary: #585B64;
+  --text-muted: #585B64;
+  /* третий уровень чернил читается, а не угадывается: #8B8E97 давал на
+     бумаге 3.3:1, и пояснения строк, мета и подписи фактов (11–13 пт)
+     не дотягивали до 4.5:1. Сейчас 4.9:1 на карточке и 4.1:1 на
+     подложке, а расстояние до «почти» (6.8:1) сохранено */
+  /* 4,8:1 на фоне меню и 5,1:1 на фоне экрана: прежний #6E717A давал
+     4,35:1 у подписей групп «Сёма сам» и «Своё» — ниже 4,5, которые
+     требует AA для мелкого текста. Держит TestКонтрастТихихПодписей */
+  --text-faint: #686B74;
+  --border: #E3E0D8;
+  --border-subtle: #EFECE4;
+  --accent: #1F4FD8;
+  --accent-bg: #E8EDFC;
+  --ok: #2E7D4F;
+  --info: #2A5FCC;
+  --warn: #9C6100;
+  --alert: #BE3320;
+  --peer: #EFEDE6;
+  --ok-bg: #E4F1E9;
+  --info-bg: #E7EDFB;
+  --warn-bg: #FBF0DC;
+  --alert-bg: #FBE7E3;
+  --sent-bg: #E8EDFC;
+  --thread-line: rgba(31, 79, 216, 0.35);
+  --hover: #FFFFFF;
+  --shelf: #FFF9EE;
+  --shelf-line: #EBDCBF;
+  --tone-red: #FBE7E3;
+  --tone-orange: #FBF0DC;
+  --tone-green: #E4F1E9;
+  --elevation: 0 1px 2px rgba(24, 20, 12, 0.07);
+  --switch-off: #CFCBC1;
+  --column: 980px;
+  --read: 760px;
+  /* шрифты: Golos Text — кириллица родная, а не приделанная; IBM Plex
+     Mono — для того, что Сёма померил. Лежат у Сёмы, см. fonts.css */
+  --font-sans: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* тёмная тема — своя пара, а не инверсия светлой */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131417;
+    --card: #1B1D21;
+    --menu-bg: #0F1013;
+    --surface: #212429;
+    --selected-bg: #1B1D21;
+    --text: #ECEDEF;
+    --text-secondary: #A1A4AC;
+    --text-muted: #A1A4AC;
+    /* в тёмной теме тот же счёт с другой стороны: #71747D на карточке
+       давал 3.6:1, сейчас 4.9:1 */
+    --text-faint: #878A93;
+    --border: #2A2D33;
+    --border-subtle: #232529;
+    --accent: #87A9FF;
+    --accent-bg: #1D2436;
+    --ok: #5FC98D;
+    --info: #8FB2FF;
+    --warn: #E2A54C;
+    --alert: #FF8874;
+    --peer: #212429;
+    --ok-bg: #16261D;
+    --info-bg: #181E2C;
+    --warn-bg: #282016;
+    --alert-bg: #2C1A17;
+    --sent-bg: #1D2436;
+    --thread-line: rgba(135, 169, 255, 0.5);
+    --hover: #1B1D21;
+    --shelf: #221C12;
+    --shelf-line: #4A3A20;
+    --tone-red: #2C1A17;
+    --tone-orange: #282016;
+    --tone-green: #16261D;
+    --elevation: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --switch-off: #3B3F46;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.45 var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* высота задаётся жёстко: без неё ни лента, ни меню не прокручиваются
+   сами, а поле ввода уезжает в конец страницы */
+#window { display: flex; height: 100vh; height: 100dvh; overflow: hidden; }
+/* `clip`, а не `hidden`: у `hidden` остаётся прокрутка из кода — фокус на
+   поле ввода и «показать элемент» в Safari сдвигают такое окно вбок, и
+   вся страница, шапка и нижняя полоса вместе, уезжала от края. У `clip`
+   прокручиваемой области нет вовсе. Прежняя строка остаётся запасной для
+   браузеров без `clip` (Safari до 16) */
+@supports (overflow: clip) { #window { overflow: clip; } }
+
+/* ---- меню слева ---- */
+#menu {
+  /* 284: у разговоров длинные имена («Мила Лучшая подруга», «Технический
+     форум»), и на 244 они резались на середине. Раньше 244, а не 220: в
+     узком рельсе названия групп настроек обрезались
+     («Что Сёма умеет», «Где Сёма работает»), а обрезанный пункт меню
+     человек читает дважды */
+  width: 284px;
+  flex: 0 0 284px;
+  background: var(--menu-bg);
+  border-right: 1px solid var(--border);
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+/* меню длиннее окна прокручивается, а не сжимает пункты: у колонки
+   flex-shrink по умолчанию 1, и 17 сентября 2026, когда в чатах стало на
+   пару пунктов больше, «Задачи», «Скрипты», «Модули» сплющились до 18 px
+   и налезли друг на друга */
+#menu > * { flex-shrink: 0; }
+/* закреплённый блок над меню: то, что ждёт человека, стоит отдельно и
+   заметно. Строкой среди двенадцати прочих счётчик не читается — глаз
+   ищет его там же, где всё остальное */
+.pinned {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px; margin-bottom: 6px;
+  border: 0; border-radius: 10px; cursor: pointer;
+  background: var(--alert-bg); color: var(--alert);
+  font: 600 14px/1.2 var(--font-sans); text-align: left;
+}
+.pinned.warn { background: var(--warn-bg); color: var(--warn); }
+.pinned.info { background: var(--info-bg); color: var(--info); }
+.pinned .item-icon { color: currentColor; }
+.pinned .count { margin-left: auto; font: 700 15px/1 var(--font-mono); }
+.pinned:hover { filter: brightness(0.97); }
+
+.group {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-faint);
+  padding: 14px 10px 6px;
+}
+/* Заголовок группы в списке чатов — не подпись десятым кеглем, а
+   мишень: по нему группа сворачивается. Мелкий серый «Telegram» человек
+   не видел вовсе (13 сентября 2026) */
+#panel .group {
+  display: flex; align-items: center; gap: 6px;
+  width: 100%; padding: 10px 12px 6px; margin: 0;
+  border: 0; background: none; cursor: pointer;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.02em; color: var(--text-secondary);
+  text-align: left; font-family: inherit;
+}
+#panel .group:hover { color: var(--text); }
+#panel .group .chevron { color: var(--text-faint); }
+#panel .group.expanded .chevron { transform: rotate(90deg); }
+#panel .group .count { margin-left: auto; font: 600 11px/1 var(--font-mono); color: var(--text-faint); }
+/* строки свёрнутой группы прячет одно правило: флаг у элемента ставили
+   два независимых кода и перетирали друг другу */
+#panel .panel-row.in-collapsed-group, #panel .panel-row.in-collapsed-container { display: none; }
+/* пункт меню: сначала сброс кнопки, потом свои размеры. Раньше было
+   наоборот — `font: inherit` стирал заданные выше кегль и вес, и меню
+   всё это время рисовалось наследованным от body, а правка «по макету»
+   не применялась вовсе */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font: 400 15px/1.2 var(--font-sans);
+  color: var(--text-secondary);
+}
+#menu .item { margin-bottom: 2px; }
+.item:hover { background: var(--surface); }
+/* выбранный раздел — подложка, а не синяя лента во всю ширину: лента
+   кричит громче, чем несёт смысла, и спорит с выделением в списках */
+.item.selected { background: var(--selected-bg); font-weight: 600; color: var(--text); box-shadow: var(--elevation); }
+.item .counter { margin-left: auto; font: 600 11px/1 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-muted); }
+/* точка уровня — справа, после счётчика: слева живёт значок раздела, и
+   фирменный цвет ящика на месте уровня читался как тревога */
+.item .dot { margin-left: 6px; }
+.item .counter + .dot { margin-left: 6px; }
+
+/* узел меню: строка с шевроном, а под ней карман с подпунктами.
+   Отступом третий уровень не рисуется — в рельсе на 248 точек лесенка
+   съедает треть строки и «Ключи и секреты» обрезаются. Вместо неё
+   подпункты стоят на том же левом крае, но лежат в утопленной плашке */
+.menu-node { margin-bottom: 2px; }
+.menu-node > summary { list-style: none; }
+.menu-node > summary::-webkit-details-marker { display: none; }
+.menu-node .chevron {
+  margin-left: 6px; color: var(--text-faint); font-size: 15px; line-height: 1;
+  transition: transform .12s; display: inline-block;
+}
+.menu-node[open] > summary .chevron { transform: rotate(90deg); }
+.menu-node[open] > summary { font-weight: 600; color: var(--text); }
+.well {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 3px;
+  margin: 2px 0 4px;
+}
+.well .item { height: 34px; font-size: 15px; }
+.well .item.self { color: var(--text-faint); }
+.well .menu-node .well { background: var(--card); }
+.item-icon { width: 16px; height: 16px; flex: 0 0 16px; color: var(--text-faint); }
+/* Меню по макету 16 сентября 2026. Уровни — отступом, без вложенных
+   плашек: карман в кармане давал россыпь белых вставок. Значок пункта —
+   трёх видов: цветной контур раздела, белый знак на плитке (мессенджеры,
+   ящики), инициалы в кружке (разговор с Сёмой). Цвет значка — оттенок
+   раздела, а не состояние: состояние по-прежнему говорит точка справа */
+:root {
+  --hue-blue: #2F6FEB; --hue-sky: #229ED9; --hue-violet: #7A5AE0;
+  --hue-green: #2E9A5B; --hue-orange: #D98A1C; --hue-red: #D8433A;
+  --hue-grey: #686B74;
+  --menu-selected: #FFFFFF; --count-node-bg: #E8EDFC; --count-node: #2F5BD8;
+  --count-bg: #E6E3DA; --count: #585B64;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --hue-blue: #5B8CFF; --hue-sky: #34AEEA; --hue-violet: #8E72FF;
+    --hue-green: #4CC47D; --hue-orange: #F0A23A; --hue-red: #FF6B5E;
+    --hue-grey: #9A9FAB;
+    --menu-bg: #0D1220; --border-menu: #1C2334;
+    --menu-selected: #17223A; --count-node-bg: #1B2742; --count-node: #8FB2FF;
+    --count-bg: #1E2533; --count: #C3C8D2;
+  }
+}
+.hue-blue { color: var(--hue-blue); } .hue-sky { color: var(--hue-sky); }
+.hue-violet { color: var(--hue-violet); } .hue-green { color: var(--hue-green); }
+.hue-orange { color: var(--hue-orange); } .hue-red { color: var(--hue-red); }
+.hue-grey { color: var(--hue-grey); }
+
+#menu .item-icon { width: 18px; height: 18px; flex: 0 0 18px; }
+/* плитка и инициалы: белое на цвете оттенка */
+#menu .tile, #menu .avatar {
+  width: 22px; height: 22px; flex: 0 0 22px; margin: 0 -2px;
+  border-radius: 50%; display: inline-grid; place-items: center; color: #fff;
+}
+#menu .avatar.square { border-radius: 6px; }
+#menu .avatar { font: 600 10px/1 var(--font-sans); letter-spacing: 0.02em; }
+#menu .tile .tile-sign { width: 13px; height: 13px; }
+#menu .tile.hue-blue, #menu .avatar.hue-blue { background: var(--hue-blue); color: #fff; }
+#menu .tile.hue-sky, #menu .avatar.hue-sky { background: var(--hue-sky); color: #fff; }
+#menu .tile.hue-violet, #menu .avatar.hue-violet { background: var(--hue-violet); color: #fff; }
+#menu .tile.hue-green, #menu .avatar.hue-green { background: var(--hue-green); color: #fff; }
+#menu .tile.hue-orange, #menu .avatar.hue-orange { background: var(--hue-orange); color: #fff; }
+#menu .tile.hue-red, #menu .avatar.hue-red { background: var(--hue-red); color: #fff; }
+#menu .tile.hue-grey, #menu .avatar.hue-grey { background: var(--hue-grey); color: #fff; }
+
+/* выбранный — одна плашка на всё меню */
+#menu .item.selected { background: var(--menu-selected); border-radius: 10px; }
+
+/* счётчик — плашкой: у раздела синяя, у пункта внутри серая */
+#menu .item .counter {
+  padding: 3px 7px; border-radius: 10px; min-width: 22px; text-align: center;
+  background: var(--count-bg); color: var(--count);
+}
+#menu .menu-node > summary.item .counter { background: var(--count-node-bg); color: var(--count-node); }
+
+/* «плюс» в строке пункта: новый чат прямо из меню */
+#menu .item-plus {
+  width: 24px; height: 24px; flex: 0 0 24px; margin-left: 6px;
+  display: inline-grid; place-items: center; border: 0; border-radius: 6px;
+  background: none; color: var(--text-faint); font: 400 18px/1 var(--font-sans); cursor: pointer;
+}
+#menu .item-plus:hover { background: var(--surface); color: var(--text); }
+/* у пункта без детей плюс стоит отдельной кнопкой поверх правого края строки */
+#menu .item + .item-plus.standalone { position: relative; float: right; margin: -34px 8px 0 0; }
+
+/* черта между блоками меню */
+#menu .menu-divider { height: 1px; background: var(--border-menu, var(--border)); margin: 8px 6px; }
+
+/* подписи групп: со значком («Переписка») — просто подпись; без значка —
+   кнопка, которая сворачивает свой раздел */
+#menu .group {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  border: 0; background: none; font-family: inherit; text-align: left;
+  font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--text-faint);
+  padding: 12px 10px 6px;
+}
+#menu .group .group-icon { width: 18px; height: 18px; flex: 0 0 18px; color: var(--text-faint); }
+#menu button.group { cursor: pointer; }
+#menu button.group:hover { color: var(--text-secondary); }
+#menu .group-chevron { width: 12px; height: 12px; margin-left: auto; transition: transform .12s; }
+#menu button.group[aria-expanded="false"] .group-chevron { transform: rotate(-90deg); }
+#menu [data-in-section].in-collapsed-section { display: none; }
+
+/* узлы: стрелка справа */
+#menu .menu-node > summary .chevron { margin-left: auto; }
+#menu .menu-node > summary .counter + .chevron, #menu .menu-node > summary .dot + .chevron { margin-left: 8px; }
+
+/* вложенность — отступом, без плашек */
+#menu .well { background: none; padding: 0; margin: 0; border-radius: 0; }
+#menu .well .item { height: 32px; padding-left: 22px; font-size: 14px; }
+#menu .well .well .item { padding-left: 36px; }
+#menu .well .well .well .item { padding-left: 50px; font-size: 13px; }
+#menu .well .item.self { color: var(--text-faint); }
+/* группа мессенджера — пункт с логотипом, раскрытая не кричит жирным */
+#menu-ask > .well > .menu-node > summary.item { font-weight: 600; color: var(--text); }
+/* группа с темами (контейнер) — стрелка слева, в поле перед значком */
+#menu-ask .well .menu-node .menu-node > summary.item { padding-left: 18px; font-weight: 400; color: var(--text-secondary); }
+#menu-ask .well .menu-node .menu-node[open] > summary.item { color: var(--text); }
+#menu-ask .well .menu-node .menu-node > summary .chevron { order: -1; margin: 0 -4px 0 0; width: 12px; }
+/* точки и счётчики — одним столбцом у правого края */
+#menu .well .item .item-name { flex: 1 1 auto; }
+#menu .well .item .dot { margin: 0 2px 0 8px; }
+
+/* у выбранного значок без своего оттенка темнеет вместе с текстом; цветной
+   значок раздела остаётся цветным — по нему раздел и узнаётся */
+.item.selected .item-icon:not([class*="hue-"]) { color: var(--text); }
+.empty-icon { display: inline-block; }
+.item-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
+/* ящик или вложенный раздел: ниже, мельче и с отступом под значок */
+#menu .item.nested-1 {
+  height: 26px;
+  padding: 0 9px 0 34px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+#menu .item.nested-1 .counter { font-size: 10px; }
+.nested-1 { padding-left: 30px; }
+
+/* ---- середина ---- */
+#middle { flex: 1; display: flex; min-width: 0; min-height: 0; }
+#panel {
+  /* 300, а не 240: у чата две строки — имя и последняя реплика, плюс
+     время справа. В 240 на имя оставалось полторы сотни точек, и
+     «Перепиши модуль…» обрывалось на третьем слове */
+  width: 300px;
+  flex: 0 0 300px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+#screen { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.column { max-width: var(--column); width: 100%; padding: 18px; margin: 0 auto; }
+/* Ритм колонки: между блоками верхнего уровня всегда один и тот же
+   воздух. У раздела и формы было 16, у абзаца 8, а у пояснения не было
+   вовсе — и объяснение под кнопкой липло к ней вплотную (13 сентября
+   2026). Отступ задаётся здесь, а не в каждом блоке: иначе новый вид
+   блока снова окажется без него */
+.column > * { margin-bottom: 26px; }
+.column > *:last-child { margin-bottom: 0; }
+/* пояснение принадлежит блоку над ним: к нему ближе, от следующего
+   дальше */
+.column > .caption, .column > .paragraph { margin-top: -14px; }
+/* пояснение под списком, таблицей или формой — мелким и приглушённым, как
+   подпись в строке: на целый абзац обычного кегля оно спорит с содержимым */
+.column > .caption { font-size: 12px; line-height: 1.5; color: var(--text-faint); }
+.column.read { max-width: var(--read); }
+/* Родное «потянуть вниз» гасится здесь, и это должно стоять раньше своего
+   жеста: браузер срабатывает первым, и своего тогда не видно вовсе
+   (phone-refresh, решение 2). Родное потягивание перезагружает страницу
+   целиком — теряется набранное и заново качается оболочка, — а обновить
+   нужно только содержимое экрана. Гасится на корне, где живёт сама
+   перезагрузка, и на ленте, откуда потягивание уходило к корню по цепочке
+   прокруток. Правило только про ось Y: горизонтальная прокрутка кода,
+   таблиц и полос вкладок им не задета. */
+html { overscroll-behavior-y: contain; }
+/* на телефоне Сёма — приложение, а не страница: двойное касание не
+   приближает (щипок гасит app.js, автоприближение у полей — viewport) */
+html { touch-action: manipulation; }
+.feed { flex: 1; overflow-y: auto; min-height: 0; overscroll-behavior-y: contain; }
+
+/* Слои верха экрана — у каждого своё место и своё правило, и ни один не
+   зависит от содержимого соседа. Иначе от нажатия чипа ездила кнопка, от
+   вкладки — меню, от подписи — вкладки (записи экрана 13 сентября 2026).
+   1. Заголовок: слева h1 и подпись (одна строка, длинная режется),
+      справа ряд кнопок, прижатый к правому краю: [списки][кнопки][···].
+      Место под «···» занято всегда, и без меню тоже (.ещё-место) —
+      у кнопок меняется только ширина, правый край стоит.
+   2. Вкладки экрана (.полоса-вкладок): своя полоса во всю ширину,
+      слева; на телефоне делит строку с кнопками и стоит слева.
+   3. Внутренние вкладки раздела (.полоса-подвкладок).
+   4. Поиск и фильтры (.полоса-фильтров): поле поиска слева одной ширины,
+      чипы после него.
+   Боковое меню и колонка разделов — такие же слои: подсветка и счётчики
+   меняются, состав и раскрытие — нет; колонка есть всегда, когда экран из
+   семьи с колонкой (см. каркас настроек). */
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.more-slot { width: var(--control-h); height: var(--control-h); flex: 0 0 var(--control-h); }
+/* внутри строки «···» строчного роста — как кнопки рядом */
+.row .right-side .more, .shelf-row .more, .table .more, .row-group .more, .panel-row .more {
+  width: var(--control-h-row); height: var(--control-h-row);
+}
+.header h1 { font-size: 28px; font-weight: 700; margin: 0; line-height: 1.1; letter-spacing: -0.015em; overflow-wrap: anywhere; }
+.label { font-size: 13px; line-height: 1.4; color: var(--text-secondary); margin-top: 4px; overflow-wrap: anywhere; }
+.controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* ---- строки и разделы ---- */
+.section { margin-bottom: 26px; }
+/* Полоса «чей это параметр» липнет к верху ленты: через два экрана
+   прокрутки непонятно, чью папку выключаешь, а сама полоса уезжала
+   вверх вместе с содержимым */
+.section.pinned-bar { position: sticky; top: 0; z-index: 5; background: var(--bg); padding-top: 6px; margin-bottom: 12px; }
+.section.pinned-bar::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -10px; height: 10px;
+  background: linear-gradient(var(--bg), transparent); pointer-events: none;
+}
+.section-heading {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  color: var(--text);
+  margin: 0 0 10px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+/* действия раздела («В спам выбранные») стоят в его заголовке: до этого
+   они не рисовались вовсе, и групповое действие было недоступно */
+.section-header { display: flex; align-items: center; gap: 10px; }
+/* линия от заголовка до края: раздел больше не коробка, и без неё
+   списки сливаются друг с другом */
+.section-heading::after {
+  content: ""; display: inline-block; vertical-align: middle;
+  flex: 1 1 auto; min-width: 10px; width: auto; height: 1px;
+  margin-left: 10px; background: var(--border-subtle);
+}
+.section > .section-heading { display: flex; align-items: center; width: 100%; }
+.section-header .section-heading { margin-bottom: 10px; }
+.section-header .right-side { margin-left: auto; margin-bottom: 10px; }
+/* строки живут на бумаге и делятся волосом: белая карточка с рамкой
+   вокруг каждого списка — четырнадцать точек хрома и ноль смысла.
+   Панель заводится только там, где нужен настоящий блок: форма, полка,
+   плитка-показатель */
+.section-card {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 10px;
+  border-radius: 9px;
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+}
+.section-card .row:last-child { border-bottom: 0; }
+.row .bar { position: absolute; left: 0; top: 4px; bottom: 4px; width: 3px; border-radius: 2px; }
+.row .body { flex: 1; min-width: 0; }
+.row .title { font-size: 15px; font-weight: 600; line-height: 1.3; }
+/* письмо в списке: отправитель и адрес со временем в одну линию, тема —
+   следующей строкой обычным весом, как в макете разбора */
+.name-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; flex-wrap: wrap; }
+.meta-inline { font: 500 11px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-faint); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .main { font-size: 15px; line-height: 1.35; color: var(--text-secondary); margin-top: 1px; }
+/* пояснение строки — не больше двух строк ни на каком экране: причина
+   от модели бывает в три предложения, и десять таких строк превращали
+   список в текст. Полное объяснение живёт в раскрытии строки */
+.row .caption {
+  font-size: 12px; line-height: 1.4; color: var(--text-faint); margin-top: 2px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.facts { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 5px; font-size: 12px; }
+.facts .label { color: var(--text-faint); margin-right: 5px; }
+.facts .value { font: 500 12px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; }
+/* Факт — пара «подпись — значение» — не шире своей колонки, а длинное
+   значение без пробелов (адрес, путь, команда) переносится внутри неё.
+   1 октября 2026 на телефоне такой адрес в раскрытой записи делал ленту
+   шире окна на 116 точек: правило про перенос стояло на `.row .value`, а
+   раскрытие лежит рядом со строкой, а не в ней, — и под него не попадало.
+   Классы не повторяют `.row`: факты бывают и в раскрытии, и в карточке,
+   и в строке таблицы. Перенос — не только на телефоне: на узкой колонке
+   рабочего стола беда та же */
+.facts > span { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.facts .label, .facts .value { overflow-wrap: anywhere; }
+.right-side { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+
+/* норма молчит: заливная капсула — только у того, что ждёт человека.
+   Шесть зелёных плашек «в норме» из семи это обои, а не сигнал: среди
+   них не видно единственной красной */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: 19px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0 7px;
+  border-radius: 5px;
+  background: none;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.pill.ok { color: var(--ok); }
+.pill.info { color: var(--info); }
+.pill.warn { color: var(--warn); }
+.pill.warn::before,
+.pill.ok::before,
+.pill.info::before {
+  content: "";
+  width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor; margin-right: 6px;
+}
+.pill.alert { background: var(--alert-bg); color: var(--alert); }
+/* капсула без текста — одна точка уровня (строка корня настроек на
+   телефоне, когда числа нет): без текста поля вокруг точки не нужны */
+.pill:empty { padding: 0 2px; }
+.pill:empty::before { margin-right: 0; }
+
+/* Элементы управления — одна система на весь клиент. Две высоты: обычная
+   (шапка, карточки, формы) и строчная (внутри строки списка, таблицы,
+   полки) — вторая та же, что у «···» и выпадающих списков, чтобы соседи
+   в ряду были одного роста. Один радиус. Три вида кнопки: основная
+   (заливка цветом), обычная (рамка), опасная — только в меню «···» и в
+   окне вопроса, в ряду её не бывает. 13 сентября 2026 в клиенте было
+   четыре высоты (26, 28, 32, 36) и три радиуса, и кнопки читались как
+   чужие друг другу. */
+:root { --control-h: 32px; --control-h-row: 28px; --control-radius: 8px; --side-phone: 16px; --tab-h: 56px; }
+button.action, .action {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  height: var(--control-h);
+  padding: 0 13px;
+  border-radius: var(--control-radius);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+button.action:hover { border-color: var(--text-faint); }
+button.action.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.action.primary:hover { filter: brightness(1.06); border-color: var(--accent); }
+button.action.destructive { color: var(--alert); border-color: transparent; background: none; }
+button.action.destructive:hover { background: var(--alert-bg); border-color: transparent; }
+@media (prefers-color-scheme: dark) {
+  button.action, .action { border-color: rgba(255, 255, 255, 0.18); box-shadow: none; }
+}
+button.action.link { border-color: transparent; background: none; color: var(--accent); }
+button.action.link:hover { background: var(--accent-bg); border-color: transparent; }
+button.action:disabled { opacity: 0.5; cursor: default; }
+/* внутри строки, полки и шага управление мельче: 26 точек по макету —
+   кнопка в 32 точки посреди строки в 15 пунктов спорит с её названием */
+/* строчный рост — у всего, что стоит внутри списка: строка, полка, шаг,
+   таблица, группа и шапка раздела. У шапки раздела кнопка была 32 точки
+   при 28 у соседней строки, и рядом это читалось как две разные системы
+   (13 сентября 2026) */
+.row .right-side .action, .shelf-row .action, .step-header .action,
+.table .action, .row-group .action, .section-header .action,
+.section-header .more, .row .right-side .select select { height: var(--control-h-row); padding: 0 10px; font-size: 12px; }
+
+.switch { width: 36px; height: 20px; border-radius: 10px; border: 0; background: var(--switch-off); position: relative; cursor: pointer; flex: 0 0 36px; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: left 0.15s; }
+.switch.on { background: var(--accent); }
+.switch.on::after { left: 18px; }
+
+/* ---- переписка ---- */
+.bubble { display: flex; margin: 6px 0; }
+.bubble .text { padding: 10px 14px; border-radius: 18px; max-width: 72%; white-space: pre-wrap; word-wrap: break-word; line-height: 1.4; }
+.bubble.свой { justify-content: flex-end; }
+/* справа стоят два разных пузыря: писали вы и писал Сёма от вашего
+   имени. Различие — рамка: сплошная ваша, пунктирная его. Цветом их не
+   различить на телефоне при солнце, а за один отвечаете вы, за второй он */
+.bubble.свой .text { background: var(--sent-bg); border: 1px solid var(--accent); }
+.bubble.ушло { justify-content: flex-end; }
+.bubble.ушло .text { background: none; border: 1px dashed var(--accent); }
+/* Сёма — заливка, а не рамка: рамка спорит с карточками команд, которые
+   стоят в той же ленте */
+.bubble.сёма .text { background: var(--surface); }
+.bubble.собеседник .text { background: var(--peer); }
+.bubble.служебное { justify-content: flex-start; }
+.bubble.служебное .text {
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 11px;
+  max-width: 100%;
+}
+.meta { font: 500 11px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-faint); margin: 2px 6px 10px; }
+.meta.right { text-align: right; }
+.thread-quote { border-left: 3px solid var(--thread-line); padding-left: 12px; margin: 8px 0; }
+
+/* ---- поле ввода ---- */
+.composer {
+  border-top: 1px solid var(--border);
+  padding: 10px 18px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  background: var(--bg);
+}
+.composer textarea {
+  flex: 1;
+  font: inherit;
+  padding: 9px 13px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: inherit;
+  resize: none;
+  max-height: 140px;
+}
+.recipient { font-size: 10px; color: var(--text-muted); padding: 0 18px 4px; }
+
+/* ---- формы ---- */
+.form { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-bottom: 26px; }
+.form h3 { font-size: 13px; margin: 0 0 12px; }
+/* поле формы — строка настройки: подпись слева, управление справа. Так
+   выглядят настройки в макетах, и так поле не растягивается на всю
+   колонку. Многострочное (код, длинный текст) остаётся во всю ширину */
+.field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 300px);
+  align-items: center;
+  column-gap: 16px;
+  padding: 12px 0;
+}
+/* линия — только между полями, и рисует её верх следующего поля. Прежнее
+   «нижняя линия у каждого, кроме `:last-of-type`» не работало: последний
+   тип `div` в форме — ряд кнопок или блок «не сохранено», а не поле, и у
+   последнего поля линия оставалась, а кнопка липла к ней вплотную
+   (снимок «Добавить сервер MCP», 30 сентября 2026). От того, что стоит
+   после последнего поля, теперь ничего не зависит */
+.field + .field { border-top: 1px solid var(--border-subtle); }
+.form > .field:first-of-type { padding-top: 2px; }
+/* раздел-стопка (Style «stack», «Под рукой» на Обзоре): формы-строки лежат одной
+   карточкой и делятся волосом, а не пятью отдельными рамками */
+.section.stack > .section-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0 14px; }
+.section.stack .form.rows { border: 0; background: none; border-radius: 0; padding: 0; margin: 0; }
+.section.stack .form.rows + .form.rows { border-top: 1px solid var(--border-subtle); }
+.section.stack .form.rows > .field.setting { padding: 10px 0; }
+/* вспышка строки после перехода по поиску или по замечанию: фон accent-bg
+   гаснет за пару секунд. Класс снимает клиент (app.js, «Подсветка строки»);
+   тем, кто просит меньше движения, фон держится без перехода */
+.hl { animation: hl-flash 2.6s ease-out 1; border-radius: 8px; }
+@keyframes hl-flash {
+  0%, 35% { background: var(--accent-bg); box-shadow: 0 0 0 6px var(--accent-bg); }
+  100% { background: transparent; box-shadow: 0 0 0 6px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hl { animation: none; background: var(--accent-bg); box-shadow: 0 0 0 6px var(--accent-bg); }
+}
+/* ряд кнопок под полями формы (и мастера): слева, с промежутком, при
+   нехватке места переносится. Свой класс, а не `right-side` — это правая
+   часть строки списка, без отступа сверху и с выравниванием вправо. Отступ
+   8 точек — шаг сетки проекта (как gap у рядов кнопок); к нему добавляется
+   нижний отступ самого поля, так что от текста подсказки до кнопки — 20.
+   Высота и радиус кнопок — из общей системы (`--control-h`), здесь их
+   нет намеренно */
+.form-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px; margin-top: 8px; }
+@media (max-width: 720px) {
+  /* одна кнопка шире колонки не бывает: подпись переносится, а не выпирает
+     за край формы (nowrap у .action остаётся для рядов в строках списка).
+     Высота — auto, а пальцевые 44 точки даёт общее правило телефона на
+     `button`: здесь min-height не задаётся, чтобы его не перебить */
+  .form-actions .action { max-width: 100%; white-space: normal; height: auto; padding-top: 6px; padding-bottom: 6px; line-height: 1.25; }
+}
+/* Подпись и подсказка поля переносятся внутри колонки: имя инструмента
+   MCP вроде `kanban_status_update_for_…` — одно слово на двести точек, и
+   без переноса оно вытягивало ленту вбок (1 октября 2026) */
+.field label { font-size: 13px; color: var(--text); margin: 0; overflow-wrap: anywhere; }
+.field .hint { grid-column: 1; overflow-wrap: anywhere; }
+.field.wide-field { grid-template-columns: minmax(0, 1fr); }
+.field.wide-field .hint, .field.wide-field label { grid-column: 1; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  justify-self: end;
+  font: inherit;
+  font-size: 14px;
+  min-height: 36px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: inherit;
+}
+/* фокус — рамка своим цветом и мягкое кольцо: обводка браузера по умолчанию
+   прыгает по прямоугольнику поля и спорит со скруглением */
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+.field textarea { max-width: 100%; }
+.field input[type="number"] { max-width: 140px; }
+.field-switch { grid-template-columns: minmax(0, 1fr) auto; }
+@media (prefers-color-scheme: dark) {
+  .field input, .field select, .field textarea { background: rgba(255, 255, 255, 0.06); }
+}
+.field .hint { font-size: 11px; line-height: 1.5; color: var(--text-muted); margin-top: 6px; max-width: 560px; }
+/* тумблер в форме: строка с подписью слева и переключателем справа, как в
+   системных настройках. Голый флажок в браузере не читается и уезжает под
+   ширину колонки */
+
+.field-switch label:first-child { font-size: 13px; color: var(--text); margin: 0; }
+/* нулевая ширина сильнее общего правила поля: `.поле input {width:100%}`
+   перебивает по силе селектора одноклассовое правило, и спрятанный
+   флажок растягивался на всю ширину экрана — на телефоне он вылезал за
+   край и тащил страницу вбок. Второй такой случай на одном правиле:
+   первым была радиокнопка сегмента */
+.hidden-checkbox, .field .hidden-checkbox { position: absolute; opacity: 0; width: 0; height: 0; }
+.field-toggle {
+  width: 36px; height: 20px; border-radius: 10px; background: var(--switch-off);
+  position: relative; cursor: pointer; display: block; margin: 0;
+}
+.field-toggle::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); transition: left .15s;
+}
+.hidden-checkbox:checked + .field-toggle { background: var(--accent); }
+.hidden-checkbox:checked + .field-toggle::after { left: 18px; }
+.hidden-checkbox:focus-visible + .field-toggle { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 720px) { .field-toggle { width: 44px; height: 26px; border-radius: 13px; } .field-toggle::after { width: 22px; height: 22px; } .hidden-checkbox:checked + .field-toggle::after { left: 20px; } }
+
+.error { color: var(--alert); font-size: 12px; padding: 10px 18px; }
+.connecting { color: var(--text-muted); padding: 40px 18px; text-align: center; }
+.empty { text-align: center; color: var(--text-muted); padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.empty .icon { font-size: 26px; line-height: 1; margin-bottom: 4px; width: auto; height: auto; background: none; color: var(--text-muted); flex: none; }
+.empty .action { margin-top: 6px; }
+.empty .title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+@keyframes slide-in { from { transform: translateX(-8px); opacity: .6; } to { transform: none; opacity: 1; } }
+@keyframes rise { from { transform: translateY(14px); } to { transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #menu.open-sheet, #panel.open-sheet, #dim-overlay { animation: none; } }
+
+/* ---- шторка меню и полоса вкладок: только телефон ---- */
+/* на широком экране рельс меню стоит слева всегда, и ни ручка, ни шапка,
+   ни поиск ему не нужны: шестнадцать разделов там видны целиком */
+.grabber, .menu-header, #tabbar, .menu-nothing, #dim-overlay { display: none; }
+#menu .menu-search { display: none; }
+
+/* телефон: одна колонка, меню приезжает снизу шторкой */
+@media (max-width: 720px) {
+  #menu, #panel { display: none; }
+  /* оболочка становится колонкой: содержимое сверху, полоса вкладок
+     внизу. Меню при этом вне потока — оно шторка поверх всего */
+  #window { flex-direction: column; }
+  #middle { flex: 1; min-height: 0; }
+
+  /* затемнение под шторкой — свой узел (#dim-overlay, его заводит
+     app.js), а не ::before у body: Safari на iPhone не шлёт click по
+     касанию в body, и меню не закрывалось касанием мимо него. cursor —
+     второй замок: iOS считает узел с ним нажимаемым */
+  body.panel-open #dim-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(23, 24, 28, 0.32);
+    z-index: 19;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    animation: fade-in .14s ease-out;
+  }
+
+  #menu.open-sheet {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: auto 0 0 0;
+    width: auto;
+    /* 82 % высоты: экран под шторкой видно, и понятно, куда вернёшься */
+    height: 82vh;
+    height: 82dvh;
+    max-height: 82dvh;
+    /* поля даёт сама шторка: у .пункт стоит width:100%, и боковые поля
+       на строке давали ширину «100 % плюс 28 точек» — строка вылезала */
+    /* снизу оставляем место под полосу вкладок: она лежит поверх шторки,
+       как в образце, и без запаса съедала бы последний раздел */
+    padding: 0 14px calc(var(--tab-h) + env(safe-area-inset-bottom) + 8px);
+    border-right: 0;
+    border-radius: 18px 18px 0 0;
+    background: var(--menu-bg);
+    z-index: 20;
+    box-shadow: 0 -8px 32px rgba(24, 20, 12, 0.18);
+    animation: rise .16s ease-out;
+    overflow: hidden;
+  }
+  /* панель экрана (список чатов, список писем) осталась слева: это не
+     меню, а содержимое самого экрана */
+  #panel.open-sheet {
+    display: block;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 288px;
+    max-width: 86vw;
+    animation: slide-in .14s ease-out;
+    background: var(--bg);
+    z-index: 20;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+  }
+  /* кнопка, открывающая шторку списка слева (скрипты): подписана
+     названием списка. Колонки разделов настроек здесь нет — на телефоне
+     её не присылают, а корень настроек рисуется обычными строками */
+  .panel-picker {
+    display: inline-flex; align-items: center; gap: 6px;
+    max-width: 52vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .panel-picker .chevron-down { color: var(--text-faint); font-size: 15px; line-height: 1; }
+
+  #menu.open-sheet .grabber { display: flex; justify-content: center; padding: 8px 0 4px; flex: 0 0 auto; }
+  #menu.open-sheet .grabber span { width: 40px; height: 4px; border-radius: 2px; background: var(--switch-off); }
+  #menu.open-sheet .menu-header {
+    display: flex; align-items: center; gap: 10px; padding: 6px 0 10px; flex: 0 0 auto;
+  }
+  .menu-header .face {
+    width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%;
+    background: var(--accent); color: #FFFFFF;
+    font: 600 13px/1 var(--font-sans);
+    display: flex; align-items: center; justify-content: center; text-transform: uppercase;
+  }
+  .menu-header .owner {
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font: 600 15px/1.2 var(--font-sans); color: var(--text);
+  }
+  .menu-header .icon-action {
+    width: 40px; height: 40px; flex: 0 0 40px; border: 0; background: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; padding: 0; color: var(--text-muted);
+  }
+
+  #menu.open-sheet .menu-search {
+    display: flex; align-items: center; gap: 8px; flex: 0 0 auto;
+    height: 44px; margin: 0 0 8px; padding: 0 12px;
+    border-radius: 12px; background: var(--surface);
+    /* волосок по краю: подложка и фон меню различаются на два процента
+       яркости, и без него поле не читалось как поле */
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  /* общий .значок-поиска абсолютный: в строке поиска экрана он лежит
+     поверх поля. Здесь поле — обычная строка, и значок стоит в потоке */
+  .menu-search .search-icon { position: static; width: 17px; height: 17px; flex: 0 0 17px; color: var(--text-faint); }
+  .menu-search input {
+    flex: 1; min-width: 0; border: 0; background: none; outline: none;
+    font: 400 15px/1.2 var(--font-sans); color: var(--text);
+    -webkit-appearance: none; appearance: none;
+  }
+  .menu-search input::-webkit-search-cancel-button { display: none; }
+  .menu-search .clear {
+    width: 24px; height: 24px; flex: 0 0 24px; border: 0; border-radius: 12px; padding: 0;
+    background: var(--border); color: var(--text-muted); cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+  }
+  .menu-search .clear svg { width: 12px; height: 12px; }
+  #menu.searching .menu-search { background: var(--card); box-shadow: inset 0 0 0 1px var(--accent); }
+  #menu.searching .menu-search .clear { display: flex; }
+  #menu.searching .group, #menu.searching .pinned, #menu.searching .footer { display: none; }
+  /* при поиске узел раскрыт всегда: иначе найденное внутри «Настроек»
+     видно не будет, а человек не поймёт, почему поиск молчит */
+  #menu.searching .menu-node .well { display: block; }
+  #menu.open-sheet .menu-nothing {
+    display: none;
+    padding: 18px 24px; text-align: center;
+    font: 400 13px/1.45 var(--font-sans); color: var(--text-muted);
+  }
+  #menu.searching.menu-empty .menu-nothing { display: block; }
+  .hidden-by-search { display: none !important; }
+
+  /* список разделов прокручивается, шапка и поиск стоят */
+  #menu.open-sheet > .pinned,
+  #menu.open-sheet > .group,
+  #menu.open-sheet > .item,
+  #menu.open-sheet > .menu-node,
+  #menu.open-sheet > .footer { flex: 0 0 auto; }
+  #menu.open-sheet { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; overflow-y: auto; }
+  #menu.open-sheet > .grabber, #menu.open-sheet > .menu-header, #menu.open-sheet > .menu-search { position: sticky; top: 0; background: var(--menu-bg); z-index: 1; }
+  #menu.open-sheet > .grabber { top: 0; }
+
+
+  /* на телефоне строки крупнее: 36 точек — это меньше пальца */
+  #menu.open-sheet .item { height: 48px; font-size: 16px; padding: 0 10px; border-radius: 10px; }
+  #menu.open-sheet .well .item { height: 46px; font-size: 15px; }
+  #menu.open-sheet .item .item-icon { width: 18px; height: 18px; flex: 0 0 18px; }
+  #menu.open-sheet .item .counter { font-size: 13px; }
+  #menu.open-sheet .pinned { height: 48px; padding: 0 12px; font-size: 16px; }
+  #menu.open-sheet .menu-node .chevron { font-size: 0; width: 16px; height: 16px; margin-left: 8px; }
+  /* стрелка вниз вместо «›»: у шторки раскрытие идёт сверху вниз, и
+     стрелка должна показывать туда же, куда поедет содержимое */
+  #menu.open-sheet .menu-node .chevron::before {
+    content: ""; display: block; width: 16px; height: 16px;
+    background: currentColor;
+    -webkit-mask: no-repeat center/16px url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg>");
+    mask: no-repeat center/16px url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg>");
+  }
+  #menu.open-sheet .menu-node[open] > summary .chevron { transform: rotate(180deg); }
+
+  /* нижняя полоса вкладок.
+     Колонки — равные и по числу пунктов (`--tabs` ставит разметка), а
+     каждый пункт растянут на всю свою колонку и центрирует содержимое
+     сам: значок над подписью, оба по середине. 1 октября 2026 владелец
+     увидел «Меню» левее середины, а «Чаты» правее: кнопка в сетке Safari
+     не растягивается на колонку, если ей не сказано, и встаёт по
+     содержимому с начала ячейки. Счётчик крепится к значку (`.tab-glyph`),
+     а не к колонке: он не двигает ни значок, ни подпись, и трёхзначное
+     число уходит вправо от значка, а не на него */
+  #tabbar {
+    display: grid;
+    grid-template-columns: repeat(var(--tabs, 4), minmax(0, 1fr));
+    flex: 0 0 auto;
+    width: 100%;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 21;
+  }
+  .tab {
+    position: relative;
+    width: 100%; min-width: 0; justify-self: stretch;
+    height: var(--tab-h); border: 0; background: none; cursor: pointer; padding: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .tab .tab-glyph { position: relative; display: block; flex: 0 0 22px; width: 22px; height: 22px; }
+  .tab .tab-icon { display: block; width: 22px; height: 22px; }
+  .tab .tab-name {
+    display: block; max-width: 100%; padding: 0 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;
+    font: 500 11px/1 var(--font-sans);
+  }
+  .tab.selected { color: var(--text); }
+  .tab.selected .tab-name { font-weight: 600; }
+  /* Счётчик начинается за правым краем значка (у «123» цифры иначе
+     ложились прямо на рисунок) и сидит на уровне его верха; обводка цветом
+     полосы отделяет его от значка окончательно. Положение отсчитывается от
+     значка, поэтому у всех пунктов оно одно и то же */
+  .tab .tab-count {
+    position: absolute; top: -6px; left: 100%; margin-left: 1px;
+    min-width: 17px; height: 17px; border-radius: 9px; padding: 0 4px;
+    background: var(--accent); color: #FFFFFF;
+    font: 600 10px/17px var(--font-mono); text-align: center; white-space: nowrap;
+    box-shadow: 0 0 0 2px var(--card);
+  }
+  .tab .tab-dot {
+    position: absolute; top: -2px; left: 100%; margin-left: 1px;
+    width: 8px; height: 8px; border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--card);
+  }
+
+  /* боковое поле — шестнадцать точек у заголовка и у ленты, одно и то же:
+     у ленты было 14, а у заголовка разговора 10, и заголовок читался
+     прижатым к краю (снимок владельца, 1 октября 2026) */
+  .column { padding: 14px var(--side-phone); }
+  .bubble .text { max-width: 88%; }
+
+  /* ---- список чатов экраном ---- */
+  /* лицо кружком крупнее обычного: чат узнают по нему раньше, чем
+     читают название, и 28 точек для этого мало */
+  .row .avatar { width: 44px; height: 44px; font-size: 16px; font-weight: 600; }
+  /* имя в одну строку, время прижато вправо: имя переносилось, и время
+     оказывалось то рядом, то отдельной строкой над названием */
+  .row .name-line { flex-wrap: nowrap; }
+  .row .name-line .title {
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  /* мета не шире 40 % строки: короткая (время) не сжимается вовсе,
+     длинная режется многоточием, и имя остаётся видно. Без предела мета
+     не сжималась: адрес, время и ящик в одну строку раздвигали ленту до
+     780 точек, на iPhone её сдвигали пальцем вбок, и строки «Похоже на
+     спам» обрезало слева (4 октября 2026) */
+  .row .name-line .meta-inline { margin-left: auto; flex: 0 0 auto; max-width: 40%; }
+  /* превью в две строки: одна обрывается на середине мысли, три
+     превращают список в текст */
+  .row .caption {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; white-space: normal; font-size: 14px; line-height: 1.35;
+  }
+  /* ветка «Сёма» — под своим разговором, а не рядом с ним */
+  .row.nested { padding-left: 42px; }
+  .row.nested::before {
+    content: "";
+    position: absolute; left: 26px; top: 10px; bottom: 10px;
+    width: 2px; border-radius: 1px; background: var(--thread-line);
+  }
+  .row.nested { position: relative; }
+
+  /* ---- шапка разговора в одну строку ---- */
+  /* заголовок, длинная подпись, две выпадашки и две кнопки занимали
+     полэкрана до первой реплики. Подпись прячем, выпадашки уезжают под
+     «…» — они меняются раз в месяц, а место отнимали каждый раз */
+  #screen[data-screen^="chat:"] .header { padding: 8px var(--side-phone); gap: 8px; }
+  #screen[data-screen^="chat:"] .header .label { display: none; }
+  #screen[data-screen^="chat:"] .header h1 {
+    font-size: 17px; line-height: 1.25; margin: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  /* выпадашки не прячем — модель и усилие меняют прямо в разговоре, —
+     а кладём во вторую строку, которая прокручивается вбок */
+  #screen[data-screen^="chat:"] .header .controls {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  #screen[data-screen^="chat:"] .header .controls::-webkit-scrollbar { display: none; }
+  #screen[data-screen^="chat:"] .header .controls > * { flex: 0 0 auto; }
+  #screen[data-screen^="chat:"] .header .select select { max-width: 46vw; }
+  /* пока шторка открыта, палец прокручивает её, а не содержимое под ней:
+     без замка меню стояло на месте, а «подложка» ехала */
+  body.panel-open #middle { overflow: hidden; }
+  #panel.open-sheet { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  /* бургер меню в шапке экрана лишний: его место заняла полоса. Второй
+     бургер (панель экрана) остаётся — он про содержимое, а не про меню */
+  .header .burger:first-child { display: none; }
+}
+
+/* ---- добавлено после ревью ---- */
+
+.row-wrap { border-bottom: 1px solid var(--border-subtle); }
+.section-card > .row-wrap:last-child { border-bottom: 0; }
+.row-wrap .row { border-bottom: 0; }
+.row.clickable { cursor: pointer; }
+.row.quiet { opacity: 0.55; }
+/* предложение подписаться на пуши («Ждут вас»): сервер отдаёт его скрытым,
+   открывает клиент классом push-offer на body, когда проверил состояние
+   устройства, — иначе оно мигало бы у тех, кому уже подписано. Класс на body,
+   а не на строке: экран перерисовывается подменой разметки, и класс на
+   строке пропадал бы вместе с ней. Прячется и рамка-обёртка, а не только
+   строка: иначе от скрытой строки оставалась бы линия */
+.row.offer { display: none; }
+.row-wrap:has(> .row.offer) { display: none; }
+body.push-offer .row.offer { display: flex; background: var(--info-bg); margin-bottom: 14px; }
+body.push-offer .row-wrap:has(> .row.offer) { display: block; border-bottom: 0; }
+.row.tone-red { background: var(--tone-red); }
+.row.tone-orange { background: var(--tone-orange); }
+.row.tone-green { background: var(--tone-green); }
+.row .above { font-size: 11px; color: var(--text-muted); }
+
+.expansion { padding: 0 14px 12px 34px; }
+.output {
+  font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  max-height: 320px;
+  overflow: auto;
+}
+.command { margin: 8px 0; }
+.command code {
+  display: block;
+  font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.attachments { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; min-width: 0; }
+/* Чип вложения — не шире своего ряда: у кнопки `white-space: nowrap`, и имя
+   файла вроде «Договор-аренды-помещения-№-12345-…-подписанный.pdf» тянуло
+   ленту вбок на 368 точек (1 октября 2026). Имя переносится внутри чипа,
+   а чип растёт вниз */
+.attachments .action {
+  max-width: 100%; min-width: 0;
+  height: auto; min-height: var(--control-h-row);
+  padding-top: 4px; padding-bottom: 4px;
+  white-space: normal; overflow-wrap: anywhere;
+  justify-content: flex-start; text-align: left; line-height: 1.3;
+}
+.preview { max-width: 260px; max-height: 200px; border-radius: 10px; cursor: pointer; }
+
+.gauge { height: 6px; border-radius: 3px; background: var(--border); margin-top: 6px; max-width: 220px; }
+.gauge .fill { height: 100%; border-radius: 3px; background: var(--accent); }
+/* значок вида строки: карточка команды, скрипта, таймера, памяти —
+   узнаются по значку, а не по первой букве имени символа SF */
+.row-icon { width: 24px; height: 24px; flex: 0 0 24px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); }
+.icon-16 { width: 16px; height: 16px; }
+.icon, .avatar {
+  width: 36px; height: 36px; border-radius: 18px;
+  background: var(--text-faint); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; flex: 0 0 36px;
+}
+
+/* картинка в строке: вопрос «показать ли её модели» решается по самой
+   картинке, поэтому она видна сразу и целиком, но не занимает экран */
+.row-image { display: inline-block; margin: 8px 0; max-width: 100%; }
+.row-image img {
+  display: block; max-width: min(420px, 100%); max-height: 320px;
+  width: auto; height: auto; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* меню строки: сюда сервер уносит всё, кроме одного действия */
+.row-menu { position: relative; }
+.more {
+  width: var(--control-h); height: var(--control-h); border-radius: var(--control-radius);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; list-style: none; color: var(--text-faint);
+}
+.more::-webkit-details-marker { display: none; }
+.more:hover { background: var(--surface); color: var(--text); }
+.more svg { width: 16px; height: 16px; fill: currentColor; }
+/* поле ввода: скрепка и круглая кнопка отправки, как в макетах чата */
+.clip {
+  width: 32px; height: 32px; border-radius: 16px; flex: 0 0 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-faint);
+}
+.clip:hover { background: var(--surface); color: var(--text); }
+.attach-icon, .send-icon { width: 18px; height: 18px; }
+.send {
+  width: 32px; height: 32px; border-radius: 16px; flex: 0 0 32px;
+  border: 0; background: var(--accent); color: #fff; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.send:hover { filter: brightness(1.08); }
+.dropdown {
+  /* под рядом, а не под самой кнопкой «···»: иначе меню наезжало на
+     соседнюю кнопку, когда та выше «···» */
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 30;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  min-width: 200px;
+  padding: 4px;
+}
+.menu-item {
+  display: block; width: 100%; text-align: left;
+  border: 0; background: none; color: inherit; font: inherit;
+  padding: 7px 10px; border-radius: 6px; cursor: pointer;
+}
+.menu-item { font-size: 13px; }
+.menu-item:hover { background: var(--surface); }
+.menu-item.danger { color: var(--alert); }
+
+.cards { display: flex; flex-wrap: wrap; gap: 12px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-width: 0;
+  /* четыре в ряд, как в макете: пять карточек в строке жмут значения, а
+     две растягиваются на пол-экрана */
+  flex: 1 1 calc(25% - 9px);
+}
+@media (max-width: 900px) { .card { flex: 1 1 calc(50% - 6px); } }
+@media (max-width: 560px) { .card { flex: 1 1 100%; } }
+.card.clickable { cursor: pointer; }
+.card .label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+/* значение — моноширинным: это то, что Сёма померил, и в столбце цифры
+   должны стоять под цифрами. Единица мельче и тише самого числа */
+.value-large {
+  font: 600 32px/1 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  margin: 7px 0 0;
+  display: flex; align-items: baseline; gap: 6px;
+}
+.value-large .unit { font: 400 14px/1 var(--font-sans); color: var(--text-faint); }
+/* показатель словом, а не числом: «пусто», «3 мин назад». Моноширинным в
+   32 точки такое расползается на две строки и кричит громче цифр */
+.value-large.прозой { font: 600 21px/1.25 var(--font-sans); letter-spacing: -0.01em; }
+.card .caption { font-size: 12px; line-height: 1.45; color: var(--text-faint); margin-top: 7px; }
+/* уровень плитки — полоса слева, а не плашка: плашку видно, только когда
+   она одна на экране, а полоса читается и в ряду из восьми */
+.card { position: relative; overflow: hidden; }
+.level-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.card.level-warn .level-bar { background: var(--warn); }
+.card.level-alert .level-bar { background: var(--alert); }
+.card.level-alert .value-large { color: var(--alert); }
+
+/* матрица выдачи «кто × что»: селект «выдать…» внутри строки агента
+   давал девять агентов на шесть областей — 54 отдельных действия и
+   никакой картины. Здесь видно всё поле сразу */
+.matrix-scroll { overflow-x: auto; }
+.matrix { border-collapse: separate; border-spacing: 0; width: 100%; }
+.matrix th { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-align: center; padding: 0 4px 9px; white-space: nowrap; }
+.matrix th:first-child { text-align: left; }
+/* колонка «кто» берёт всю оставшуюся ширину и переносит длинный путь:
+   с nowrap путь вроде «…/iCloud~md~obsidian/Documents/Работа» распирал
+   таблицу за край экрана, и правые области было не видно. Клетки —
+   фиксированной ширины (1 % + nowrap = «по содержимому») */
+.matrix td.who { padding: 5px 12px 5px 2px; border-top: 1px solid var(--border-subtle); font-size: 13px; }
+.matrix td.who .title { font-size: 13px; font-weight: 600; }
+.matrix td.who small { display: block; font: 500 11px/1.4 var(--font-mono); color: var(--text-faint); overflow-wrap: anywhere; }
+.matrix td.cell { text-align: center; padding: 5px 0; border-top: 1px solid var(--border-subtle); width: 1%; white-space: nowrap; }
+.cell-button {
+  width: 22px; height: 22px; border-radius: 6px; padding: 0;
+  border: 1px solid var(--border); background: none; color: transparent;
+  font: 600 12px/1 var(--font-sans); cursor: pointer;
+}
+.cell-button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.cell-button.out { background: var(--warn-bg); border-color: var(--shelf-line); color: var(--warn); }
+.cell-button:hover { border-color: var(--text-faint); }
+/* право, которого у такого чата не бывает: не кнопка, а прочерк с причиной в
+   подсказке — тумблер отказал бы после нажатия */
+.cell-na { color: var(--text-faint); font-size: 13px; cursor: help; }
+/* значение чужое: у темы группы это право группы. Нажатие делает его своим, а
+   пока оно чужое — штриховая рамка и бледная заливка */
+.cell-button.inherited { border-style: dashed; }
+.cell-button.on.inherited { background: color-mix(in srgb, var(--accent) 45%, transparent); border-color: var(--accent); }
+/* подпись колонки внутри клетки нужна одному телефону: на широком экране её
+   несёт шапка таблицы */
+.cell-label { display: none; }
+/* строка матрицы: уровень — полоса слева у названия, тема группы — со сдвигом */
+.matrix tr.matrix-row.warn td.who { box-shadow: inset 3px 0 0 var(--warn); padding-left: 10px; }
+.matrix tr.matrix-row.alert td.who { box-shadow: inset 3px 0 0 var(--alert); padding-left: 10px; }
+.matrix tr.matrix-row.ok td.who { box-shadow: inset 3px 0 0 var(--ok); padding-left: 10px; }
+.matrix tr.matrix-row.info td.who { box-shadow: inset 3px 0 0 var(--info); padding-left: 10px; }
+.matrix tr.matrix-row.nested td.who { padding-left: 26px; }
+.matrix tr.matrix-row.nested td.who .title { font-weight: 500; }
+.matrix td.who .title .pill { margin-left: 8px; vertical-align: 1px; }
+.matrix td.controls { width: 1%; text-align: right; }
+/* матрица прав: семь колонок с короткими словами. Колонка не уже слова в шапке,
+   а длинное («Писать первым») переносится по пробелу, а не по буквам: без
+   нижней границы браузер сжимал колонки до одной буквы, а название чата
+   забирало всю ширину */
+.matrix.rights th { white-space: normal; line-height: 1.25; vertical-align: bottom; min-width: 70px; max-width: 84px; padding-left: 2px; padding-right: 2px; }
+.matrix.rights td.cell { min-width: 70px; }
+.matrix.rights td.who { min-width: 170px; }
+@media (max-width: 720px) { .cell-button { width: 30px; height: 30px; } }
+/* на телефоне матрица — не таблица, которую прокручивают вбок, а строка:
+   название чата, под ним чипы прав (подпись внутри клетки, заливка — «да»).
+   Права, которого у чата не бывает, чипом не рисуются. Ничего не едет вбок */
+@media (max-width: 720px) {
+  .matrix-scroll { overflow-x: visible; }
+  .matrix, .matrix tbody { display: block; width: 100%; }
+  .matrix thead { display: none; }
+  .matrix tr.matrix-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 0; border-top: 1px solid var(--border-subtle); }
+  .matrix tr.matrix-row:first-child { border-top: 0; }
+  .matrix td.who { flex: 1 0 100%; width: 100%; border: 0; padding: 0 2px 2px; }
+  .matrix tr.matrix-row.warn td.who, .matrix tr.matrix-row.alert td.who,
+  .matrix tr.matrix-row.ok td.who, .matrix tr.matrix-row.info td.who { padding-left: 10px; }
+  .matrix tr.matrix-row.nested { padding-left: 14px; }
+  .matrix tr.matrix-row.nested td.who { padding-left: 2px; }
+  .matrix td.cell { display: block; flex: 0 0 auto; width: auto; padding: 0; border: 0; text-align: left; }
+  .matrix td.cell.na { display: none; }
+  .matrix td.controls { flex: 0 0 auto; margin-left: auto; }
+  .matrix.rights td.cell, .matrix.rights td.who { min-width: 0; }
+  .cell-label { display: inline; }
+  .cell-button {
+    width: auto; min-width: 44px; height: 32px; padding: 0 12px; border-radius: 16px;
+    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--text-secondary); font: 500 12px/1 var(--font-sans); white-space: nowrap;
+  }
+  .cell-button .cell-mark:empty { display: none; }
+  .cell-button.on { color: #fff; }
+  .cell-button.out { color: var(--warn); }
+  .cell-button.on.inherited { color: var(--text); }
+}
+
+/* полка «ждут вас»: то, что не поедет без человека, стоит вверху одним
+   тёплым блоком. Раньше разбор спама лежал под всем дайджестом, а записи
+   памяти на решение — под областями и потребителями */
+.shelf {
+  background: var(--shelf);
+  border: 1px solid var(--shelf-line);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.shelf-header { display: flex; align-items: center; gap: 8px; padding: 11px 16px 10px; }
+.shelf-header .what { font-size: 13px; font-weight: 700; color: var(--warn); }
+.shelf-header .count { font: 500 11px/1 var(--font-mono); color: var(--text-faint); }
+.shelf-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; border-top: 1px solid var(--shelf-line);
+}
+.shelf-row .body { min-width: 0; flex: 1 1 auto; }
+.shelf-row .title { font-size: 15px; font-weight: 600; line-height: 1.35; }
+.shelf-row .caption { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+.shelf-row .right-side { margin-left: auto; flex: 0 0 auto; }
+@media (max-width: 720px) {
+  .shelf-row { flex-wrap: wrap; }
+  .shelf-row .right-side { width: 100%; justify-content: flex-start; }
+}
+
+/* одинаковые строки, свёрнутые в одну: тридцать отказов с одной и той же
+   ошибкой DNS занимали весь экран и прятали остальные пять */
+.row-group > summary {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 11px 8px; cursor: pointer; list-style: none;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.row-group > summary::-webkit-details-marker { display: none; }
+.row-group > summary::before {
+  content: "›"; color: var(--text-faint); font-size: 15px; line-height: 1;
+  transition: transform .12s; display: inline-block;
+}
+.row-group[open] > summary::before { transform: rotate(90deg); }
+.row-group > summary:hover { background: var(--hover); }
+.row-group .title { font-size: 15px; font-weight: 600; flex: 0 1 auto; overflow-wrap: anywhere; }
+.row-group .caption { font-size: 12px; color: var(--text-faint); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 0; }
+.row-group .count { margin-left: auto; font: 600 12px/1 var(--font-mono); color: var(--text-faint); }
+.row-group .inside { padding-left: 22px; }
+
+/* плашка поломки: не хвост к подписи экрана через «·», а свой блок */
+.alert-box {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; margin-bottom: 14px;
+  border-radius: 12px; background: var(--alert-bg);
+}
+.alert-box .title { font-size: 15px; font-weight: 600; color: var(--alert); }
+.alert-box .caption { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.alert-box .right-side { margin-left: auto; }
+
+/* строка чисел-сводки в шапке: счётчики уезжают из подписи экрана */
+.figures { display: flex; align-items: stretch; margin: 4px 0 6px; }
+.figure { flex: 1 1 0; padding: 0 18px; display: flex; flex-direction: column; gap: 4px; border-left: 1px solid var(--border-subtle); }
+.figure:first-child { padding-left: 0; border-left: 0; }
+.figure b { font: 600 22px/1 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.015em; }
+.figure b .unit { font: 400 12px/1 var(--font-sans); color: var(--text-faint); margin-left: 4px; }
+.figure span { font-size: 12px; color: var(--text-faint); }
+@media (max-width: 720px) { .figures { flex-wrap: wrap; gap: 12px 0; } .figure { flex: 1 1 50%; } }
+
+.subheading { font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+.divider { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
+/* пояснение над настройками («одинаково для всех ящиков»): подсвеченная
+   плашка в две-три строки, а не обычный абзац — её видно раньше первой
+   настройки. Жирное начало — Component.Title (макет Pochta.html, .callout) */
+.callout { background: var(--accent-bg); border-radius: 8px; padding: 8px 12px; font-size: 11px; line-height: 1.5; color: var(--text-secondary); overflow-wrap: anywhere; }
+.callout b { color: var(--text); font-weight: 600; }
+.paragraph { margin: 0; line-height: 1.5; }
+.paragraph, .subheading, .error, .column > .caption { overflow-wrap: anywhere; }
+.rail { padding-left: 2px; }
+
+.chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 18px 0; }
+/* сегмент-контрол: вкладки экрана и фильтры. Серая дорожка, выбранный —
+   белая пилюля с тенью; так же выглядит переключатель в макетах */
+.segments {
+  display: inline-flex;
+  background: var(--surface);
+  border-radius: 9px;
+  padding: 2px;
+  gap: 2px;
+}
+.segment {
+  font-size: 12px;
+  font-weight: 600;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+.segment.selected { background: var(--card); color: var(--text); box-shadow: var(--elevation); }
+.segment:hover:not(.selected) { color: var(--text); }
+.chip {
+  font: inherit; font-size: 12px;
+  padding: 5px 12px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--card); color: inherit;
+  cursor: pointer;
+}
+.chip.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+/* полоса внутренних вкладок раздела настроек: «Почта» делится на шесть,
+   «Модели» на четыре. Своя строка, а не второй ряд к пяти постоянным —
+   это разные уровни, и сложить их в один ряд значит сказать, что «Спам»
+   и «Безопасность» соседи. На телефоне прокручивается вбок */
+.subtabs-bar { display: flex; padding: 10px 18px 0; }
+.subtabs-bar .segments { max-width: 100%; }
+/* вкладки экрана живут в шапке, но своей строкой во всю ширину: они стоят
+   на одном месте на любом экране, а кнопки шапки — какие есть — их не
+   двигают. Шапка переносит строки, полоса уходит вниз своим порядком */
+.header { flex-wrap: wrap; }
+.tabs-bar { order: 10; flex: 1 1 100%; display: flex; padding-top: 6px; min-width: 0; }
+.tabs-bar .segments { max-width: 100%; }
+/* счётчик у имени вкладки: он говорит, есть ли там что смотреть, до
+   того как человек туда зайдёт */
+.segment-count {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+.segment.selected .segment-count { background: var(--surface); color: var(--text); }
+.segment-count.at-warn { background: var(--warn); color: #fff; }
+.segment-count.at-alert { background: var(--alert); color: #fff; }
+.filters-bar { display: flex; gap: 10px; align-items: center; padding: 8px 18px 0; flex-wrap: wrap; }
+.search-box { position: relative; display: inline-flex; align-items: center; }
+.search-icon { position: absolute; left: 8px; width: 14px; height: 14px; color: var(--text-faint); pointer-events: none; }
+.search {
+  font: inherit; font-size: 13px;
+  height: 28px;
+  padding: 0 10px 0 28px; border-radius: 8px;
+  border: 1px solid transparent; background: var(--surface); color: inherit;
+  min-width: 240px;
+}
+.search:focus { background: var(--card); border-color: var(--accent); outline: none; }
+
+.panel-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; }
+.panel-header .title { font-size: 13px; font-weight: 600; }
+.panel-header .action { margin-left: auto; }
+.panel-row { display: flex; align-items: stretch; position: relative; }
+/* у пункта меню высота одна строка, а у чата их две: имя и последняя
+   реплика. Общая высота из меню зажимала их в 36 точек */
+.panel-row .item {
+  flex: 1; min-width: 0;
+  height: auto; min-height: 58px;
+  align-items: flex-start;
+  padding: 9px 10px;
+  gap: 8px;
+}
+/* Колонка разделов настроек — это не список чатов: у раздела одно короткое
+   имя без второй строки и без времени справа, а над ним четыре заголовка
+   групп. Высота чата в 58 точек превращала восемнадцать разделов в три
+   экрана, поэтому здесь строка в 30 точек, как в макете
+   design/nastroyki-2/Karkas.html: колонка помещается в окно целиком.
+   Поле поиска — первая строка, счётчик замечаний — справа от названия. */
+#panel.sections {
+  width: 232px; flex: 0 0 232px;
+  padding: 12px 10px 20px;
+  background: var(--menu-bg);
+  display: flex; flex-direction: column; gap: 2px;
+}
+#panel.sections .panel-header { padding: 2px 10px 6px; }
+#panel.sections .panel-search { display: flex; margin: 0 0 8px; }
+#panel.sections .panel-search .search {
+  width: 100%; min-width: 0; height: 32px; border-radius: 8px;
+  background: var(--card); border-color: var(--border); padding-left: 30px;
+}
+#panel.sections .panel-search .search:focus { border-color: var(--accent); }
+#panel.sections .panel-search .search-icon { left: 9px; }
+#panel.sections .panel-heading {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+  color: var(--text-faint); padding: 12px 10px 4px;
+}
+#panel.sections .panel-row .item {
+  min-height: 30px; height: 30px; align-items: center; padding: 0 10px;
+  border-radius: 8px; gap: 8px; color: var(--text-secondary); font-size: 13px;
+}
+#panel.sections .panel-row .item:hover { color: var(--text); }
+#panel.sections .panel-row .item.selected { color: var(--text); }
+#panel.sections .panel-row .title { font: inherit; color: inherit; }
+#panel.sections .panel-row .counter {
+  align-self: center; font: 500 11px/1.3 var(--font-mono); color: var(--text-faint);
+}
+#panel.sections .panel-row .counter.warn { color: var(--warn); font-weight: 600; }
+#panel.sections .panel-row .counter.alert { color: var(--alert); font-weight: 600; }
+#panel.sections .panel-row .mark {
+  width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; margin-left: auto;
+}
+#panel.sections .panel-row .mark.warn { background: var(--warn); }
+#panel.sections .panel-row .mark.alert { background: var(--alert); }
+#panel.sections .panel-row .item .counter, #panel.sections .panel-row .item .mark { margin-left: auto; }
+
+.panel-row .title { font: 600 15px/1.3 var(--font-sans); color: var(--text); }
+.panel-row .counter {
+  margin-left: auto; align-self: flex-start;
+  font: 500 11px/1.3 var(--font-mono); font-variant-numeric: tabular-nums;
+  color: var(--text-faint); white-space: nowrap;
+}
+.panel-row .dot { margin-top: 5px; }
+/* пункт списка чатов — как в макете chat-threads: название и последняя
+   реплика по строке, лишнее уходит в многоточие, список не растёт вниз */
+.panel-row .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.panel-row .title, .panel-row .caption { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.panel-row .caption { font: 400 12px/1.35 var(--font-sans); color: var(--text-faint); margin-top: 2px; }
+.item.selected .caption { color: var(--text-muted); }
+/* три уровня: контейнер → разговор → ветка. Отступ у строки, а не у кнопки:
+   линия ветки и шеврон должны стоять на одном уровне с текстом */
+.panel-row.nested-1 .item { padding-left: 30px; }
+.panel-row.nested-2 .item { padding-left: 44px; }
+.panel-row.container .title { color: var(--text-muted); font-weight: 600; }
+
+.chevron { width: 12px; height: 12px; flex: 0 0 12px; color: var(--text-faint); transition: transform .15s; }
+.chevron.expanded { transform: rotate(90deg); }
+/* кнопка сворачивания контейнера: своя мишень рядом с именем, иначе
+   нажатие по шеврону открывало экран контейнера вместо сворачивания */
+.collapse-container {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; margin-left: 4px; padding: 0;
+  border: 0; background: none; border-radius: 6px; cursor: pointer; color: var(--text-faint);
+}
+.collapse-container:hover { background: var(--hover); color: var(--text); }
+.collapse-container .chevron { transition: transform .15s; }
+.collapse-container.expanded .chevron { transform: rotate(90deg); }
+.panel-row.container { display: flex; align-items: center; }
+@media (max-width: 720px) { .collapse-container { width: 40px; height: 40px; } }
+.panel-row.thread::before { content: ""; position: absolute; top: 0; bottom: 0; left: 22px; border-left: 2px solid var(--thread-line); }
+.panel-row.thread.nested-2::before { left: 36px; }
+.thread-icon { width: 14px; height: 14px; flex: 0 0 14px; color: var(--accent); }
+.item.selected .thread-icon { color: var(--accent); }
+/* подвал меню: состояние Сёмы всегда на виду, как в макете —
+   когда проверяла почту, кем думает, что разбирает прямо сейчас */
+.footer { font-size: 11px; color: var(--text-muted); padding: 12px 9px 0; margin-top: auto; }
+.footer .line { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.footer .bar { height: 3px; border-radius: 2px; background: var(--border); margin-top: 6px; }
+.footer .bar .fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+.turn { margin: 6px 0; }
+/* разделитель дня — по центру, как в мессенджерах: слева он теряется
+   среди реплик собеседника */
+.feed-day { text-align: center; font-size: 11px; color: var(--text-muted); margin: 10px 0 4px; }
+.bottom { border-top: 1px solid var(--border); background: var(--bg); padding-bottom: env(safe-area-inset-bottom, 0); }
+.bottom .composer { border-top: 0; }
+/* очередь отложенных действий (offline-snapshot, группа 5): сообщение
+   или файл, поставленные без связи, ждут над полем ввода — человек
+   должен видеть, что ушло не сразу, и мочь отменить, пока не отправилось */
+.outbox {
+  display: flex; flex-direction: column; gap: 6px;
+  margin: 8px 18px 0; padding: 8px 12px;
+  background: var(--shelf); border: 1px solid var(--shelf-line); border-radius: 11px;
+}
+.outbox[hidden] { display: none; }
+.queue-item { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.queue-item .queue-text { flex: 1 1 auto; min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+.queue-item .queue-time { font-size: 11px; color: var(--text-muted); flex: 0 0 auto; }
+.queue-item .action { flex: 0 0 auto; }
+.queue-item.doubtful .queue-time { color: var(--warn); }
+.queue-item.sent .queue-time { color: var(--ok); }
+
+/* Указатель жеста «потянуть вниз» (phone-refresh, макет
+   design/обновление-телефон). Живёт в #экране над лентой, потому что
+   перечитывание подменяет ровно ленту. Высоту ставит сам жест: она едет за
+   пальцем, поэтому перехода по height здесь нарочно нет — переход на каждом
+   кадре движения читается как запаздывание. Четыре вида и четыре уровня
+   состояния из общей палитры: намёк тихим, порог своим, успех ok, неудача
+   alert. */
+.pull-refresh {
+  flex: 0 0 auto; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  font-size: 12px; color: var(--text-faint);
+}
+.pull-refresh .sign {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px;
+}
+.pull-refresh .sign svg { width: 15px; height: 15px; }
+/* порог пройден: стрелка развёрнута — «отпустите», цвет акцентный, подпись
+   уверенная, а не намёк */
+.pull-refresh.threshold { font-size: 13px; font-weight: 600; color: var(--accent); }
+.pull-refresh.threshold .sign {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--accent-bg);
+}
+.pull-refresh.threshold .sign svg { transform: rotate(180deg); }
+.pull-refresh.running { font-size: 13px; color: var(--text-secondary); }
+.pull-refresh.running .sign svg { animation: spin .9s linear infinite; }
+.pull-refresh.done { font-weight: 600; color: var(--ok); }
+/* неудача той же формы, что успех, но с заливкой и цветом тревоги: держится
+   дольше галочки, фразу с причиной нужно успеть прочитать */
+.pull-refresh.failed {
+  font-weight: 600; color: var(--alert);
+  background: var(--alert-bg); border-radius: 10px; margin: 0 18px 4px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .pull-refresh.running .sign svg { animation: none; }
+}
+/* плашка — сноска под списком. Снизу ей нужен воздух: без него на
+   телефоне она упиралась в полосу вкладок и читалась как обрезанная */
+.banner { font-size: 11px; line-height: 1.4; color: var(--text-muted); padding: 8px 18px 10px; }
+.recipient.to-sema { color: var(--accent); }
+
+/* «button.действие» весомее одного класса: без имени тега правило
+   «спрятать» проигрывало общему «display: inline-flex» у кнопок, и
+   кнопка шторки разделов висела на широком экране рядом с самим
+   списком разделов */
+button.action.burger, .burger, button.action.panel-picker { display: none; }
+.heading { min-width: 0; }
+
+.code { font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; min-height: 240px; }
+
+@media (max-width: 720px) {
+  button.action.burger, .burger { display: inline-flex; width: 36px; padding: 0; }
+  button.action.panel-picker { display: inline-flex; width: auto; padding: 0 10px; }
+  /* «display: block» здесь стояло от прежней шторки и побеждало
+     «display: flex» выше: у открытого меню разваливалась колонка —
+     ручка, шапка и поиск переставали быть липкими, а список не
+     прокручивался внутри себя. Раскладку задаёт один блок выше. */
+}
+
+/* ---- поисковый выбор из общего набора ---- */
+/* Один на все строки: список собирается в момент открытия, а в разметке
+   экрана его нет вовсе. У «Моделей» это убрало 972 строчки вариантов */
+.set-picker {
+  position: fixed; z-index: 40;
+  background: var(--card); border: 1px solid var(--border); border-radius: 11px;
+  box-shadow: 0 8px 32px rgba(24, 20, 12, 0.18);
+  display: flex; flex-direction: column; overflow: hidden;
+  max-height: min(360px, calc(100vh - 40px));
+}
+.set-picker .search-box { padding: 8px; border-bottom: 1px solid var(--border-subtle); }
+.set-picker .search { width: 100%; min-width: 0; padding-left: 10px; }
+.set-picker .options { overflow-y: auto; padding: 4px; min-height: 0; }
+.set-picker .option {
+  display: block; width: 100%; text-align: left;
+  font: inherit; font-size: 13px; color: var(--text);
+  background: none; border: 0; border-radius: 7px; padding: 7px 9px; cursor: pointer;
+}
+.set-picker .option:hover, .set-picker .option:focus-visible { background: var(--surface); }
+.set-picker .option.selected { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+.set-picker .nothing { padding: 10px; font-size: 12px; color: var(--text-faint); }
+/* на телефоне выпадашка становится шторкой снизу: список в пятьдесят
+   строк у нижней роли иначе не помещается никуда */
+@media (max-width: 720px) {
+  .set-picker {
+    left: 0 !important; right: 0; top: auto !important; bottom: 0;
+    width: auto !important; max-height: 70dvh;
+    border-radius: 14px 14px 0 0;
+  }
+  .set-picker .option { padding: 12px 10px; font-size: 15px; }
+}
+
+/* ---- телефон ----/* ---- телефон ----
+   Проверялось на 320, 390 и 430 CSS-пикселях. Два правила, ради которых
+   всё: нажимаемое не меньше 44 пикселей (иначе пальцем не попасть) и
+   ничего не выпирает вбок — горизонтальная прокрутка на телефоне делает
+   экран непригодным, а появляется она от одной длинной строки. */
+@media (max-width: 720px) {
+  /* переключатели не переносятся на третий ряд, а прокручиваются вбок:
+     иначе шапка на телефоне вырастает выше самого списка */
+  .filters-bar { flex-wrap: wrap; }
+  /* на телефоне шапка ужимается: подпись в одну строку, полосы вплотную.
+     Вкладки в своей полосе прибавили ряд, и до содержимого стало 182 точки
+     из 844 — порог 150 держит TestБраузерТелефонШапкаНеСъедаетЭкран */
+  .header .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* на телефоне полоса делит ряд с кнопками шапки: свой ряд стоил 44 точки.
+     Вкладки при этом прижаты влево и не двигаются, ходит только кнопка */
+  .tabs-bar { order: 0; flex: 1 1 0; min-width: 0; padding-top: 0; align-self: center; }
+  .header .heading { flex-basis: 100%; }
+  /* когда есть полоса вкладок, ряд кнопок не растягивается на всю ширину,
+     а встаёт справа от неё; без полосы он по-прежнему занимает ряд целиком.
+     Шапка переносит строки, и перенос решается по размеру содержимого, а
+     не после ужатия: поэтому у полосы базис 0, а у ряда кнопок потолок —
+     иначе «Письма · Отправители» и «Проверить сейчас» не помещались в
+     390 точек и кнопки уезжали на третью строку */
+  .header:has(.tabs-bar) .controls { width: auto; flex: 0 1 auto; max-width: 62%; margin-left: auto; }
+  .subtabs-bar { padding-top: 2px; }
+  .filters-bar { padding-top: 2px; }
+  .header { padding-bottom: 4px; }
+  .chips, .filters-bar .segments, .tabs-bar .segments, .subtabs-bar .segments {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    /* запас по краям: обрезанное на самой границе слово читалось как
+       обрезанное, а не как «дальше есть»; с запасом край растворяется
+       на пустом месте, и маска говорит правду */
+    padding-inline: 4px 24px;
+    scroll-padding-inline: 12px;
+  }
+  .chips::-webkit-scrollbar, .filters-bar .segments::-webkit-scrollbar,
+  .tabs-bar .segments::-webkit-scrollbar, .subtabs-bar .segments::-webkit-scrollbar { display: none; }
+  /* поиск — своей строкой во всю ширину: рядом с переключателем он
+     сжимался до неюзабельных 160 точек, а переключатель уезжал в третий
+     ряд. Сегменты под ним прокручиваются вбок и остаются в одну строку */
+  /* поиск больше не занимает свой ряд: он делит его с фильтрами.
+     Отдельный ряд стоил 42 точки высоты у списка писем */
+  .filters-bar .search-box { flex: 1 1 120px; min-width: 0; }
+  .filters-bar { flex-wrap: nowrap; padding-top: 6px; }
+  .search { min-width: 0; width: 100%; }
+  /* Шапка на телефоне. Разбор 10 сентября 2026: до первого письма было
+     195 точек, и половину съедала сама шапка — заголовок кеглем в 28,
+     подпись на три строки, поиск во всю ширину отдельным рядом и пустая
+     полоса, на которой стояло одно многоточие. Правим все четыре: имя
+     экрана мельче, подпись не длиннее двух строк, поиск делит ряд с
+     фильтрами, а ряд управления перестал быть пустым — в нём вместе
+     стоят вкладки, кнопки и многоточие. */
+  .header { padding: 8px var(--side-phone); gap: 6px; }
+  .header h1 { font-size: 20px; line-height: 1.15; }
+  .header .label {
+    font-size: 12px; line-height: 1.35; margin-top: 2px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  /* ряд управления — общий и прокручиваемый: вкладки, кнопки и «ещё»
+     стоят в одну строку, а не занимают две, одна из которых пустая */
+  .header .controls {
+    width: 100%; margin-left: 0; flex-wrap: nowrap;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .header .controls::-webkit-scrollbar { display: none; }
+  .header .controls > * { flex: 0 0 auto; }
+  .header .controls .row-menu { margin-left: auto; }
+  /* пустой ряд управления не занимает места вовсе */
+  .header .controls:empty { display: none; }
+  /* вкладки экрана — сегмент-контрол в шапке: пять вкладок с числами
+     шире телефона, и вся страница ехала вбок. Прокручиваются внутри
+     себя, как и фильтры */
+  .header .controls { gap: 6px; max-width: 100%; min-width: 0; }
+  .header .controls .segments {
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%;
+    padding-inline: 4px 24px; scroll-padding-inline: 12px;
+  }
+  .header .controls .segments::-webkit-scrollbar { display: none; }
+  /* край растворяется, пока за ним что-то есть: без этого «История · 497»
+     кончалась ровно на границе экрана и читалась как обрезанная, а не
+     как «прокрути». Классы ставит клиент по настоящему scrollLeft */
+  .chips.scrolls-right, .segments.scrolls-right {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
+  }
+  .chips.scrolls-left, .segments.scrolls-left {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22px);
+    mask-image: linear-gradient(to right, transparent 0, #000 22px);
+  }
+  .chips.scrolls-left.scrolls-right, .segments.scrolls-left.scrolls-right {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
+  }
+  /* Кнопка в ряду не шире ряда: подпись у `.action` не переносится (в
+     строках списка так и надо — кнопка одной ширины с соседями), но
+     подпись из модуля или от Сёмы бывает любой длины, и ряд кнопок карточки
+     тянул ленту вбок. Здесь подпись переносится внутри кнопки, а сама она
+     растёт вниз */
+  .matter-actions .action, .row .right-side .action, .section-header .right-side .action {
+    max-width: 100%; min-width: 0;
+    height: auto; min-height: var(--control-h-row);
+    padding-top: 4px; padding-bottom: 4px;
+    white-space: normal; overflow-wrap: anywhere; line-height: 1.25;
+  }
+  /* вбок не двигаемся никогда: длинный адрес или команда прокручиваются
+     внутри своего блока, а не тащат за собой всю страницу */
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .column { max-width: 100%; }
+  .row, .bubble, .section-card { min-width: 0; }
+  .row .label, .row .value, .fact .value { overflow-wrap: anywhere; }
+  pre, code, .command, .output { overflow-x: auto; max-width: 100%; }
+
+  /* пальцем в 30 пикселей не попасть: у всего нажимаемого — 44 */
+  #menu .item, #menu .menu-node > summary { height: 48px; font-size: 16px; }
+  #menu .well .item { height: 46px; }
+  button, .button, .chip, .tab, .item, summary, .row.clickable,
+  input[type="checkbox"] + .switch, .burger {
+    min-height: 44px;
+  }
+  button, .button { min-width: 44px; }
+  button.switch {
+    min-height: 0; min-width: 0; width: 44px; height: 26px;
+    border-radius: 13px; flex: 0 0 44px;
+  }
+  button.switch::after { width: 22px; height: 22px; }
+  button.switch.on::after { left: 20px; }
+  .chip, .tab { display: inline-flex; align-items: center; }
+  .item, .row { padding-top: 10px; padding-bottom: 10px; }
+
+  /* поле ввода не должно вызывать наезд экрана в Safari: он это делает,
+     когда шрифт меньше 16 пикселей */
+  input, textarea, select { font-size: 16px; }
+
+  /* заголовок раздела и его действия — в две строки: рядом они сжимают
+     друг друга до переносов посреди слова */
+  .section-header { flex-wrap: wrap; }
+  .section-header .right-side { margin-left: 0; width: 100%; justify-content: flex-start; }
+  .section-heading::after { display: none; }
+
+  .field { grid-template-columns: minmax(0, 1fr); }
+  .field input, .field select, .field textarea { justify-self: stretch; margin-top: 6px; }
+  .field-switch { grid-template-columns: minmax(0, 1fr) auto; }
+  .field-switch .field-toggle { margin-top: 0; }
+
+  /* поле с сегментами — в две строки: подпись сверху, переключатель под
+     ней во всю ширину. Рядом они не помещаются никогда */
+  .field:has(.field-segments) { grid-template-columns: minmax(0, 1fr); }
+  .field:has(.field-segments) .field-segments { justify-self: stretch; margin-top: 6px; }
+  .field:has(.field-segments) .segment { flex: 1 1 0; justify-content: center; text-align: center; }
+
+  /* письмо в списке — три строки: отправитель со временем, тема,
+     пояснение. «Почему» на телефоне уходит из строки: оно есть на самом
+     письме, а в списке из полутора сотен строк отнимало по строке у
+     каждого. Правило бьёт только по строкам с метой рядом — это письма
+     и отправители, а не карточки серверов, где факты и есть содержание */
+  .row:has(.main) .facts { display: none; }
+}
+
+/* самый узкий из живых экранов — 320: колонка сжимается, отступы тоже */
+@media (max-width: 360px) {
+  :root { --side-phone: 12px; }
+  .column { padding: 10px var(--side-phone); }
+  .bubble .text { max-width: 94%; }
+}
+
+/* ---- граф памяти ----
+   Раскладку считает сервер: у клиента на htmx своего JavaScript почти нет,
+   а тянуть библиотеку ради силовой раскладки незачем. Кольцами, самые
+   связанные — в середине; одинаково при каждом открытии, потому что
+   прыгающий граф читать невозможно. */
+.graph { margin: 0 0 12px; }
+.graph svg { width: 100%; height: auto; display: block; background: var(--card); border-radius: 10px; }
+.graph .edge { stroke: var(--border); stroke-width: 1; }
+.graph .node circle { fill: var(--accent); opacity: 0.85; }
+.graph .node text { font-size: 10px; fill: var(--text); }
+.graph .node.dim circle { opacity: 0.25; }
+.graph .node.dim text { opacity: 0.45; }
+.graph .node.selected circle { stroke: var(--text); stroke-width: 2; }
+/* узел — переход на свой экран: видно, что его можно нажать */
+.graph .node[data-goto] { cursor: pointer; outline: none; }
+.graph .node[data-goto]:hover circle,
+.graph .node[data-goto]:focus-visible circle { opacity: 1; stroke: var(--text); stroke-width: 1.5; }
+.graph .node[data-goto]:hover text,
+.graph .node[data-goto]:focus-visible text { font-weight: 600; }
+.graph figcaption { font-size: 11px; color: var(--text-muted); padding: 6px 2px 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+.area-mark { display: inline-flex; align-items: center; gap: 4px; }
+.area-mark .dot { width: 7px; height: 7px; flex: 0 0 7px; }
+
+/* чипы в форме: выбор одного из готовых значений. Радиокнопку прячем —
+   нажимается сам чип, так же как в клиенте на маке */
+/* сегменты в строке настройки: тот же переключатель, что в шапке, но
+   выбор — радиокнопка формы, а не ссылка */
+/* сегменты не должны душить подпись: у «читать и наводить порядок»
+   собственная ширина под двести точек, и на узкой колонке подсказка
+   рассыпалась по слову на строку */
+.field-segments { justify-self: end; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.field-segments::-webkit-scrollbar { display: none; }
+.field-segments .segment { cursor: pointer; padding: 4px 10px; }
+/* спрятанная радиокнопка должна быть нулевого размера: у поля формы
+   ширина 100 %, и абсолютная позиция считает её от окна — невидимый
+   input в 390 точек тащил за собой горизонтальную прокрутку */
+.field-segments .segment { position: relative; }
+.field-segments input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+/* выбранный вариант определяет сама радиокнопка, а не класс из разметки:
+   класс ставит сервер при показе и не знает, что человек нажал другой, —
+   без этого выбор менялся, а подсветка оставалась на прежнем до сохранения
+   (и полоса «Изменено» говорила одно, а глаза видели другое) */
+.field-segments .segment.selected:not(:has(input:checked)) { background: none; color: var(--text-secondary); box-shadow: none; }
+.field-segments .segment:has(input:checked) { background: var(--card); color: var(--text); box-shadow: var(--elevation); }
+/* ответ правила: цвет только у выбранного. Три цветные кнопки сразу
+   кричали бы — человеку нужно видеть один ответ, а не светофор */
+.field-segments .segment.tone-ok:has(input:checked) { background: var(--ok-bg); color: var(--ok); box-shadow: none; }
+.field-segments .segment.tone-warn:has(input:checked) { background: var(--warn-bg); color: var(--warn); box-shadow: none; }
+.field-segments .segment.tone-alert:has(input:checked) { background: var(--alert-bg); color: var(--alert); box-shadow: none; }
+.field-segments .segment:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* отметка строки для группового действия: круг, а не системный квадрат —
+   он одного роста с аватаром и не спорит с тумблерами формы */
+.row-check { position: relative; width: 18px; height: 18px; flex: 0 0 18px; margin-top: 2px; cursor: pointer; }
+.row-check input { position: absolute; opacity: 0; width: 0; height: 0; }
+.row-check span {
+  display: block; width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: var(--card);
+}
+.row-check input:checked + span { background: var(--accent); border-color: var(--accent); }
+.row-check input:checked + span::after {
+  content: ""; position: absolute; left: 5px; top: 4px;
+  width: 5px; height: 9px; border: 1.5px solid #fff; border-top: 0; border-left: 0;
+  transform: rotate(42deg);
+}
+.row-check input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row:has(.row-check input:checked) { background: var(--sent-bg); }
+/* полоса выбора: появляется, только когда что-то отмечено */
+.select-bar {
+  display: none; align-items: center; gap: 10px;
+  padding: 8px 16px; margin-bottom: 8px;
+  background: var(--sent-bg); border-radius: 8px; font-size: 13px;
+}
+.select-bar.shown { display: flex; flex-wrap: wrap; }
+.select-bar .count { font-weight: 600; }
+/* групповые действия раздела клиент переносит сюда из заголовка: они
+   имеют смысл только при выбранных строках */
+.select-bar .action[data-bulk] { margin-left: auto; }
+.select-bar .action[data-bulk] ~ .action[data-bulk] { margin-left: 0; }
+.field-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-choice {
+  border: 1px solid var(--border); border-radius: 999px; padding: 7px 12px;
+  font-size: 12px; cursor: pointer; background: var(--card);
+  display: inline-flex; align-items: center; min-height: 34px;
+}
+.chip-choice { position: relative; }
+.chip-choice input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.chip-choice:has(input:checked), .chip-choice.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+@media (max-width: 720px) { .chip-choice { min-height: 44px; } }
+
+
+/* ---- клиентские действия и занятость ---- */
+.row:hover { background: var(--hover); }
+.row.clickable:hover { background: var(--hover); }
+.busy { opacity: 0.55; pointer-events: none; }
+button.busy::after { content: "…"; margin-left: 4px; }
+
+
+/* ---- мастер: шаги один под другим ---- */
+.wizard fieldset.step { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin: 0 0 10px; }
+.wizard legend { font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); padding: 0 6px; }
+
+.row .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--text-faint); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex: none; margin-right: 10px; }
+/* значок файла — не кружок: тип пишется целиком («WEBM» в кружке
+   обрезался), лист чуть выше своей ширины, как в макете «Файлы» */
+.row .avatar.file {
+  width: 34px; height: 42px; flex: 0 0 34px;
+  border-radius: 6px;
+  font-size: 9px; letter-spacing: 0.02em;
+  text-transform: uppercase;
+  align-items: flex-end;
+  padding-bottom: 5px;
+}
+.row .avatar.icon { background: var(--accent); }
+/* плитка сущности (сервер, модель, ящик): скруглённый квадрат, а не кружок
+   человека — так их не путают в одном списке */
+.row .avatar.square { border-radius: 8px; }
+.row .meta { font: 500 11px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-faint); margin-top: 3px; }
+.row.wide .right-side { margin-left: auto; }
+
+.link-banner { position: fixed; left: 12px; right: 12px; bottom: 12px; padding: 10px 14px; border-radius: 10px;
+  background: var(--card); color: var(--text); border: 1px solid var(--warn); font-size: 13px; z-index: 30; box-shadow: 0 6px 24px rgba(0,0,0,.2); }
+/* на телефоне внизу полоса вкладок: плашка встаёт над ней, а не на неё.
+   3 октября 2026 «Связи нет, а снимка этого экрана…» легла поверх «Меню»
+   и всех вкладок — без связи с экрана было не уйти (снимок владельца) */
+@media (max-width: 720px) {
+  body:has(#tabbar) .link-banner { bottom: calc(var(--tab-h) + 1px + env(safe-area-inset-bottom) + 8px); }
+}
+
+/* Шапка снимка: экран показан из снимка на устройстве, связи нет
+   (offline-snapshot, 4.3). Стоит над всем содержимым экрана и уровнем
+   «warn» — это не беда, но и не свежие данные, и человек должен видеть
+   это до того, как начнёт читать. */
+.snapshot-header { padding: 8px 18px; font-size: 11px; line-height: 1.4; color: var(--text);
+  background: color-mix(in srgb, var(--warn) 14%, var(--bg)); border-bottom: 1px solid var(--warn); }
+/* Действие, которое нельзя отложить, в снимке не показывается вовсе.
+   «!important» тут по делу: у кнопок и списков свой display, и обычное
+   правило проиграло бы ему — кнопка осталась бы на месте. */
+.not-in-snapshot { display: none !important; }
+
+/* окно вопроса */
+dialog.ask { border: 0; border-radius: 12px; padding: 16px; max-width: 420px; width: calc(100% - 32px);
+  background: var(--card); color: var(--text); box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+dialog.ask::backdrop { background: rgba(0,0,0,.35); }
+dialog.ask .ask-text { margin: 0 0 10px; font-size: 13px; line-height: 1.45; white-space: pre-line; }
+dialog.ask .ask-input { width: 100%; box-sizing: border-box; margin-bottom: 12px; }
+/* вопрос читают, а не проматывают: текст крупнее подписи, кнопка называет
+   действие словом («Убрать», «Забыть»), а не «OK» */
+dialog.ask .ask-text { font-size: 15px; line-height: 1.45; color: var(--text); margin-bottom: 14px; }
+dialog.ask .right-side { gap: 8px; }
+dialog.ask .action.danger {
+  background: var(--alert); border-color: var(--alert); color: #fff;
+}
+dialog.ask .action.danger:hover { filter: brightness(1.05); }
+
+
+/* ---- клавиатура и озвучивание ----
+   Чипы — ссылки, но подчёркивания у них нет; у <details> свой знак вместо
+   системного треугольника; фокус с клавиатуры виден на любом фоне. */
+a.chip { text-decoration: none; color: inherit; }
+a.chip.selected { color: #fff; }
+summary { list-style: none; cursor: pointer; }
+summary::-webkit-details-marker { display: none; }
+/* Раскрытие: один знак на весь клиент — шеврон, который поворачивается.
+   Текстовые «▸ ▾» десятым кеглем были и мелки, и разной ширины: строка
+   дёргалась при раскрытии, а сам знак читался как точка (13 сентября
+   2026). Знак крупнее подписи и отделён от неё, заголовок при наведении
+   получает подложку — видно, что по нему нажимают */
+.details-more, .fold > .section-heading { display: flex; align-items: center; gap: 8px; }
+.details-more { font-size: 11px; color: var(--accent); padding: 6px 14px 8px; }
+.details-more::before, .fold > .section-heading::before {
+  content: "›"; flex: 0 0 auto; width: 12px; text-align: center;
+  font-size: 17px; line-height: 1; color: var(--text-muted);
+  display: inline-block; transition: transform 0.15s;
+}
+details[open] > .details-more::before, .fold[open] > .section-heading::before { transform: rotate(90deg); }
+.fold > .section-heading { padding: 6px 8px; margin-left: -8px; border-radius: 8px; }
+.fold > .section-heading:hover { background: var(--hover); }
+.fold > .section-heading:hover::before { color: var(--text); }
+.details-more:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* заголовок получает фокус программно после смены экрана — ради скринридера;
+   рамка вокруг него для зрячего ничего не значит и выглядит поломкой */
+h1[tabindex="-1"]:focus, h1[tabindex="-1"]:focus-visible { outline: none; }
+.item.selected:focus-visible { outline-color: var(--accent); outline-offset: -3px; }
+
+/* ---- списки выбора: одно правило для шапки и строки ---- */
+label.select { display: inline-flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--text-muted); }
+label.select select, .controls select, .row .right-side select {
+  font: inherit; font-size: 12px; font-weight: 500; height: var(--control-h-row); padding: 0 26px 0 10px; border-radius: var(--control-radius);
+  border: 1px solid var(--border); background: var(--card); color: var(--text);
+  appearance: none; -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-muted) 50%), linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 13px) 55%, calc(100% - 9px) 55%; background-size: 4px 4px; background-repeat: no-repeat;
+}
+.row .right-side { flex-wrap: wrap; align-items: center; }
+/* три списка в строке ролей не должны отжимать текст в колонку шириной в
+   слово: тело держит минимум, списки не шире 170, при нехватке места
+   правая часть переезжает под текст */
+.row.wide { flex-wrap: wrap; }
+.row .body { flex: 1 1 220px; min-width: 0; }
+.row .caption, .row .title, .row .above { overflow-wrap: anywhere; }
+label.select select, .controls select, .row .right-side select { max-width: 190px; }
+
+/* искра — мини-график в широкой строке, как Sparkline на маке */
+.sparkline { width: 120px; height: 22px; flex: none; }
+.sparkline polyline { fill: none; stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+
+/* строка с переходом нажимается и с клавиатуры */
+.row.clickable:focus-visible { outline-offset: -2px; }
+/* ссылка перехода на названии строки: видом не отличается от текста —
+   строка целиком и так кликается, а подчёркивание синим в списке из
+   пятидесяти писем было бы шумом. Существует она ради клавиатуры,
+   чтения вслух и «открыть в новой вкладке» */
+a.row-link { color: inherit; text-decoration: none; }
+a.row-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.row.clickable:hover a.row-link { text-decoration: none; }
+
+/* свёрнутый раздел внутри карточки: заголовок по центру своих 44 px,
+   без хвоста-отступа — иначе под каждым провайдером пустая полоса */
+summary.section-heading { display: flex; align-items: center; margin: 0; padding: 4px 14px; }
+.section-card > .section { margin-bottom: 0; }
+.section-card > .section + .row-wrap, .section-card > .section + .section { border-top: 1px solid var(--border); }
+
+/* меню у пузыря: троеточие в углу, не ломает ширину реплики */
+.bubble { position: relative; }
+.bubble .bubble-menu { position: absolute; top: 2px; right: 4px; }
+.bubble .bubble-menu summary { padding: 0 6px; opacity: .55; }
+.bubble:hover .bubble-menu summary { opacity: 1; }
+
+/* ---- таблица с подписями колонок ----
+   Строки с одинаковым управлением (области памяти, роли моделей, папки
+   ящика) раньше несли по паре фактов на каждую строку: подпись «наружу»
+   печаталась тридцать раз вместо одного заголовка колонки. Здесь подпись
+   стоит один раз наверху, а значения выстраиваются в столбец. */
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th {
+  font-size: 11px; font-weight: 600; color: var(--text-faint);
+  text-align: left; padding: 0 10px 8px; letter-spacing: 0.02em; white-space: nowrap;
+}
+.table td { padding: 9px 10px; border-top: 1px solid var(--border-subtle); font-size: 14px; vertical-align: middle; }
+.table tr:hover td { background: var(--hover); }
+.table td.who { padding-left: 2px; }
+.table td.who .title { font-size: 14px; font-weight: 600; }
+.table td.who small { display: block; font: 500 11px/1.4 var(--font-mono); color: var(--text-faint); }
+/* капсула строки стоит рядом с названием, а не в колонке управления:
+   «без модели» говорит про саму роль */
+.table td.who .title { color: var(--text); }
+.table td.who .title .pill { margin-left: 8px; vertical-align: 1px; }
+/* колонки таблицы ролей: название узкое, три списка делят остальное — без
+   этого «последний ответ» уезжал за край окна, и таблица прокручивалась вбок */
+.table td.who { width: 22%; }
+.table td.table-cell.has-select { width: 27%; min-width: 0; }
+.table td.table-cell.has-select select[data-option-set] { width: 100%; min-width: 164px; text-overflow: ellipsis; }
+.table td.table-cell.has-select select:not([data-option-set]) { width: auto; }
+/* уровень строки — полоса слева у её первой ячейки */
+.table tr.table-row.warn td.who { box-shadow: inset 3px 0 0 var(--warn); padding-left: 10px; }
+.table tr.table-row.alert td.who { box-shadow: inset 3px 0 0 var(--alert); padding-left: 10px; }
+.table tr.table-row.ok td.who { box-shadow: inset 3px 0 0 var(--ok); padding-left: 10px; }
+.table tr.table-row.info td.who { box-shadow: inset 3px 0 0 var(--info); padding-left: 10px; }
+/* список в ячейке: меняется на месте и не шире своей колонки */
+.table td.table-cell.has-select { padding-top: 5px; padding-bottom: 5px; }
+.table td.table-cell.has-select label.select { display: block; }
+.table td.table-cell.has-select select { max-width: 100%; }
+/* машинный факт — моноширинным и по правому краю: в столбце цифры должны
+   стоять под цифрами, иначе колонка читается как текст, а не как счёт */
+.table td.table-cell.mono { font: 500 13px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+.table td.table-cell.ok { color: var(--ok); }
+.table td.table-cell.info { color: var(--info); }
+.table td.table-cell.warn { color: var(--warn); }
+.table td.table-cell.alert { color: var(--alert); }
+/* «число» уже занято строкой чисел figs — у заголовка колонки свой класс */
+.table th.right-aligned { text-align: right; }
+.table th:first-child { padding-left: 2px; }
+/* колонка управления не сжимается процентом: с `width: 1%` браузер в
+   авто-раскладке отдавал ей девять точек, а тумблер вылезал за таблицу */
+.table td.controls { white-space: nowrap; text-align: right; }
+.table td.controls .right-side { justify-content: flex-end; flex-wrap: nowrap; }
+/* на телефоне строка таблицы раскладывается карточкой, а не прокручивается
+   вбок: правило проекта — ничего шире 390 точек. Шапки колонок нет, подпись
+   печатается перед значением ячейки (data-label) — её клиент берёт из
+   заголовка колонки, в разметке строки её нет. Управление строки (тумблер,
+   кнопки, меню) идёт последней строкой карточки */
+@media (max-width: 720px) {
+  .table-scroll { overflow-x: visible; }
+  .table { min-width: 0; }
+  .table thead { display: none; }
+  .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
+  .table tr { padding: 10px 0; border-top: 1px solid var(--border-subtle); }
+  .table tr:first-child { border-top: 0; }
+  .table tr:hover td { background: none; }
+  .table td { padding: 3px 0; border: 0; }
+  .table td.who, .table td.table-cell.has-select { width: 100%; }
+  .table td.who { padding-left: 2px; padding-bottom: 6px; }
+  .table td.who .title { font-size: 14px; }
+  .table tr.table-row.warn td.who, .table tr.table-row.alert td.who,
+  .table tr.table-row.ok td.who, .table tr.table-row.info td.who { padding-left: 10px; }
+  .table td.table-cell { display: flex; align-items: center; gap: 8px; min-width: 0; text-align: left; }
+  .table td.table-cell[data-label]::before {
+    content: attr(data-label); flex: 0 0 92px; font-size: 11px; font-weight: 500; color: var(--text-faint);
+  }
+  .table td.table-cell.mono { text-align: left; }
+  .table td.table-cell.has-select { padding-top: 3px; padding-bottom: 3px; }
+  .table td.table-cell.has-select label.select { flex: 1 1 0; min-width: 0; }
+  .table td.table-cell.has-select select { width: 100%; max-width: none; }
+  .table td.controls { white-space: normal; text-align: left; position: static; }
+  .table td.controls .right-side { justify-content: flex-start; flex-wrap: wrap; }
+}
+
+/* ---- ряд капсул с хвостом «ещё N» ----
+   Восемьдесят образцов круга чтения и пятьдесят четыре модели — это не
+   список строк и не факты: ряд показывает столько, сколько влезает в две
+   строки, и честно говорит, сколько осталось. */
+.pill-row { margin-bottom: 14px; }
+.pill-row > .section-heading { display: flex; align-items: center; width: 100%; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pill.set {
+  font: 600 11px/19px var(--font-mono);
+  background: var(--surface); color: var(--text-secondary);
+}
+.pill.set::before { display: none; }
+.pill.set.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.set.info { background: var(--info-bg); color: var(--info); }
+.pill.set.warn { background: var(--warn-bg); color: var(--warn); }
+.pill.set.alert { background: var(--alert-bg); color: var(--alert); }
+.pill.tail { background: var(--accent-bg); color: var(--accent); border: 0; }
+.pill.tail.pressable { cursor: pointer; font: 600 11px/1 var(--font-sans); height: 19px; padding: 0 7px; border-radius: 5px; }
+.pill-row .caption { font-size: 12px; color: var(--text-faint); margin-top: 6px; }
+
+/* ---- шаг мастера первого запуска ----
+   Сделанный шаг сворачивается в строку с тем, что выбрано, раскрытый
+   несёт своё содержимое, будущий — серая строка с обещанием. Раньше все
+   шаги были строками с капсулой, а содержимое висело под списком
+   отдельно, и было непонятно, к какому шагу оно относится. */
+.wizard-step {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 0;
+}
+.wizard-step + .wizard-step { margin-top: -1px; border-top-left-radius: 0; border-top-right-radius: 0; }
+.wizard-step:has(+ .wizard-step) { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.step-header { display: flex; align-items: center; gap: 14px; padding: 13px 16px; }
+.step-header .number {
+  flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font: 700 11px/1 var(--font-sans);
+  background: var(--surface); color: var(--text-secondary);
+}
+.step-header .number svg { width: 12px; height: 12px; }
+.wizard-step.done .number { background: var(--ok-bg); color: var(--ok); }
+.wizard-step.open .number { background: var(--accent); color: #fff; }
+.step-header .title { font-size: 15px; font-weight: 600; min-width: 0; }
+.wizard-step.next .title { color: var(--text-secondary); }
+.step-header .result { font: 500 12px/1.4 var(--font-mono); color: var(--text-faint); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.step-header .right-side { margin-left: auto; }
+.step-body { padding: 0 16px 14px; border-top: 1px solid var(--border-subtle); padding-top: 12px; }
+.step-body .form { border: 0; background: none; padding: 0; margin-bottom: 0; }
+@media (max-width: 720px) {
+  .step-header { flex-wrap: wrap; }
+  .step-header .result { flex: 1 1 100%; padding-left: 38px; }
+}
+
+/* ---- обратный путь ----
+   У пятнадцати вкладок настроек заголовок один и тот же — «Настройки», а
+   где именно стоишь, видно только по подсвеченному пункту меню, которого
+   на телефоне нет. Строка стоит одну строку и всегда ведёт назад. */
+.crumbs { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-faint); margin-bottom: 4px; flex-wrap: wrap; }
+.crumbs.in-feed { margin: 0 0 10px; }
+.crumbs .crumb {
+  border: 0; background: none; padding: 0; margin: 0;
+  font: inherit; color: var(--text-faint); cursor: pointer; height: auto;
+}
+.crumbs .crumb:hover { color: var(--text); }
+.crumbs .crumb-chevron { width: 11px; height: 11px; flex: 0 0 11px; color: var(--border); }
+.crumbs .crumb-chevron:last-child { display: none; }
+.crumbs .here { color: var(--text-secondary); font-weight: 600; }
+@media (max-width: 720px) {
+  .crumbs .crumb { min-height: 0; min-width: 0; }
+  /* «‹ Настройки» над заголовком — кнопка «назад», а не подпись: акцентным
+     цветом и с полем вокруг, чтобы в неё попадал палец, а не только курсор.
+     Отрицательное поле возвращает строке прежнюю высоту */
+  .crumbs:not(:has(.here)) .crumb {
+    color: var(--accent); font-size: 13px; padding: 9px 16px 9px 0; margin: -9px 0 -5px;
+  }
+}
+
+/* ---- лента разговора: пузыри, ожидание, карточки дел ----
+   Сторона пузыря говорит о направлении, а не об авторе: слева чужое,
+   справа ушедшее собеседнику. Справа стоят два разных пузыря — писали вы
+   и писал Сёма от вашего имени, — и путать их нельзя: за один отвечаете
+   вы, за второй он. Цветом это на телефоне при солнце не различить,
+   поэтому различие в рамке: сплошная — ваша, пунктирная — Сёмы. */
+.who { font-size: 11px; font-weight: 600; color: var(--text-faint); margin: 0 6px 2px; }
+.who.right { text-align: right; }
+
+/* именное ожидание вместо крутящегося кружка: локальная модель думает
+   по четыре минуты, и человек должен видеть, кого он ждёт и сколько.
+   Класс «думает», а не «ожидание»: «ожидание» уже занято заглушкой
+   «Подключаюсь к Сёме…» в оболочке, и мой блок перекрасил бы её */
+.thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  margin: 6px 0;
+  padding: 9px 13px;
+  border-radius: 18px;
+  border-bottom-left-radius: 6px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.thinking .what { font-size: 13px; color: var(--text-secondary); }
+.thinking .by-whom { font: 500 11px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-faint); }
+.thinking .dots { display: inline-flex; gap: 4px; flex: 0 0 auto; }
+.thinking .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--text-faint); display: block; animation: thinking-pulse 1.2s infinite; }
+.thinking .dots i:nth-child(2) { animation-delay: .2s; }
+.thinking .dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes thinking-pulse { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .thinking .dots i { animation: none; }
+  .thinking .dots i:nth-child(2) { opacity: .6; }
+  .thinking .dots i:nth-child(3) { opacity: .3; }
+}
+
+/* карточка дела — не пузырь: волос по кругу, значок дела и полоска
+   уровня слева, когда она чего-то ждёт. Раньше это была строка с
+   раскрытием, и команда на подтверждение, таймер и запись в память
+   выглядели одинаково и ехали одним кеглем */
+.matter {
+  position: relative;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  /* не overflow: hidden — он обрезал выпадающее меню «···» границей
+     карточки, и нажатие по точкам выглядело как «ничего не происходит»
+     (запись экрана 13 сентября 2026). Уголки скругляет clip-path: он
+     режет только по контуру самой карточки, а меню лежит поверх */
+  clip-path: inset(0 round 12px);
+}
+/* у карточки с открытым меню обрезка снимается вовсе: clip-path режет и
+   то, что лежит поверх, — иначе меню видно наполовину */
+.matter:has(details.row-menu[open]) { clip-path: none; }
+.matter.level-warn .level-bar { background: var(--warn); }
+.matter.level-alert .level-bar { background: var(--alert); }
+.matter.level-ok .level-bar { background: var(--ok); }
+.matter.level-info .level-bar { background: var(--info); }
+.matter-header { display: flex; align-items: center; gap: 10px; padding: 11px 14px 10px; }
+.matter-icon {
+  flex: 0 0 26px; width: 26px; height: 26px; border-radius: 7px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--surface); color: var(--text-secondary);
+}
+.matter-icon.warn { background: var(--warn-bg); color: var(--warn); }
+.matter-icon.alert { background: var(--alert-bg); color: var(--alert); }
+.matter-icon.ok { background: var(--ok-bg); color: var(--ok); }
+.matter-icon.info { background: var(--info-bg); color: var(--info); }
+.matter-name { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; }
+.matter-name b { font-size: 13px; font-weight: 700; line-height: 1.3; }
+/* текст карточки переносится внутри неё: название, подпись, абзац и
+   пояснение приходят от человека, модели и модулей, и слово без пробелов
+   (адрес, путь, имя службы) не должно делать карточку шире колонки */
+.matter-name b, .matter-meta, .matter-prose, .matter-quiet, .matter-caution span:last-child { overflow-wrap: anywhere; }
+.matter-meta { font: 500 11px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-faint); }
+/* правая часть шапки не сжимается ниже своего содержимого, но и не шире
+   половины карточки: капсулы в ней переносятся, а не растягивают шапку */
+.matter-header .right-side { margin-left: auto; flex: 0 0 auto; max-width: 55%; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px 8px; }
+.matter-header .pill { white-space: normal; overflow-wrap: anywhere; height: auto; min-height: 19px; }
+/* в карточке капсула заливная и без точки: она говорит о состоянии
+   самого дела, а не помечает строку в длинном списке */
+.matter .pill::before { display: none; }
+.matter .pill.warn { background: var(--warn-bg); }
+.matter .pill.ok { background: var(--ok-bg); }
+.matter .pill.info { background: var(--info-bg); }
+.countdown-large { font: 600 19px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.matter-body { padding: 0 14px 12px; display: flex; flex-direction: column; gap: 9px; }
+.matter-prose { font-size: 14px; line-height: 1.45; }
+.matter-code, .matter-diff {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 9px 11px;
+  margin: 0;
+  font: 12px/1.55 var(--font-mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+  max-height: 320px;
+}
+/* разница правки скилла: знак решает цвет. Тот же текст одним куском
+   человек читает вдвое дольше и не видит, что именно добавлено */
+.matter-diff { font: 13px/1.55 var(--font-sans); }
+.matter-diff .plus { color: var(--ok); }
+.matter-diff .minus { color: var(--alert); }
+.matter-links { display: flex; flex-direction: column; gap: 7px; align-items: flex-start; }
+.matter-link {
+  font: inherit; font-size: 13px; text-align: left;
+  border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer;
+  max-width: 100%; overflow-wrap: anywhere;
+}
+.matter-link:hover { color: var(--text); }
+.matter-quiet { font-size: 12px; line-height: 1.55; color: var(--text-faint); }
+/* найденное в сети — данные, а не указание: предостережение стоит в
+   карточке, а не в промпте, потому что читает его человек */
+.matter-caution { display: flex; gap: 7px; align-items: flex-start; font-size: 12px; line-height: 1.55; color: var(--text-faint); }
+.matter-caution span:first-child { color: var(--warn); flex: 0 0 auto; }
+.matter-actions {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; border-top: 1px solid var(--border-subtle); background: var(--bg);
+  /* ряд действий — последний в карточке, и меню «···» открывается вниз:
+     без своего слоя оно уходило под соседнюю карточку */
+  position: relative; z-index: 1;
+}
+/* меню в последнем ряду открывается вверх: вниз ему некуда — там конец
+   карточки и следующее сообщение */
+.matter-actions .dropdown { top: auto; bottom: calc(100% + 4px); }
+/* Меню отсчитывается от ряда действий, а не от самой кнопки «···»: у
+   карточки памяти кнопок нет, «···» стоит первой слева, и меню шириной
+   в двести точек, выровненное по её правому краю, уезжало за левый край
+   окна на сто тридцать четыре (1 октября 2026, 390 точек) */
+.matter-actions .row-menu { position: static; }
+.matter-actions .dropdown { right: 10px; max-width: calc(100% - 20px); }
+.matter-actions .action { height: var(--control-h-row); padding: 0 10px; font-size: 12px; }
+/* разрушительное отделено пустотой: «Отклонить» вплотную к «Выполнить»
+   нажимается сгоряча, а отменить выполненную команду нечем */
+.matter-actions .spacer { flex: 1 1 auto; min-width: 12px; }
+
+/* ---- цепочка писем ----
+   Одиннадцать одинаковых счетов от одного отправителя — это не
+   одиннадцать строк, а шкала и три письма: первое, это и последнее. */
+.chain {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.chain-count { font: 500 12px/1 var(--font-mono); color: var(--text-faint); }
+.chain .scale { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.chain .notch { width: 9px; height: 9px; border-radius: 50%; background: var(--border); display: block; flex: 0 0 9px; }
+.chain .notch.current { background: var(--accent); }
+.chain .scale .caption { font-size: 12px; line-height: 1.5; color: var(--text-faint); margin-left: 8px; min-width: 0; }
+.chain-mails { border-top: 1px solid var(--border-subtle); padding-top: 4px; }
+.chain-mails .row { padding: 9px 0; }
+
+/* ---- класс чувствительности письма ----
+   Не список на всю ширину, а сегмент: три варианта читаются за один
+   взгляд, а строка рядом честно говорит, что уходит наружу. */
+.mail-class {
+  display: flex; align-items: center; gap: 14px;
+  border: 1px solid var(--border); border-radius: 12px; background: var(--card);
+  padding: 13px 16px; margin: 10px 0;
+}
+/* основа 0, а не auto: с «auto» текст пояснения задаёт ширину, и на
+   телефоне значок уезжал на свою строку, а подпись под него */
+.mail-class .body { min-width: 0; flex: 1 1 0; }
+.mail-class .title { font-size: 14px; font-weight: 600; }
+.mail-class .caption { font-size: 12px; line-height: 1.55; color: var(--text-faint); margin-top: 2px; }
+.mail-class .segments { margin-left: auto; flex: 0 0 auto; }
+button.segment { border: 0; background: none; font-family: inherit; cursor: pointer; }
+
+/* ---- переключатель сущностей ----
+   Ящики и серверы карточками: боковая панель на телефоне не живёт, а
+   выпадающий список прячет состояние — какой ящик сейчас молчит. */
+.switcher { margin: 10px 0; }
+.entities { display: flex; gap: 10px; flex-wrap: wrap; }
+.entity {
+  flex: 1 1 200px; min-width: 0; max-width: 100%;
+  display: flex; flex-direction: column; gap: 4px; align-items: flex-start;
+  border: 1px solid var(--border); border-radius: 12px; background: var(--card);
+  padding: 11px 13px; font: inherit; text-align: left; cursor: pointer;
+  /* цвет своими чернилами: у кнопки он по умолчанию системный, и в тёмной
+     теме имя сервера читалось чёрным по чёрному */
+  color: var(--text);
+}
+.entity:hover { border-color: var(--text-faint); }
+.entity.selected { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.entity .top { display: flex; align-items: center; gap: 7px; max-width: 100%; }
+.entity .name { font-size: 14px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* пояснение под именем — фраза, а не замер: моноширинным набирается
+   только то, что Сёма померил */
+.entity .bottom { font-size: 12px; line-height: 1.35; color: var(--text-faint); overflow-wrap: anywhere; }
+
+@media (max-width: 720px) {
+  /* ничего не выпирает вбок: карточка дела и цепочка живут в 390 точках,
+     а длинная команда прокручивается внутри своего блока */
+  .matter, .chain, .mail-class, .thinking, .entity { max-width: 100%; }
+  .matter-code, .matter-diff { max-width: 100%; }
+  .matter-actions .action { min-height: 44px; height: 44px; }
+  /* значок встаёт к заголовку, а не к середине блока: на телефоне
+     пояснение в три строки уводило его на пустое место сбоку */
+  .mail-class { flex-wrap: wrap; align-items: flex-start; }
+  .mail-class .segments { margin-left: 0; width: 100%; }
+  .mail-class .segment { flex: 1 1 0; justify-content: center; min-height: 44px; }
+  /* карточки сущностей встают в две колонки, а не уезжают вбок лентой:
+     ящик, который молчит, должен быть виден сразу, а не за прокруткой —
+     ради этого переключатель и заводился вместо боковой панели */
+  .entities { flex-wrap: wrap; gap: 8px; }
+  .entity { flex: 1 1 calc(50% - 4px); min-width: 0; padding: 10px 11px; }
+  /* «Отменить» уходит на свою строку: втроём — имя, модель и кнопка — в
+     358 точек не помещаются, и «Сёма читает файл» ломалось пополам */
+  .thinking { flex-wrap: wrap; min-height: 0; }
+  .thinking .action { margin-left: auto; }
+}
+
+/* Письмо как есть: рамка в песочнице. Высоту рамке говорит сам документ
+   письма (он наш и знает свою высоту), пока не сказал — держим экранную,
+   чтобы страница не прыгала при загрузке. */
+.mail-view { margin-top: 6px; }
+.view-switch { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.view-switch .view {
+  font: 11px/1 inherit; padding: 6px 10px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--card); color: var(--text-secondary);
+}
+.view-switch .view.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+.view-switch .view.images { margin-left: auto; }
+.mail-frame {
+  width: 100%; height: 60vh; border: 1px solid var(--border); border-radius: 10px;
+  background: #fff; display: block; resize: vertical; overflow: auto;
+}
+.mail-view.full-height .mail-frame { height: 88vh; }
+.mail-view[data-view="as-text"] .mail-frame { display: none; }
+.mail-view[data-view="as-text"] .mail-as-text { display: block; }
+@media (max-width: 720px) { .mail-frame { height: 55vh; } }
+
+
+/* ---- нижняя полоса сохранения настроек ----
+   Настройки не сохраняются на лету: правки копятся, полоса внизу
+   считает их и держит «Сохранить» и «Отменить» под рукой. Полоса стоит
+   в самом низу экрана и не уезжает с лентой: несохранённое не должно
+   прятаться за прокруткой. */
+.save-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 18px; border-top: 1px solid var(--border);
+  background: var(--card); box-shadow: 0 -4px 14px rgba(40, 34, 20, 0.06);
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.save-bar[hidden] { display: none; }
+/* полоса мигает, когда что-то пытается перечитать экран под несохранённым
+   (поиск в шапке): человек видит, чего она ждёт */
+.save-bar.attention { animation: save-bar-attention .8s ease-in-out 2; }
+@keyframes save-bar-attention {
+  0%, 100% { box-shadow: 0 -4px 14px rgba(40, 34, 20, 0.06); }
+  50% { box-shadow: 0 0 0 3px var(--warn), 0 -4px 14px rgba(40, 34, 20, 0.06); }
+}
+@media (prefers-reduced-motion: reduce) { .save-bar.attention { animation: none; outline: 2px solid var(--warn); } }
+.save-bar .what { font-size: 12px; color: var(--text-secondary); min-width: 0; }
+.save-bar .what b { color: var(--text); font-weight: 600; }
+.save-bar .what .trouble { color: var(--alert); font-weight: 600; }
+.save-bar .right-side { margin-left: auto; display: flex; gap: 8px; flex: 0 0 auto; }
+
+/* точка у изменённого поля: человек должен видеть, что тронул, не
+   пересматривая весь экран */
+.field.changed > label::after {
+  content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--warn); margin-left: 6px; vertical-align: middle;
+}
+
+/* отказ стоит у своей формы, а не общим красным пятном наверху экрана:
+   иначе непонятно, какая из пяти настроек не сохранилась */
+.not-saved {
+  display: flex; align-items: flex-start; gap: 9px; margin-top: 10px;
+  background: var(--alert-bg); border-radius: 9px; padding: 9px 12px;
+}
+.not-saved[hidden] { display: none; }
+.not-saved .dot { background: var(--alert); margin-top: 5px; width: 7px; height: 7px; flex: 0 0 7px; }
+.not-saved .text { min-width: 0; flex: 1 1 auto; font-size: 11px; line-height: 1.45; color: var(--text); }
+.not-saved .text b { display: block; font-size: 12px; color: var(--alert); }
+.not-saved .action { flex: 0 0 auto; }
+
+/* панель ухода: местная, над содержимым, а не окно поверх всего. Видно
+   и вкладку, куда собрались, и то, что останется несохранённым */
+.leave {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin: 10px 18px 0; padding: 12px 14px;
+  background: var(--shelf); border: 1px solid var(--shelf-line); border-radius: 11px;
+}
+.leave[hidden] { display: none; }
+.leave .gist { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.leave .gist b { font-size: 13px; color: var(--warn); }
+.leave .gist .what { font-size: 11px; line-height: 1.45; color: var(--text-secondary); }
+.leave .right-side { margin-left: auto; display: flex; gap: 8px; flex: 0 0 auto; }
+
+@media (max-width: 720px) {
+  .save-bar .action, .leave .action { min-height: 44px; }
+  .leave .right-side, .save-bar .right-side { margin-left: 0; width: 100%; }
+  .leave .right-side .action, .save-bar .right-side .action { flex: 1 1 0; justify-content: center; }
+}
+
+/* ---- ленивая часть раздела ---- */
+details.fragment > .section-card { display: flex; flex-direction: column; gap: 6px; }
+.fragment-search { display: flex; align-items: center; gap: 6px; padding: 4px 10px 2px; }
+.fragment-search .search { width: 100%; min-width: 0; }
+.fragment-loading { padding: 8px 14px; color: var(--text-muted); }
+
+/* ---- ожидание ответа: полоска сверху после 200 мс ---- */
+/* Быстрый ответ полоски не заслуживает — мигание хуже ожидания. После
+   200 мс человек уже не уверен, что нажал, и нажимает второй раз */
+body.waiting::after {
+  content: ""; position: fixed; top: 0; left: 0; height: 2px; width: 28%;
+  background: var(--accent); border-radius: 0 2px 2px 0; z-index: 60;
+  animation: waiting-run 1.1s ease-in-out infinite;
+}
+@keyframes waiting-run {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(360%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.waiting::after { animation: none; width: 100%; opacity: .6; }
+}
+
+/* ---- правила сервера тремя колонками ----
+   «Разрешить / Спросить / Запретить»: в колонке образцы капсулами с «×»
+   и поле «добавить». Образец, по которому решена проверяемая команда,
+   обведён. На телефоне колонки встают одна под другой */
+.pattern-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 10px 0; }
+/* одна колонка сетки с запретом растягиваться: без него дорожка сетки
+   подгоняется под самую широкую строку внутри («добавить» со своим полем
+   ввода), колонка вылезает за свою ячейку и накрывает соседнюю — кнопка
+   «Добавить» оказывалась под чужой колонкой и не нажималась */
+.pattern-col { border: 1px solid var(--border); border-radius: 10px; background: var(--card); padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-content: start; min-width: 0; }
+.pattern-col h3 { margin: 0; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pattern-col.ok h3 { color: var(--ok); }
+.pattern-col.warn h3 { color: var(--warn); }
+.pattern-col.alert h3 { color: var(--alert); }
+.pattern-col .explain { margin: 0; font-size: 12px; line-height: 1.45; color: var(--text-secondary); }
+.pattern-col .pats { display: flex; flex-wrap: wrap; gap: 6px; max-height: 240px; overflow: auto; align-content: flex-start; }
+.pat { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 3px 4px 3px 8px; border-radius: 6px; background: var(--surface); font: 11.5px/1.35 var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); }
+.pat > span { overflow-wrap: anywhere; }
+.pat.hit { outline: 2px solid var(--accent); }
+.pat-x { border: 0; background: none; color: var(--text-faint); cursor: pointer; font: inherit; padding: 0 4px; border-radius: 4px; }
+.pat-x:hover { color: var(--alert); }
+.pat-x:focus-visible { outline: 2px solid var(--accent); }
+.pat-add { display: flex; gap: 6px; }
+.pat-add input { flex: 1 1 auto; min-width: 0; height: var(--control-h-row); padding: 0 8px; border: 1px solid var(--border); border-radius: var(--control-radius); background: var(--card); color: var(--text); font: 12px var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); }
+.pat-add .action { height: var(--control-h-row); }
+@media (max-width: 720px) {
+  .pattern-cols { grid-template-columns: minmax(0, 1fr); }
+  .pat-x, .pat-add input, .pat-add .action { min-height: 44px; }
+}
+
+/* ---- строки настройки и «Тонкая настройка» ----
+   Форма со Style «rows» (макеты — design/nastroyki-2/Predely.html): подпись и
+   подсказка слева, один контрол справа, единица рядом с ним. Поле остаётся
+   `.field`: нижняя полоса сохранения считает правки именно по нему, а
+   строка — всего лишь другая раскладка того же поля. Подсказка одной
+   строкой с хвостом, нажатие раскрывает. На телефоне контрол встаёт под
+   подпись, сегменты и список — на всю ширину, число остаётся узким. */
+.form.rows { padding: 2px 14px; margin-bottom: 18px; }
+.form.rows h3 {
+  font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--text-muted); margin: 10px 0 0;
+}
+.form.rows > .field.setting {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; row-gap: 1px;
+  align-items: center; padding: 9px 0;
+}
+.form.rows > .field.setting:first-of-type { padding-top: 9px; }
+.setting-label { grid-column: 1; grid-row: 1; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.field.setting .hint.setting-hint {
+  grid-column: 1; grid-row: 2; margin: 0; max-width: 64ch;
+  font-size: 11px; line-height: 1.4; color: var(--text-muted);
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+  cursor: pointer;
+}
+.field.setting .hint.setting-hint.open { display: block; }
+.field.setting .hint.setting-hint:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.setting-control {
+  grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 8px;
+  justify-self: end; flex-wrap: wrap; justify-content: flex-end; min-width: 0;
+}
+.setting-control input[type="text"], .setting-control input[type="password"] {
+  width: 240px; max-width: 100%; height: var(--control-h-row); min-height: 0;
+  padding: 0 9px; font-size: 12px; border-radius: var(--control-radius);
+}
+/* закрытое поле с «показать»: в поле пароля macOS не даёт русскую
+   раскладку, нажатие делает его обычным на время набора */
+.secure-wrap { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; }
+.secure-wrap input { flex: 1 1 auto; min-width: 0; }
+.setting-control .secure-wrap { width: auto; }
+.secure-show {
+  flex: none; height: var(--control-h-row); padding: 0 8px; font: 12px var(--font-sans);
+  border: 1px solid var(--border); border-radius: var(--control-radius);
+  background: var(--card); color: var(--text-secondary); cursor: pointer;
+}
+.secure-show[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+.secure-show:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.setting-control .setting-number {
+  width: 86px; max-width: 100%; height: var(--control-h-row); min-height: 0; padding: 0 8px;
+  font: 500 12px var(--font-mono); font-variant-numeric: tabular-nums; text-align: right;
+  border-radius: var(--control-radius);
+}
+.setting-control select {
+  width: auto; max-width: 100%; height: var(--control-h-row); min-height: 0; padding: 0 8px; font-size: 12px;
+  border-radius: var(--control-radius);
+}
+/* верхний отступ у поля телефонный «.field input» уже даёт строке целиком */
+.setting-control input, .setting-control select { margin-top: 0; }
+.setting-control .unit { font-size: 11px; color: var(--text-faint); }
+.setting-control .field-toggle { margin: 0; }
+/* «по умолчанию» видна, пока значение с умолчанием расходится: она же и
+   отметка «это изменено». Нажатие кладёт умолчание в контрол, а
+   сохраняет его нижняя полоса, как любую другую правку */
+.to-default {
+  border: 0; background: none; color: var(--accent); font: inherit; font-size: 11px; font-weight: 600;
+  padding: 2px 4px; border-radius: 4px; cursor: pointer; white-space: nowrap;
+}
+.to-default:hover { text-decoration: underline; }
+.to-default:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.field.setting.is-default .to-default { display: none; }
+/* правка, ещё не сохранённая: точка перед подписью, а не после неё */
+.form.rows .field.changed > label::after { content: none; }
+.form.rows .field.changed > .setting-label::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+}
+
+/* текст в строке настройки (скилл): подпись и подсказка сверху, редактор на всю
+   ширину ниже — в правой колонке в двести точек код не читается */
+.form.rows > .field.setting:has(textarea.code) { grid-template-columns: minmax(0, 1fr); align-items: start; }
+.form.rows > .field.setting:has(textarea.code) > .setting-control { grid-column: 1; grid-row: auto; justify-self: stretch; margin-top: 8px; }
+.setting-control textarea.code { width: 100%; max-width: 100%; margin-top: 0; }
+
+/* несколько вариантов чипами («Источники»): тот же рост, что у остальных
+   контролов строки, и по правому краю, как сегменты */
+.setting-control .field-chips { gap: 6px; justify-content: flex-end; }
+.setting-control .chip-choice { min-height: var(--control-h-row); padding: 0 11px; font-size: 12px; }
+
+/* окно «с … до …»: два поля времени в одной строке настройки, посередине
+   тире. Поле времени — браузерное: клавиатура на телефоне своя, формат
+   «02:00» не нужно помнить */
+.timespan { display: inline-flex; align-items: center; gap: 6px; }
+.setting-control .time-input {
+  width: 92px; max-width: 100%; height: var(--control-h-row); min-height: 0; padding: 0 6px;
+  font: 500 12px var(--font-mono); font-variant-numeric: tabular-nums; text-align: center;
+  border-radius: var(--control-radius); margin-top: 0;
+}
+@media (max-width: 720px) {
+  .timespan { width: 100%; }
+  .setting-control .time-input { flex: 1 1 0; width: auto; height: 36px; font-size: 16px; }
+}
+
+/* «Ещё N полей» внутри формы: редкие поля свёрнуты, но лежат в той же форме
+   и уходят вместе с ней. Раскладка строк та же, что у верхних */
+.more-fields { margin-top: 4px; border-top: 1px dashed var(--border); }
+.more-fields > summary {
+  list-style: none; cursor: pointer; padding: 9px 0; font-size: 12px; font-weight: 600;
+  color: var(--text-secondary); display: flex; align-items: center; gap: 8px;
+}
+.more-fields > summary::-webkit-details-marker { display: none; }
+.more-fields > summary::before { content: "›"; font-size: 17px; line-height: 1; color: var(--text-muted); width: 12px; text-align: center; transition: transform .15s; }
+.more-fields[open] > summary::before { transform: rotate(90deg); }
+.more-fields > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.form.rows .more-body > .field.setting {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; row-gap: 1px;
+  align-items: center; padding: 9px 0;
+}
+@media (max-width: 720px) {
+  .form.rows .more-body > .field.setting { grid-template-columns: minmax(0, 1fr); }
+  .form.rows .more-body > .field.setting.setting-switch { grid-template-columns: minmax(0, 1fr) auto; }
+}
+
+/* вариант переключателя, который сейчас выбрать нельзя: виден, но серый;
+   причину говорит строка рядом, а не подсказка при наведении */
+.field-segments .segment.disabled { opacity: .45; cursor: not-allowed; text-decoration: line-through; text-decoration-thickness: 1px; }
+
+/* «Опасное»: красная рамка вокруг карточки и красный заголовок. Стоит в самом
+   низу экрана сущности, и кнопка у строки — своя, видимая: разрушительное
+   здесь не прячется в «···», потому что карточка сама и есть предупреждение */
+.section.danger .section-heading { color: var(--alert); }
+.section.danger > .section-card {
+  border: 1px solid color-mix(in srgb, var(--alert) 45%, var(--border)); border-radius: 10px; padding: 2px 14px;
+}
+.section.danger .row { padding-left: 0; padding-right: 0; }
+
+/* кнопки в заголовке полки («Снять все с очереди») */
+.shelf-actions { margin-left: auto; display: inline-flex; gap: 8px; align-items: center; }
+@media (max-width: 720px) {
+  /* на телефоне заголовок полки не умещается в строку: название и число — одной
+     строкой, кнопка — под ними, а не склеенный в столбик моноширинный хвост */
+  .shelf-header { flex-wrap: wrap; row-gap: 6px; }
+  .shelf-header .count { flex: 1 1 100%; order: 3; line-height: 1.4; }
+  .shelf-actions { margin-left: auto; }
+}
+
+/* шапка сущности на телефоне: переключатель соседних сущностей не нужен —
+   назад ведёт «‹ Серверы», а в шапке остаётся одна кнопка и «···» */
+@media (max-width: 720px) {
+  #sec-entity .select { display: none; }
+  /* закреплённая строка на телефоне в одну линию: плитка, имя, кнопка, «···».
+     Факты (адрес, связь, уровень) — на «Обзоре» и «Самостоятельности», а
+     закреплённая строка едет за пальцем и не должна съедать пол-экрана */
+  #sec-entity .row { padding: 8px 4px; gap: 10px; align-items: center; }
+  #sec-entity .row .avatar { width: 34px; height: 34px; font-size: 14px; margin-right: 0; }
+  #sec-entity .row .body { flex: 1 1 0; }
+  #sec-entity .row .caption { display: none; }
+  #sec-entity .row .right-side { width: auto; margin-left: auto; justify-content: flex-end; }
+  /* одна капсула: две съедали имя до «y…», а вторая («зеркало», «свой») — роль,
+     которую телефон и так называет на экране ниже */
+  #sec-entity .row .right-side .pill + .pill { display: none; }
+}
+
+/* «Тонкая настройка»: пунктирная рамка вместо карточки — это не главное
+   на экране, а то, что лежит под рукой на всякий случай */
+details.fold.fine { border: 1px dashed var(--border); border-radius: 10px; margin-bottom: 18px; }
+.fold.fine > .section-heading {
+  margin: 0; padding: 10px 14px; border-radius: 10px; font-size: 12px; font-weight: 600;
+  color: var(--text-secondary); flex-wrap: nowrap; min-width: 0; white-space: nowrap;
+}
+.fold.fine > .section-heading::after { display: none; }
+.fold.fine .fine-note {
+  font-weight: 500; color: var(--text-muted); min-width: 0; flex: 0 1 auto;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fold.fine .fine-state { margin-left: auto; flex: 0 0 auto; font-weight: 500; color: var(--text-muted); white-space: nowrap; }
+.fold.fine .fine-state.changed { color: var(--accent); font-weight: 600; }
+details.fragment.fine > .section-card { gap: 0; border-top: 1px dashed var(--border); padding: 4px 14px 8px; }
+details.fine .form.rows { border: 0; background: none; padding: 0; margin: 0 0 4px; }
+details.fine .form.rows h3 { margin-top: 14px; }
+details.fine .form.rows:first-child h3 { margin-top: 8px; }
+details.fine .form.rows > .field.setting { padding: 7px 0; }
+details.fine .setting-label { font-size: 12px; }
+
+@media (max-width: 720px) {
+  .form.rows > .field.setting { grid-template-columns: minmax(0, 1fr); }
+  .form.rows > .field.setting.setting-switch { grid-template-columns: minmax(0, 1fr) auto; }
+  .setting-control { grid-column: 1; grid-row: auto; justify-self: stretch; margin-top: 6px; justify-content: flex-start; }
+  .setting-switch > .setting-control { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; justify-self: end; justify-content: flex-end; }
+  .setting-control .field-segments { width: 100%; }
+  .setting-control .field-segments .segment { flex: 1 1 0; justify-content: center; text-align: center; }
+  .setting-control .field-chips { justify-content: flex-start; width: 100%; }
+  /* по два в ряд: «Серверы · Почта» и «Запросы · Модули», а не три и один */
+  .setting-control .chip-choice { min-height: 36px; flex: 1 1 calc(50% - 6px); justify-content: center; }
+  .setting-control input[type="text"], .setting-control input[type="password"], .setting-control select { width: 100%; }
+  .setting-control .secure-wrap { width: 100%; }
+  .setting-control .setting-number { height: 36px; font-size: 16px; }
+  .setting-control input[type="text"], .setting-control select { height: 36px; }
+  .to-default { min-height: 32px; min-width: 0; padding: 0 8px; }
+  /* нижняя полоса приложения сама держит безопасную зону, и полоса
+     сохранения над ней второй раз её не прибавляет: иначе между ними
+     оставался пустой зазор в высоту «чёлки» */
+  body:has(#tabbar) .save-bar { padding-bottom: 10px; }
+}

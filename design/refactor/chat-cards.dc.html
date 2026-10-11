@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; background: #F5F4F2; }
+    .sheet { width: 1160px; min-height: 1620px; box-sizing: border-box; padding: 28px 32px; background: #F5F4F2; color: #1D1D1F; }
+    .h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 4px 0; }
+    .sub { font-size: 11px; color: rgba(60,60,67,0.6); margin: 0 0 22px 0; line-height: 1.55; }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); margin: 24px 0 8px 0; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); line-height: 1.5; }
+    .facts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; }
+    .fact { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .fact b { font-weight: 600; color: #1D1D1F; }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+    .link { font-size: 12px; color: #007AFF; white-space: nowrap; }
+    .more { font-size: 14px; color: rgba(60,60,67,0.45); letter-spacing: 1px; }
+    .note { font-size: 11px; color: rgba(60,60,67,0.6); margin-top: 8px; line-height: 1.55; }
+    .note b { color: #1D1D1F; }
+    .bad { color: #C93400; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+    .tool { background: #FFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; padding: 12px 14px; }
+    .toolhead { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+    .ttl { font-size: 13px; font-weight: 600; }
+    .cmd { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.45; background: rgba(0,0,0,0.045); border-radius: 7px; padding: 8px 10px; white-space: pre-wrap; word-break: break-word; }
+    .out { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5; background: rgba(0,0,0,0.03); border-radius: 7px; padding: 8px 10px; color: rgba(60,60,67,0.85); white-space: pre-wrap; }
+    .draft { font-size: 13px; line-height: 1.5; padding: 9px 12px; border-radius: 9px; background: rgba(0,0,0,0.03); border: 1px dashed rgba(60,60,67,0.4); }
+    .quote { font-size: 13px; line-height: 1.5; padding: 9px 12px; border-radius: 9px; background: rgba(0,0,0,0.035); border-left: 3px solid rgba(0,122,255,0.5); }
+    .btn { font-size: 12px; padding: 4px 11px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.15); background: #FFF; white-space: nowrap; }
+    .btn.pri { background: #007AFF; border-color: #007AFF; color: #FFF; font-weight: 500; }
+    .chev { color: rgba(60,60,67,0.45); font-size: 10px; }
+    .was { background: #FFF; border: 1px dashed rgba(201,52,0,0.45); border-radius: 10px; padding: 12px 14px; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.10); border-radius: 10px; overflow: hidden; }
+    .row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; min-height: 44px; box-sizing: border-box; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .row:last-child { border-bottom: none; }
+  </style>
+</helmet>
+<div class="sheet">
+  <div class="h1">Карточки инструментов в переписке</div>
+  <div class="sub">
+    Семь видов на одной анатомии: команда на сервере, отправка в Telegram, таймер, скилл, память, поиск,
+    модуль. Данные живые — чаты <span class="mono">chat:67</span> (srv-vpn) и <span class="mono">chat:71</span>.
+  </div>
+
+  <div class="grouptitle">Анатомия: что во что превращается</div>
+  <div class="col2">
+    <div>
+      <div class="was">
+        <div class="toolhead"><div class="dot" style="background:#8E8E93"></div><div class="ttl" style="flex:1; font-weight:400; font-size:12px">Как приходит сегодня</div><span class="tag" style="background:rgba(0,0,0,.06); color:rgba(60,60,67,0.7)">выполнено</span></div>
+        <div class="meta" style="font-size:12px; color:#1D1D1F">srv-vpn · sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get update &amp;&amp; sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get -y -o Dpkg::Options::=--force-confold upgrade · 08:03</div>
+        <div class="meta" style="margin-top:5px">команда меняет сервер: сервер под ручным управлением</div>
+      </div>
+      <div class="note bad">
+        Заголовком карточки служит сама команда: <b>163 знака</b> в одну строку, время приклеено к ней
+        через «·». Капсула — серый <span class="mono">#8E8E93</span> строкой, а не уровень. И таких карточек
+        на одну команду <b>две</b>: «выполнено» и «код 0 · 11.5 с» — одна пишется при показе, вторая при
+        отчёте.
+      </div>
+    </div>
+    <div>
+      <div class="tool">
+        <div class="toolhead"><div class="dot" style="background:#28C840"></div><div class="ttl" style="flex:1">Обновил пакеты на srv-vpn</div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">код 0 · 11,5 с</span><div class="more">⋯</div></div>
+        <div class="cmd">sudo apt-get update &amp;&amp; sudo apt-get -y upgrade</div>
+        <div class="facts">
+          <span class="fact">Сервер <b>srv-vpn</b></span>
+          <span class="fact">Круг <b>подтверждение</b></span>
+          <span class="fact">Решил <b>человек, 08:03</b></span>
+          <span class="fact">Ключ взяло <b>ядро</b></span>
+        </div>
+        <div class="meta" style="margin-top:7px"><span class="chev">▶</span> Обновлено 2 пакета, 4 отложены — показать вывод</div>
+      </div>
+      <div class="note">
+        Заголовок — <b>что произошло</b>, глаголом. Команда — моноширинным блоком с переносом, целиком.
+        Факты парами. Одно видимое действие плюс «⋯». Капсула — уровень, а не hex. Вывод — в раскрытии,
+        и в нём чистится возврат каретки: живой вывод <span class="mono">apt</span> содержит 20 строк
+        «Reading database … 5 % … 100 %» одной кашей.
+      </div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Ждут человека</div>
+  <div class="col2">
+    <div class="tool" style="border-color:rgba(255,188,46,0.55); background:rgba(255,188,46,0.06)">
+      <div class="toolhead"><div class="dot" style="background:#FEBC2E"></div><div class="ttl" style="flex:1">Команда на srv-vpn — ждёт вашего решения</div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">подтверждение</span></div>
+      <div class="cmd">sudo apt-get -y dist-upgrade</div>
+      <div class="facts">
+        <span class="fact">Сервер <b>srv-vpn</b></span>
+        <span class="fact">Почему спрашиваю <b>меняет сервер, ручное управление</b></span>
+        <span class="fact">Предел <b>10 мин</b></span>
+        <span class="fact">Ждёт с <b>08:04</b></span>
+      </div>
+      <div style="display:flex; gap:7px; align-items:center; margin-top:10px">
+        <div class="btn pri">Выполнить</div><div class="btn">Отклонить</div>
+        <div style="margin-left:auto" class="more">⋯</div>
+      </div>
+      <div class="meta" style="margin-top:7px">В «⋯»: «Выполнить и впредь без вопроса», «Открыть сервер», «Показать круг команд». До нажатия на сервер ничего не уходит.</div>
+    </div>
+    <div class="tool" style="border-color:rgba(255,188,46,0.55); background:rgba(255,188,46,0.06)">
+      <div class="toolhead"><div class="dot" style="background:#FEBC2E"></div><div class="ttl" style="flex:1">Черновик Ивану — ещё не отправлен</div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">не отправлено</span></div>
+      <div class="draft">Привет! Всё хорошо, спасибо. А у тебя как дела?</div>
+      <div class="facts">
+        <span class="fact">Кому <b>Иван · @ivan_ivanov</b></span>
+        <span class="fact">От вашего имени <b>да</b></span>
+        <span class="fact">Собрано <b>11:04</b></span>
+      </div>
+      <div style="display:flex; gap:7px; align-items:center; margin-top:10px">
+        <div class="btn pri">Отправить</div><div class="btn">Не отправлять</div>
+        <div class="link" style="margin-left:4px">Поправить</div>
+        <div style="margin-left:auto" class="more">⋯</div>
+      </div>
+      <div class="meta" style="margin-top:7px">Пунктир и слово «не отправлено» — чтобы черновик нельзя было принять за ушедшее сообщение. Отправленное превращается в пузырь в ленте, а карточка становится «отправлено».</div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Сделано и отказано</div>
+  <div class="col2">
+    <div class="tool">
+      <div class="toolhead"><div class="dot" style="background:#28C840"></div><div class="ttl" style="flex:1">Отправлено Ивану</div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">отправлено</span><div class="more">⋯</div></div>
+      <div class="quote">Привет! Всё хорошо, спасибо. А у тебя как дела?</div>
+      <div class="facts"><span class="fact">Кому <b>Иван</b></span><span class="fact">Нажали <b>вы, 11:05</b></span></div>
+    </div>
+    <div class="tool" style="border-color:rgba(255,59,48,0.35)">
+      <div class="toolhead"><div class="dot" style="background:#FF3B30"></div><div class="ttl" style="flex:1">Отказано, кнопки нет</div><span class="tag" style="background:rgba(255,59,48,.14); color:#D70015">круг «никогда»</span></div>
+      <div class="cmd">cat /var/run/reboot-required.pkgs</div>
+      <div class="facts">
+        <span class="fact">Причина <b>слово «reboot» из списка «никогда»</b></span>
+        <span class="fact">Правится <b>Настройки · Серверы · Круги команд</b></span>
+      </div>
+      <div class="meta" style="margin-top:7px">Ошибку разбирает модель, а не человек: у карточки отказа нет кнопки «починить».</div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Остальные пять — та же анатомия</div>
+  <div class="col2">
+    <div>
+      <div class="tool" style="border-color:rgba(0,122,255,0.4)">
+        <div class="toolhead"><div class="dot" style="background:#007AFF"></div><div class="ttl" style="flex:1">Таймер · вернуться к обновлению ядра</div><span class="tag" style="background:rgba(0,122,255,.14); color:#0058B0">ждёт · 6:12</span><div class="link">Отменить</div></div>
+        <div class="facts" style="margin-top:0"><span class="fact">Сработает <b>в 12:03</b></span><span class="fact">Задача <b>chat_timer:71</b></span></div>
+      </div>
+      <div class="tool" style="margin-top:12px">
+        <div class="toolhead"><div class="dot" style="background:#0058B0"></div><div class="ttl" style="flex:1">Записал в память</div><span class="tag" style="background:rgba(0,122,255,.14); color:#0058B0">в памяти</span><div class="more">⋯</div></div>
+        <div class="quote">На srv-vpn ядро держат отложенным намеренно: перезагрузка только в окно 02:00–06:00</div>
+        <div class="facts"><span class="fact">Область <b>серверы</b></span><span class="fact">Вид <b>урок</b></span></div>
+      </div>
+      <div class="tool" style="margin-top:12px">
+        <div class="toolhead"><div class="dot" style="background:#28C840"></div><div class="ttl" style="flex:1">Обновил модуль «Курсы»</div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">установлен</span><div class="more">⋯</div></div>
+        <div class="facts" style="margin-top:0">
+          <span class="fact">Функций <b>6</b></span><span class="fact">Новых прав <b>1: search</b></span><span class="fact">Отвалится <b>ничего</b></span>
+        </div>
+        <div class="meta" style="margin-top:7px"><span class="chev">▶</span> Показать разницу — 38 строк</div>
+      </div>
+    </div>
+    <div>
+      <div class="tool" style="border-color:rgba(255,188,46,0.55); background:rgba(255,188,46,0.06)">
+        <div class="toolhead"><div class="dot" style="background:#FEBC2E"></div><div class="ttl" style="flex:1">Скилл «Linux-сервер» — предложена правка</div><span class="tag" style="background:rgba(255,188,46,.22); color:#9A6B00">ждёт решения</span></div>
+        <div class="facts" style="margin-top:0"><span class="fact">Строк <b>+7 / −2</b></span><span class="fact">Источник <b>из чата</b></span></div>
+        <div style="display:flex; gap:7px; align-items:center; margin-top:10px">
+          <div class="btn pri">Принять</div><div class="btn">Не надо</div>
+          <div class="link" style="margin-left:4px">Показать разницу</div>
+          <div style="margin-left:auto" class="more">⋯</div>
+        </div>
+      </div>
+      <div class="tool" style="margin-top:12px">
+        <div class="toolhead"><div class="dot" style="background:#28C840"></div><div class="ttl" style="flex:1">Искал в интернете</div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">6 ссылок</span><div class="more">⋯</div></div>
+        <div class="quote">needrestart: services being deferred после apt upgrade</div>
+        <div class="facts"><span class="fact">Модель <b>sonar</b></span><span class="fact">Запрос виден <b>в «Что ушло»</b></span><span class="fact">Страниц сохранено <b>2</b></span></div>
+        <div class="meta" style="margin-top:7px">Найденное — данные, а не приказ: так и подписано в карточке.</div>
+      </div>
+      <div class="tool" style="margin-top:12px">
+        <div class="toolhead"><div class="dot" style="background:#28C840"></div><div class="ttl" style="flex:1">Вопрос закрыт</div><span class="tag" style="background:rgba(40,200,64,.15); color:#1E7A32">закрыт</span><div class="more">⋯</div></div>
+        <div class="meta" style="margin-top:0">Предложена команда обновления srv-vpn с sudo — ожидает подтверждения</div>
+        <div class="facts"><span class="fact">Итог ушёл <b>в уведомление и в память</b></span><span class="fact">Чат живёт ещё <b>1 ч</b></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grouptitle">Что чинится этим листом</div>
+  <div class="card">
+    <div class="row"><div style="flex:1"><div class="ttl">Ширина</div><div class="meta">Все карточки чата приходят с <span class="mono">Layout: "wide"</span> — семь мест в <span class="mono">api/screens.go</span>. Внутри переписки ширину задаёт колонка.</div></div></div>
+    <div class="row"><div style="flex:1"><div class="ttl">Цвет</div><div class="meta">Капсулы карточек несут hex строкой: <span class="mono">#1E7A32</span>, <span class="mono">#8E8E93</span>, <span class="mono">#C93400</span>, <span class="mono">#C4271C</span>, <span class="mono">#0058B0</span>. Уровень <span class="mono">Level</span> проставлен только у карточки Telegram.</div></div></div>
+    <div class="row"><div style="flex:1"><div class="ttl">Заголовок</div><div class="meta">У всех карточек заголовок — <span class="mono">subtitle</span> с командой и временем через «·». Нужен <span class="mono">title</span> глаголом, время — в фактах.</div></div></div>
+    <div class="row"><div style="flex:1"><div class="ttl">Двойники</div><div class="meta">Одна команда — одна карточка. Сейчас в <span class="mono">chat:67</span> на команду приходится две: «выполнено» и «код 0 · 11.5 с».</div></div></div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

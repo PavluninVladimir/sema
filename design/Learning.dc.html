@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: #007AFF; } a:hover { color: #0063CC; }
+    .win { width: 1200px; height: 1180px; display: flex; background: #FFFFFF; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); }
+    .sidebar { width: 220px; flex-shrink: 0; background: #EFEDEA; border-right: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; padding: 12px; box-sizing: border-box; }
+    .traffic { display: flex; gap: 8px; padding: 6px 8px 18px 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 6px; }
+    .navitem { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 9px; border-radius: 6px; font-size: 13px; color: #1D1D1F; }
+    .navitem svg { flex-shrink: 0; }
+    .badge-count { margin-left: auto; font-size: 11px; font-weight: 600; color: rgba(60,60,67,0.6); }
+    .subitem { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 9px 0 34px; border-radius: 6px; font-size: 12px; color: rgba(60,60,67,0.85); }
+    .subitem .badge-count { font-size: 10px; }
+    .card { background: #FFFFFF; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; }
+    .setrow { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .setrow:last-child { border-bottom: none; }
+    .radio { width: 16px; height: 16px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.25); flex-shrink: 0; box-sizing: border-box; }
+    .radio-on { border: 5px solid #007AFF; background: #FFFFFF; }
+    .meta { font-size: 11px; color: rgba(60,60,67,0.6); }
+    .tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 8px; }
+    .box { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 8px; }
+    .pick { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 12px; color: #1D1D1F; flex-shrink: 0; }
+    .sw { width: 34px; height: 20px; border-radius: 10px; position: relative; flex-shrink: 0; }
+    .sw-on { background: #28C840; }
+    .sw-off { background: rgba(0,0,0,0.16); }
+    .knob { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    .grouptitle { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 4px 6px 4px; }
+  </style>
+</helmet>
+<div class="win">
+  <div class="sidebar">
+    <div class="traffic">
+      <div class="dot" style="background: #FF5F57"></div>
+      <div class="dot" style="background: #FEBC2E"></div>
+      <div class="dot" style="background: #28C840"></div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(60,60,67,0.6); padding: 0 9px 6px 9px">Сёма</div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 9.5h3l1 2h5l1-2h3"/><path d="M2.5 3.5h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/></svg>
+        Почта
+        <span class="badge-count" style="color: #D70015">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px"></span>
+        Все ящики
+        <span class="badge-count">61</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #D93025; flex-shrink: 0"></span>
+        owner@example.org
+        <span class="badge-count">38</span>
+      </div>
+      <div class="subitem"><span style="width: 7px; height: 7px; border-radius: 4px; background: #FC3F1D; flex-shrink: 0"></span>
+        me@example.com
+        <span class="badge-count">23</span>
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.5h5l3.5 3.5v9a1 1 0 0 1-1 1h-7.5a1 1 0 0 1-1-1v-11.5a1 1 0 0 1 1-1z"/><path d="M9 1.5V5h3.5"/></svg>
+        Файлы
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5h12v7.5h-6.5L4.5 14v-3H2v-7.5z"/></svg>
+        Чаты
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.5 1.8"/></svg>
+        Задачи
+      </div>
+      <div class="navitem">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4.5L2.5 8l3 3.5"/><path d="M10.5 4.5L13.5 8l-3 3.5"/></svg>
+        Скрипты
+      </div>
+      <div class="navitem" style="background: rgba(0,0,0,0.07); font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#007AFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.9M8 12.3v1.9M1.8 8h1.9M12.3 8h1.9M3.6 3.6l1.4 1.4M11 11l1.4 1.4M12.4 3.6L11 5M5 11l-1.4 1.4"/></svg>
+        Настройки
+      </div>
+    </div>
+    <div style="margin-top: auto; padding: 9px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(60,60,67,0.6)">
+        <span style="width: 7px; height: 7px; border-radius: 4px; background: #28C840; flex-shrink: 0"></span>
+        Проверено в 10:46
+      </div>
+      <div style="font-size: 11px; color: rgba(60,60,67,0.6)">qwen3-4b · локально</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; background: #F7F6F4; overflow: hidden; display: flex; justify-content: center">
+    <div style="width: 820px; display: flex; flex-direction: column; gap: 20px; padding: 28px 0">
+      <div style="display: flex; align-items: flex-start; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 8px"><div style="font-size: 20px; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em">Развитие</div><span class="tag" style="background: rgba(255,149,0,0.18); color: #B25000">2 ждут решения</span></div>
+          <span class="meta">Чему Сёма научился сам. Ничего не попадает в работу без вашего согласия: черновик лежит здесь, пока вы не нажмёте.</span>
+        </div>
+        <div style="margin-left: auto"><div style="display: flex; height: 26px; border-radius: 7px; background: rgba(0,0,0,0.05); padding: 2px"><span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">сутки</span><span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F; font-weight: 500; background: #FFFFFF; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.12)">неделя</span><span style="display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: #1D1D1F">месяц</span></div></div>
+      </div>
+
+      <div style="display: flex; gap: 10px">
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">Ждут решения</span>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F">2</div>
+          <span class="meta">новый скилл и правка</span>
+        </div>
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">Принято за неделю</span>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F">3</div>
+          <span class="meta">2 правки, 1 новый</span>
+        </div>
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">Отклонено</span>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F">4</div>
+          <span class="meta">такое больше не предложит</span>
+        </div>
+        <div class="card" style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+          <span class="meta" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px">Уроков в памяти</span>
+          <div style="font-size: 20px; font-weight: 700; color: #1D1D1F">11</div>
+          <span class="meta">из закрытых вопросов</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Ждут вашего решения</div>
+        <div class="card">
+          <div class="setrow" style="align-items: flex-start">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #FF9500; margin-top: 6px; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Скилл «Обновление Debian»</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">новый</span><span class="tag" style="background: rgba(0,88,176,0.14); color: #0058B0">из опыта</span></div>
+              <span class="meta">родился из чата «srv-bots · обновление» · 6 шагов, 4 команды, 2 ошибки по дороге, 38 минут</span>
+              <div style="background: #F7F6F4; border: 1px solid rgba(0,0,0,0.07); border-radius: 8px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.6; color: #1D1D1F; white-space: pre-wrap"><span style="color: #1E7A32">+ Сначала apt-get update: без него apt upgrade даёт 404 на старом индексе.</span>
+<span style="color: #1E7A32">+ Ставить DEBIAN_FRONTEND=noninteractive, иначе апгрейд встаёт на вопросе и выходит с кодом 100.</span>
+<span style="color: #1E7A32">+ Занятый dpkg lock — не ошибка: подождать и повторить, а не ломать замок.</span>
+<span style="color: #1E7A32">+ После обновления проверить /var/run/reboot-required и спросить человека.</span></div>
+              <div style="display: flex; gap: 8px; align-items: center"><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #007AFF; color: #FFFFFF; font-size: 12px; font-weight: 600">Принять</div><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 12px">Открыть и поправить</div><a href="#" style="font-size: 12px; color: #007AFF">Отклонить</a><a href="#" style="font-size: 12px; color: rgba(60,60,67,0.6)">Открыть чат</a></div>
+            </div>
+          </div>
+          <div class="setrow" style="align-items: flex-start">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #FF9500; margin-top: 6px; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Скилл «MikroTik RouterOS»</span><span class="tag" style="background: rgba(255,149,0,0.18); color: #B25000">правка</span><span class="tag" style="background: rgba(0,88,176,0.14); color: #0058B0">из ошибки</span></div>
+              <span class="meta">работа шла по скиллу и сорвалась: команда Linux ушла на RouterOS</span>
+              <div style="background: #F7F6F4; border: 1px solid rgba(0,0,0,0.07); border-radius: 8px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.6; color: #1D1D1F; white-space: pre-wrap"><span style="color: #1E7A32">+ На RouterOS нет uname и systemctl: род сервера виден в справочнике, команды только /system, /interface, /log.</span>
+<span style="color: #C4271C">− Проверить службы: systemctl status</span></div>
+              <div style="display: flex; gap: 8px; align-items: center"><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #007AFF; color: #FFFFFF; font-size: 12px; font-weight: 600">Принять</div><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 12px">Открыть и поправить</div><a href="#" style="font-size: 12px; color: #007AFF">Отклонить</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="meta" style="padding: 8px 4px 0 4px">Судья на другой модели посмотрел оба черновика и не возражает. Его мнение — совет, решение за вами.</div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Польза скиллов · неделя</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Linux-сервер</span><span class="tag" style="background: rgba(40,200,64,0.15); color: #1E7A32">помогает</span></div>
+              <span class="meta">подмешивался 34 раза · 31 работа закончилась удачно · предотвратил 5 ошибок</span>
+            </div>
+            <div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden; flex-shrink: 0"><div style="width: 91%; height: 100%; background: #28C840"></div></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">MikroTik RouterOS</span><span class="tag" style="background: rgba(255,188,46,0.22); color: #9A6B00">спорно</span></div>
+              <span class="meta">подмешивался 9 раз · 5 работ удачно · 3 ошибки после него</span>
+            </div>
+            <div style="width: 140px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06); overflow: hidden; flex-shrink: 0"><div style="width: 55%; height: 100%; background: #FEBC2E"></div></div>
+          </div>
+          <div class="setrow" style="align-items: flex-start">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Чеки и счета</span><span class="tag" style="background: rgba(215,0,21,0.13); color: #C4271C">не помогает</span></div>
+              <span class="meta">подмешивался 12 раз · ни одна работа не стала лучше · Сёма предлагает выключить</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0"><div style="display: flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 6px; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.15); font-size: 12px">Выключить</div><a href="#" style="font-size: 12px; color: #007AFF">Оставить</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Выучено за неделю</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #28C840; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; color: #1D1D1F">Урок: «apt upgrade без обновления индекса даёт 404»</span>
+              <span class="meta">из закрытого вопроса «srv-bots · обновление» · связан со скиллом «Linux-сервер» · 2 сентября</span>
+            </div>
+          </div>
+          <div class="setrow">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #28C840; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; color: #1D1D1F">Правка скилла «Linux-сервер»: ждать dpkg lock, а не ломать</span>
+              <span class="meta">принято вами 3 сентября · с тех пор 6 работ без этой ошибки</span>
+            </div>
+          </div>
+          <div class="setrow">
+            <div style="width: 8px; height: 8px; border-radius: 4px; background: #8E8E93; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; color: rgba(60,60,67,0.85)">Отклонено: «всегда перезагружать сервер после обновления»</span>
+              <span class="meta">отклонено вами 3 сентября · такое Сёма больше не предложит</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="grouptitle">Пределы</div>
+        <div class="card">
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Учиться из законченных работ</span>
+              <span class="meta">черновик рождается только после удачного и непростого дела</span>
+            </div>
+            <div class="sw sw-on"><div class="knob" style="right: 2px"></div></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Не больше предложений в сутки</span>
+              <span class="meta">чтобы карточки не сыпались</span>
+            </div>
+            <div class="pick">3<svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="rgba(60,60,67,0.5)" stroke-width="1.4" stroke-linecap="round"><path d="M2 4l3 3 3-3"/></svg></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Порог «работа была непростой»</span>
+              <span class="meta">шаги, команды, ошибки по дороге и время складываются в очки</span>
+            </div>
+            <div class="pick">5 очков<svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="rgba(60,60,67,0.5)" stroke-width="1.4" stroke-linecap="round"><path d="M2 4l3 3 3-3"/></svg></div>
+          </div>
+          <div class="setrow">
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 13px; font-weight: 600; color: #1D1D1F">Спрашивать судью на другой модели</span>
+              <span class="meta">советует принять или нет; решение всё равно ваше</span>
+            </div>
+            <div class="sw sw-off"><div class="knob" style="left: 2px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

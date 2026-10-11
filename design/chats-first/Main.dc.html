@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif; }
+    a { color: #1F4FD8; } a:hover { color: #173FA8; }
+    .счёт { font: 600 11px/1 "IBM Plex Mono", ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; color: #585B64; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; height: 900px; background: #FBFAF7; color: #17181C; overflow: hidden">
+
+  <!-- рельс меню -->
+  <div style="width: 244px; flex: 0 0 244px; background: #F4F2EC; border-right: 1px solid #E3E0D8; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px">
+
+    <div style="font-size: 11px; color: #686B74; padding: 6px 8px 4px; letter-spacing: 0.02em">Переписка</div>
+
+    <!-- Чаты — первый и активный -->
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(24, 20, 12, 0.07); font-weight: 600; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9.5a2 2 0 0 1-2 2H5.5L2 14V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/></svg>
+      <span>Чаты</span>
+      <span class="счёт" style="margin-left: auto">2</span>
+    </div>
+
+    <!-- разговоры под пунктом -->
+    <div style="display: flex; flex-direction: column; gap: 1px; margin: 2px 0 2px 0">
+      <div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 30px; border-radius: 8px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(24, 20, 12, 0.07); font-size: 13px; font-weight: 600">
+        <span>Сёма · Иван</span>
+        <span class="счёт" style="margin-left: auto">2</span>
+      </div>
+      <div style="padding: 6px 8px 6px 30px; font-size: 13px; color: #17181C; border-radius: 8px">Telegram · Мила</div>
+      <div style="padding: 6px 8px 6px 30px; font-size: 13px; color: #17181C; border-radius: 8px">Telegram · Анна</div>
+      <div style="padding: 6px 8px 6px 30px; font-size: 13px; color: #17181C; border-radius: 8px">Технический форум</div>
+      <div style="padding: 6px 8px 6px 30px; font-size: 13px; color: #17181C; border-radius: 8px">MAX · Соседи</div>
+      <div style="display: flex; align-items: center; gap: 6px; padding: 6px 8px 6px 18px; font-size: 13px; color: #17181C; border-radius: 8px">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#686B74" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(90deg)"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Поставки</span>
+      </div>
+      <div style="padding: 5px 8px 5px 42px; font-size: 13px; color: #585B64; border-radius: 8px">General</div>
+    </div>
+
+    <div style="height: 1px; background: #E3E0D8; margin: 8px 4px"></div>
+
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5 8 9l6-3.5"/><rect x="2" y="3" width="12" height="10" rx="1.6"/></svg>
+      <span>Почта</span>
+      <span class="счёт" style="margin-left: auto">4</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.5H4.5A1.5 1.5 0 0 0 3 3v10a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 13 13V5.5z"/><path d="M9 1.5V5.5H13"/></svg>
+      <span>Файлы</span>
+    </div>
+
+    <div style="font-size: 11px; color: #686B74; padding: 12px 8px 4px">Сёма сам</div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>
+      <span>Задачи</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 5 2.5 8l3 3"/><path d="M10.5 5l3 3-3 3"/></svg>
+      <span>Скрипты</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 2.5h3v2a1.5 1.5 0 0 0 3 0V7h-2a1.5 1.5 0 0 0 0 3h2v3.5h-3.5a1.5 1.5 0 0 0-3 0H2.5V10h2a1.5 1.5 0 0 0 0-3h-2V2.5z"/></svg>
+      <span>Модули</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5a2 2 0 0 0-2 2 2 2 0 0 0-1.5 3.4A2 2 0 0 0 6 11.5a2 2 0 0 0 4 0 2 2 0 0 0 1.5-3.6A2 2 0 0 0 10 4.5a2 2 0 0 0-2-2z"/><path d="M8 2.5v11"/></svg>
+      <span>Память</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8h3l2-4 3 8 2-4h3"/></svg>
+      <span>Здоровье</span>
+      <span style="margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: #9C6100"></span>
+    </div>
+
+    <div style="height: 1px; background: #E3E0D8; margin: 8px 4px"></div>
+    <div style="display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; font-size: 13px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#17181C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.6M8 12.6v1.6M14.2 8h-1.6M3.4 8H1.8M12.4 3.6l-1.1 1.1M4.7 11.3l-1.1 1.1M12.4 12.4l-1.1-1.1M4.7 4.7 3.6 3.6"/></svg>
+      <span>Настройки</span>
+    </div>
+  </div>
+
+  <!-- разговор -->
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+
+    <div style="padding: 18px 24px 14px; border-bottom: 1px solid #EFECE4; background: #FBFAF7">
+      <div style="max-width: 760px; margin: 0 auto; display: flex; align-items: flex-start; gap: 12px">
+        <div style="min-width: 0">
+          <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Сёма · Иван</div>
+          <div style="font-size: 11px; color: #686B74; margin-top: 3px">ваш разговор с Сёмой · сюда приходит всё, что ждёт решения</div>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+          <button class="действие" style="font: 600 13px/1 inherit; height: 32px; padding: 0 13px; border-radius: 8px; border: 1px solid #E3E0D8; background: #FFFFFF; color: #17181C; cursor: pointer">Новый чат</button>
+          <div style="width: 28px; height: 28px; border-radius: 8px; border: 1px solid #E3E0D8; background: #FFFFFF; display: flex; align-items: center; justify-content: center">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="#585B64"><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="11" cy="7" r="1.2"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- лента -->
+    <div style="flex: 1; overflow: hidden; padding: 20px 24px 8px">
+      <div style="max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px">
+
+        <!-- свёрнутые ok -->
+        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #EFECE4; border-radius: 12px; background: #FFFFFF">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#686B74" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #2E7D4F"></span>
+          <span style="font-size: 13px; color: #585B64">Ночная смена: четыре сервера, делать было нечего</span>
+          <span style="margin-left: auto; font-size: 11px; color: #686B74">02:01</span>
+        </div>
+
+        <!-- карточка warn: серверы -->
+        <div style="display: flex; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(24, 20, 12, 0.07); overflow: hidden">
+          <div style="width: 3px; background: #9C6100; flex: 0 0 3px"></div>
+          <div style="flex: 1; padding: 12px 14px; min-width: 0">
+            <div style="display: flex; align-items: baseline; gap: 8px">
+              <div style="font-size: 13px; font-weight: 600">Требует внимания: srv-vpn, Microtik</div>
+              <div style="margin-left: auto; font-size: 11px; color: #686B74; white-space: nowrap">модуль watch · 07:27</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 10px">
+              <div style="display: flex; gap: 10px; font-size: 13px">
+                <span style="flex: 0 0 96px; font-size: 11px; color: #686B74; padding-top: 2px">srv-vpn</span>
+                <span style="color: #17181C">ошибка в журнале: systemd-networkd-wait-online</span>
+              </div>
+              <div style="display: flex; gap: 10px; font-size: 13px">
+                <span style="flex: 0 0 96px; font-size: 11px; color: #686B74; padding-top: 2px">Microtik</span>
+                <span style="color: #17181C">доступна RouterOS 7.24.3 — установлена 7.24.2</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px">
+              <button style="font: 600 13px/1 inherit; height: 28px; padding: 0 12px; border-radius: 8px; border: 1px solid #1F4FD8; background: #1F4FD8; color: #FFFFFF; cursor: pointer">Разобраться</button>
+              <div style="width: 28px; height: 28px; border-radius: 8px; border: 1px solid #E3E0D8; background: #FFFFFF; display: flex; align-items: center; justify-content: center">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="#585B64"><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="11" cy="7" r="1.2"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- реплика Сёмы -->
+        <div style="display: flex">
+          <div style="max-width: 72%; background: #EFEDE6; border-radius: 12px; padding: 10px 14px; font-size: 13px; line-height: 1.5; color: #17181C">
+            Утренняя сводка: 9 чеков, часть в спаме. Реклама — 17 писем, не показываю.
+          </div>
+        </div>
+
+        <!-- карточка warn: чек -->
+        <div style="display: flex; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(24, 20, 12, 0.07); overflow: hidden">
+          <div style="width: 3px; background: #9C6100; flex: 0 0 3px"></div>
+          <div style="flex: 1; padding: 12px 14px; min-width: 0">
+            <div style="display: flex; align-items: baseline; gap: 8px">
+              <div style="font-size: 13px; font-weight: 600">Чек в спаме — 2 140,50 ₽</div>
+              <div style="margin-left: auto; font-size: 11px; color: #686B74; white-space: nowrap">почта · 04:17</div>
+            </div>
+            <div style="font-size: 11px; color: #686B74; margin-top: 6px">«Горэнерго» · noreply@ofd.example</div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px">
+              <button style="font: 600 13px/1 inherit; height: 28px; padding: 0 12px; border-radius: 8px; border: 1px solid #1F4FD8; background: #1F4FD8; color: #FFFFFF; cursor: pointer">Открыть письмо</button>
+              <div style="width: 28px; height: 28px; border-radius: 8px; border: 1px solid #E3E0D8; background: #FFFFFF; display: flex; align-items: center; justify-content: center">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="#585B64"><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="11" cy="7" r="1.2"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- своя реплика -->
+        <div style="display: flex; justify-content: flex-end">
+          <div style="max-width: 72%; background: #E8EDFC; border-radius: 12px; padding: 10px 14px; font-size: 13px; line-height: 1.5; color: #17181C">
+            открой письмо
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- поле ввода -->
+    <div style="padding: 10px 24px 20px; background: #FBFAF7">
+      <div style="max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 8px; border: 1px solid #E3E0D8; border-radius: 12px; background: #FFFFFF; padding: 8px 10px; box-shadow: 0 1px 2px rgba(24, 20, 12, 0.07)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#686B74" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 8 8 12.5a2.5 2.5 0 0 1-3.5-3.5l5-5a1.8 1.8 0 0 1 2.5 2.5l-5 5"/></svg>
+        <span style="flex: 1; font-size: 13px; color: #686B74">Напишите Сёме…</span>
+        <div style="width: 28px; height: 28px; border-radius: 8px; background: #1F4FD8; display: flex; align-items: center; justify-content: center">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 12V3.5"/><path d="M4 7l3.5-3.5L11 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

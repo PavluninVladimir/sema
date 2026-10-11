@@ -1,0 +1,1 @@
+токены взяты из server/internal/web/static/style.css
