@@ -426,6 +426,13 @@ func (s *Server) buildAgentsSection(doc *Document, tab string) error {
 		Fields: []Field{s.settingField("agents.listen", "listen", "Адрес", hint, "")},
 		Submit: &Action{Action: "set_agent_listen", Label: "Сохранить"}})
 
+	// когда говорить о пропаже — тоже «Тонкая настройка»: шлюз
+	// переподключается за секунду, и пуш на каждый обрыв будил зря
+	add(Component{Type: "form", ID: "agent-off-notify", Title: "Пропажа агента", Tier: tierRare, Style: formRows,
+		Fields: []Field{s.settingField(engine.AgentOffNotifyKey, "off_notify", "Сказать, если агента нет дольше",
+			"Агент обычно перезванивает за секунды, и такой обрыв вас не тревожит. 0 — говорить сразу о каждом", "с")},
+		Submit: &Action{Action: "set_agent_off_notify", Label: "Сохранить"}})
+
 	// журнал — хроника, а не настройка: последним и по раскрытию
 	add(Component{Type: "section", ID: agentsLogPart, Title: "Журнал агентов", Caption: "о чём спрашивали, кто входил и что разрешали — по всем агентам",
 		Tier: tierTail, Collapsed: true, Lazy: agentsLogPart})

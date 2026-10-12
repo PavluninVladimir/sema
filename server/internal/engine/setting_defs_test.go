@@ -141,6 +141,7 @@ func TestEveryRegisteredSettingIsReadByEngineWithItsDefault(t *testing.T) {
 		"learn.max_per_day":       func() string { return strconv.Itoa(e.LearnMaxPerDay()) },
 		"learn.min_score":         func() string { return strconv.Itoa(e.LearnMinScore()) },
 		"agents.listen":           func() string { return e.AgentListen() },
+		"agents.off_notify_s":     func() string { return strconv.Itoa(int(e.agentOffWait() / time.Second)) },
 		"agents.gateway":          func() string { return e.GatewayAddr() },
 		"agents.gateway_upstream": func() string { return st.Setting("agents.gateway_upstream", "") },
 		SettingsLogKeepKey:        func() string { return strconv.Itoa(e.SettingsLogKeepDays()) },

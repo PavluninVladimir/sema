@@ -26,12 +26,20 @@ func (e *Engine) scanAllAccounts(ctx context.Context) int {
 	defer func() { e.workers.end(WorkerAttachments, "") }()
 	total := 0
 	for _, acct := range e.Accounts() {
+		// Сначала база, потом ящик: задача ходит раз в 15 секунд, и вход
+		// ради «разбирать нечего» — пять тысяч входов в сутки на ящик.
+		// Яндекс на такое отвечает отказами: 12 октября 2026 за 17 часов
+		// их было около восьмидесяти, и в журнале это выглядело бедой почты.
+		msgs, err := e.store.UnscannedMessages(acct.Name, 20)
+		if err != nil || len(msgs) == 0 {
+			continue
+		}
 		sess, err := e.dialAccount(acct)
 		if err != nil {
 			log.Printf("attachments dial %s: %v", acct.Name, err)
 			continue
 		}
-		total += e.scanAttachments(ctx, sess, acct.Name)
+		total += e.scanAttachments(ctx, sess, msgs)
 		sess.Close()
 	}
 	return total
@@ -39,11 +47,7 @@ func (e *Engine) scanAllAccounts(ctx context.Context) int {
 
 // scanAttachments разбирает порцию писем: скачивает вложения, извлекает
 // текст, распознаёт чеки и кладёт всё в локальную базу.
-func (e *Engine) scanAttachments(ctx context.Context, sess *mail.Session, account string) int {
-	msgs, err := e.store.UnscannedMessages(account, 20)
-	if err != nil || len(msgs) == 0 {
-		return 0
-	}
+func (e *Engine) scanAttachments(ctx context.Context, sess *mail.Session, msgs []*store.Message) int {
 	maxSize := int64(e.FilesMaxMB()) << 20
 	for _, m := range msgs {
 		prefer := []string{"INBOX"}

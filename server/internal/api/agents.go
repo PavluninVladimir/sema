@@ -88,6 +88,9 @@ func (s *Server) agentsActions(req actionRequest) (string, error) {
 		return stayOnAgents(req, agentsScreen), nil
 	case "set_agent_listen":
 		return stayOnAgents(req, agentsScreen), st.SetSetting("agents.listen", strings.TrimSpace(req.Params["listen"]))
+	case "set_agent_off_notify":
+		return stayOnAgents(req, agentsScreen), s.saveSettings(req,
+			settingParam{"off_notify", engine.AgentOffNotifyKey, "срок до уведомления о пропаже"})
 	case "set_gateway":
 		if err := st.SetSetting("agents.gateway", strings.TrimSpace(req.Params["gateway"])); err != nil {
 			return "", err

@@ -634,8 +634,8 @@ func TestSecretsAndAgentsSettingsNotLost(t *testing.T) {
 		"name", "role", "!invite_agent", "!drop_invite",
 		// способности и отзыв, отпечаток, «Забыть», «Проверить связь»
 		"!allow_agent", "!revoke_agent", "!accept_agent_fp", "!forget_agent", "!check_agent",
-		// где слушать и куда звонить шлюзу
-		"listen", "!set_agent_listen", "gateway", "upstream", "!set_gateway",
+		// где слушать, когда говорить о пропаже и куда звонить шлюзу
+		"listen", "!set_agent_listen", "off_notify", "!set_agent_off_notify", "gateway", "upstream", "!set_gateway",
 	})
 	// прежние действия живы под прежними именами: их зовут уведомления и старые клиенты
 	for _, act := range []string{"replace_secret", "dismiss_key", "copy_root_fp", "grant_pending_secret"} {
