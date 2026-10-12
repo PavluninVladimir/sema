@@ -40,6 +40,7 @@ func TestAgentNotificationsLeadToAgentScreen(t *testing.T) {
 		t.Fatal(err)
 	}
 	// «Агент пропал со связи» — на экран агента, а не в общий список
+	notifyAtOnce(t, st)
 	e.agentGone("мак", time.Minute)
 	if got := gotoOf(t, st, agentOffKey("мак")); got != "settings:agents@мак" {
 		t.Errorf("пропажа со связи ведёт на %q", got)

@@ -96,6 +96,7 @@ func TestAreaGrantedFolder(t *testing.T) {
 // агента, вторая пропажа заменяет первую.
 func TestDropLinkOneNotification(t *testing.T) {
 	e, st := newTestEngine(t, "модель", &fakeProvider{answer: "ладно"})
+	notifyAtOnce(t, st)
 	if err := st.SaveAgent(&store.Agent{Name: "мак", Fingerprint: "aa", State: store.AgentOK}); err != nil {
 		t.Fatal(err)
 	}
@@ -144,6 +145,7 @@ func TestDropLinkOneNotification(t *testing.T) {
 // не должно будить человека — агент на связи.
 func TestEvictedConnNotDrop(t *testing.T) {
 	e, st := newTestEngine(t, "модель", &fakeProvider{answer: "ладно"})
+	notifyAtOnce(t, st)
 	if err := st.SaveAgent(&store.Agent{Name: "мак", Fingerprint: "aa", State: store.AgentOK}); err != nil {
 		t.Fatal(err)
 	}
@@ -173,5 +175,67 @@ func TestEvictedConnNotDrop(t *testing.T) {
 	e.linkClosed("мак", fresh) // а теперь ушёл и живой
 	if open() != 1 {
 		t.Fatal("настоящий обрыв не дал уведомления")
+	}
+}
+
+// notifyAtOnce — уведомление о пропаже без срока ожидания: тестам самой
+// логики обрыва ждать две минуты незачем.
+func notifyAtOnce(t *testing.T, st *store.Store) {
+	t.Helper()
+	if err := st.SetSetting(AgentOffNotifyKey, "0"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// Шлюз переподключается за секунду, и пуш на каждый такой обрыв читался
+// как «Сёма отваливается постоянно» (12 октября 2026). Уведомление ждёт
+// срока: вернулся агент раньше — его нет; не вернулся — есть.
+func TestAgentOffWaitsForReturn(t *testing.T) {
+	e, st := newTestEngine(t, "модель", &fakeProvider{answer: "ладно"})
+	if err := st.SaveAgent(&store.Agent{Name: "шлюз", Fingerprint: "aa", State: store.AgentOK, Role: RoleGateway}); err != nil {
+		t.Fatal(err)
+	}
+	open := func() []*store.Notification {
+		list, err := st.Notifications(true, 100)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got []*store.Notification
+		for _, x := range list {
+			if x.Key == agentOffKey("шлюз") && x.State == store.NotifyOpen {
+				got = append(got, x)
+			}
+		}
+		return got
+	}
+	a, _ := st.Agent("шлюз")
+	n := agentOffNotice(a, time.Hour, time.Now())
+
+	// по умолчанию срок есть: сразу после обрыва человека не будят
+	e.agentGone("шлюз", time.Hour)
+	if got := open(); len(got) != 0 {
+		t.Fatalf("уведомление ушло, не дождавшись срока: %+v", got)
+	}
+	// вернулся до срока — срок наступил, а сказать нечего
+	e.linkMu.Lock()
+	gen := e.agentOffGen["шлюз"]
+	e.linkMu.Unlock()
+	e.agentBack("шлюз", time.Now().Format(time.RFC3339))
+	e.agentOffDue("шлюз", gen, n)
+	if got := open(); len(got) != 0 {
+		t.Fatalf("вернувшийся агент всё равно разбудил человека: %+v", got)
+	}
+	// оборвался и не вернулся — по сроку уведомление есть, и оно про шлюз
+	e.agentGone("шлюз", time.Hour)
+	e.linkMu.Lock()
+	gen = e.agentOffGen["шлюз"]
+	e.linkMu.Unlock()
+	e.agentOffDue("шлюз", gen, n)
+	got := open()
+	if len(got) != 1 {
+		t.Fatalf("пропавший шлюз не дал уведомления: %d", len(got))
+	}
+	if !strings.Contains(got[0].Summary, "снаружи") || strings.Contains(got[0].Summary, "память") {
+		t.Fatalf("у шлюза текст жителя машины: %q", got[0].Summary)
 	}
 }

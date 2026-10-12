@@ -175,9 +175,11 @@ var (
 	learnMaxDayDef     = store.DefPositive(learnMaxDayKey, 3, 1, 0)
 	learnMinScoreDef   = store.DefPositive(learnMinScore, 5, 1, 0)
 	// где слушать агентов и куда звонить шлюзу — открывают порт: осторожные (Careful)
-	agentListenDef         = store.Careful(store.DefText(agentPortKey, ""))
-	gatewayAddrDef         = store.Careful(store.DefText(gatewayAddrKey, ""))
-	gatewayUpDef           = store.Careful(store.DefText(gatewayUpKey, ""))
+	agentListenDef = store.Careful(store.DefText(agentPortKey, ""))
+	gatewayAddrDef = store.Careful(store.DefText(gatewayAddrKey, ""))
+	gatewayUpDef   = store.Careful(store.DefText(gatewayUpKey, ""))
+	// сколько агент может молчать, прежде чем о пропаже скажут; 0 — сразу
+	agentOffNotifyDef      = store.DefCount(AgentOffNotifyKey, 120, 0, 86400)
 	settingsLogKeepDaysDef = store.DefPositive(SettingsLogKeepKey, settingsLogKeepDef, 1, 0)
 )
 

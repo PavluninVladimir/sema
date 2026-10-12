@@ -52,7 +52,7 @@ var rareScreens = map[string][]rareSetting{
 	learningScreen:                        {{"max", "learn.max_per_day"}, {"score", "learn.min_score"}},
 	// «Агенты» (2 октября 2026): где слушать — на вкладке «Агенты», адрес шлюза и
 	// куда он вносит запросы — на вкладке «Шлюз»
-	agentsScreen:                          {{"listen", "agents.listen"}},
+	agentsScreen:                          {{"listen", "agents.listen"}, {"off_notify", "agents.off_notify_s"}},
 	agentsScreen + "~" + agentsTabGateway: {{"gateway", "agents.gateway"}, {"upstream", "agents.gateway_upstream"}},
 	// журнал настроек: срок хранения и список служебных отметок (2 октября 2026)
 	changesScreen: {{"value", "settings.log_keep_days"}, {"marks", "settings_log.marks"}},

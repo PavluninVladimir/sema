@@ -165,6 +165,9 @@ type Engine struct {
 	engineUp atomic.Bool
 	savings  map[string]AgentSavings // счёт сэкономленного по агентам
 	links    map[string]*link
+	// agentOffGen — отметка последнего обрыва или возвращения агента, под
+	// linkMu: отложенное уведомление об обрыве сверяет с ней свою
+	agentOffGen map[string]uint64
 
 	// шлюз: счётчики своего конца провода. Отдельный замок, а не
 	// linkMu: потоки открываются пачкой и не должны ждать экран «Агенты»
