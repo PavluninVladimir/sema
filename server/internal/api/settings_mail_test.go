@@ -203,7 +203,7 @@ func TestMailScreensBuildEveryTab(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", screen, err)
 		}
-		if doc.ActivePanel != mailScreen {
+		if doc.ActivePanel != settingsChannels {
 			t.Errorf("%s: в колонке выбран %q", screen, doc.ActivePanel)
 		}
 		if doc.Screen != screen {
@@ -324,10 +324,9 @@ func TestMailOldAddressesStillOpen(t *testing.T) {
 		if doc.Heading != "Новый ящик" {
 			t.Errorf("%s без ящиков: заголовок %q", screen, doc.Heading)
 		}
-		for _, c := range doc.Components {
-			if c.Type == "crumb" {
-				t.Errorf("%s без ящиков: «‹ Почта» ведёт в пустоту", screen)
-			}
+		crumb := findByType(doc, "crumb")
+		if crumb == nil || len(crumb.Actions) != 1 || crumb.Actions[0].Target != settingsChannels {
+			t.Errorf("%s без ящиков: обратная ссылка должна вести в «Каналы»: %+v", screen, crumb)
 		}
 	}
 }

@@ -11,7 +11,7 @@ func TestSectionNameInColumnIsScreenHeading(t *testing.T) {
 	s, _ := testServer(t)
 	addrs := []string{settingsRoot}
 	for _, group := range settingsGroups {
-		addrs = append(addrs, group.Sections...)
+		addrs = append(addrs, group.sections()...)
 	}
 	for _, addr := range addrs {
 		doc, err := s.buildScreen(addr, "", "", 0)

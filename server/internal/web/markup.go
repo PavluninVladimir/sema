@@ -55,16 +55,13 @@ const markupTemplate = `
 <main id="middle">
 {{if or .Panel .PanelTitle}}
 {{$sections := eq .PanelKind "sections"}}
-<div id="panel"{{if .PanelKind}} class="{{.PanelKind}}"{{end}}>
+<div id="panel"{{if .PanelKind}} class="{{.PanelKind}}"{{end}}{{if $sections}} role="navigation" aria-label="Группы настроек"{{end}}>
   <div class="panel-header">
     <div class="title">{{.PanelTitle}}</div>
     {{with .PanelAdd}}<button class="action" {{attrs .}}>+</button>{{end}}
   </div>
   {{if and $sections .Search}}
-  {{/* поле поиска по настройкам — первой строкой колонки, а не в полосе
-       фильтров экрана: поле одно на экран, и стоит оно там, откуда
-       человек выбирает раздел. Тот же id и те же атрибуты, что у поля в
-       полосе фильтров: клиент ищет его по id */}}
+  {{/* Поиск настроек остаётся в панели и на широком экране, и на телефоне. */}}
   <label class="search-box panel-search">
     {{icon "magnifyingglass" "search-icon"}}
     <input class="search" id="search" type="search" name="search" placeholder="{{if .SearchHint}}{{.SearchHint}}{{else}}Найти настройку{{end}}" aria-label="{{if .SearchHint}}{{.SearchHint}}{{else}}Найти настройку{{end}}" autocomplete="off" value="{{.SearchQuery}}"
@@ -86,6 +83,7 @@ const markupTemplate = `
               onclick="sema.container('{{.Addr}}')"><svg class="chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4.5 3l3 3-3 3"></path></svg></button>{{end}}
       <button class="item {{if .Selected}}selected{{end}}"{{if .Selected}} aria-current="page"{{end}}
               hx-get="/ui?screen={{.Addr}}" hx-target="#window" hx-swap="innerHTML">
+        {{if hasIcon .Icon}}{{icon .Icon "item-icon"}}{{end}}
         {{if and .Level (not $sections)}}<span class="dot" style="background:var(--{{.Level}})"></span>{{end}}
         {{if eq .Kind "thread"}}<svg class="thread-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 3.5h9v6H5l-3 2.5z"></path><path d="M11 6.5h3v6l-2-1.5H7"></path></svg>{{end}}
         <span class="body"><span class="title">{{.Name}}</span>
@@ -131,8 +129,7 @@ const markupTemplate = `
     <button class="action burger" data-panel="menu" aria-label="меню" onclick="sema.panel('menu')">☰</button>
     {{/* Список слева — содержимое экрана (скрипты), а на телефоне места
          для него нет: он приезжает шторкой слева, и открывает её эта
-         кнопка. У колонки разделов настроек кнопки нет: на телефоне её
-         не присылают вовсе, а на широком экране она стоит сама */}}
+         кнопка. В настройках список групп стоит слева или сверху на телефоне */}}
     {{if and .Panel (ne .PanelKind "sections")}}<button class="action panel-picker" data-panel="panel" type="button"
       aria-label="{{.PanelTitle}} — открыть список" aria-haspopup="dialog" aria-controls="panel" aria-expanded="false"
       onclick="sema.panel('panel')">{{.PanelTitle}} <span class="chevron-down" aria-hidden="true">⌄</span></button>{{end}}
@@ -862,7 +859,7 @@ const markupTemplate = `
         {{end}}
       </div>
     </div>
-    {{if or .Output .Props .Commands .Files .Children .FrameURL}}
+    {{if or .Output .Props .Commands .Files .Children .FrameURL .ImageURL .InlinePNG}}
     <details class="expansion-wrap" {{if .Open}}open{{end}}{{if .ID}} id="exp-{{.ID}}"{{end}}>
       <summary class="details-more">{{if .Expand}}{{.Expand}}{{else}}Подробнее{{end}}</summary>
       <div class="expansion">
@@ -870,7 +867,8 @@ const markupTemplate = `
         {{/* картинка — картинкой, а не рамкой: файл отдаётся с запретом
              встраивания, и в рамке человек видел «сайт не позволяет
              установить соединение» вместо своей картинки */}}
-        {{if .ImageURL}}<a class="row-image" href="{{.ImageURL}}" target="_blank" rel="noopener"><img src="{{.ImageURL}}" alt="{{.Title}}" loading="lazy"></a>{{end}}
+        {{if .InlinePNG}}<span class="row-image"><img src="{{pngDataURL .InlinePNG}}" alt="{{.Title}}"></span>
+        {{else if .ImageURL}}<a class="row-image" href="{{.ImageURL}}" target="_blank" rel="noopener"><img src="{{.ImageURL}}" alt="{{.Title}}" loading="lazy"></a>{{end}}
         {{if .FrameURL}}
         {{/* письмо как есть: чужая разметка живёт в своём документе и в
              песочнице, а не в адресе Сёмы. Текстовый вариант лежит рядом

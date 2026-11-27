@@ -43,7 +43,7 @@ func TestSettingsFormsSavedByBar(t *testing.T) {
 		storagesScreen + "~" + storTabSources,
 	}
 	for _, в := range settingsGroups {
-		screens = append(screens, в.Sections...)
+		screens = append(screens, в.sections()...)
 	}
 	for _, р := range screens {
 		doc, err := s.buildScreen(р, "", "", 0)

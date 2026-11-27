@@ -63,15 +63,11 @@ func letter(р rune) bool {
 
 // chatChips — по каким источникам делится список. Те же группы, что и в
 // панели: их человек уже знает.
-var chatChips = []string{"Telegram", "MAX", "Разбор уведомлений", "Задачи", "Мои чаты"}
+var chatChips = []string{"Telegram", "MAX", "WeChat", "Разбор уведомлений", "Задачи", "Мои чаты"}
 
 // buildChatsList — экран списка чатов для телефона.
-func (s *Server) buildChatsList(doc *Document, filter, search string) error {
+func (s *Server) buildChatsList(doc *Document, chats []*store.Chat, filter, search string) error {
 	st := s.eng.Store()
-	chats, err := st.Chats()
-	if err != nil {
-		return err
-	}
 	doc.Heading = "Чаты"
 	doc.Layout = "wide"
 	doc.Searchable = true
@@ -104,8 +100,17 @@ func (s *Server) buildChatsList(doc *Document, filter, search string) error {
 	// не находит, врёт про содержимое
 	has := map[string]bool{}
 	for _, c := range roots {
-		has[chatGroup(c.Title)] = true
+		has[chatGroup(c)] = true
 	}
+	var wechatChats []Screen
+	for _, screen := range doc.Screens {
+		for _, group := range screen.Children {
+			if group.ID == wechatMenuID {
+				wechatChats = group.Children
+			}
+		}
+	}
+	has["WeChat"] = len(wechatChats) != 0
 	doc.Filters = []Filter{{ID: "", Title: "Все"}}
 	for _, г := range chatChips {
 		if has[г] {
@@ -118,7 +123,7 @@ func (s *Server) buildChatsList(doc *Document, filter, search string) error {
 	черновики := st.TGDraftCounts()
 	var строки []Component
 	for _, c := range roots {
-		г := chatGroup(c.Title)
+		г := chatGroup(c)
 		if filter != "" && filter != г {
 			continue
 		}
@@ -131,6 +136,14 @@ func (s *Server) buildChatsList(doc *Document, filter, search string) error {
 		for _, к := range kids[c.ID] {
 			if к.IsThread() && (s.chatUnread(к) || черновики[к.ID] > 0) {
 				строки = append(строки, s.threadRow(к, черновики))
+			}
+		}
+	}
+	if filter == "" || filter == "WeChat" {
+		for _, chat := range wechatChats {
+			if req == "" || strings.Contains(strings.ToLower(chat.Title), req) {
+				строки = append(строки, Component{Type: "row", Subtitle: chat.Title, Caption: "WeChat", Icon: chat.Icon,
+					Actions: []Action{{Action: "$goto", Target: chat.ID, Label: "Открыть чат"}}})
 			}
 		}
 	}
@@ -148,15 +161,17 @@ func (s *Server) buildChatsList(doc *Document, filter, search string) error {
 
 // chatGroup — к какому источнику относится чат. Та же мерка, что у
 // панели на широком экране: список один, и делиться он должен одинаково.
-func chatGroup(title string) string {
+func chatGroup(chat *store.Chat) string {
 	switch {
-	case strings.HasPrefix(title, "Telegram · "):
+	case chat.Kind == store.ChatKindAssistant:
+		return "Мои чаты"
+	case strings.HasPrefix(chat.Title, "Telegram · "):
 		return "Telegram"
-	case strings.HasPrefix(title, "MAX · "):
+	case strings.HasPrefix(chat.Title, "MAX · "):
 		return "MAX"
-	case strings.HasPrefix(title, "Уведомление · "):
+	case strings.HasPrefix(chat.Title, "Уведомление · "):
 		return "Разбор уведомлений"
-	case strings.HasPrefix(title, "Задача"):
+	case strings.HasPrefix(chat.Title, "Задача"):
 		return "Задачи"
 	}
 	return "Мои чаты"
@@ -181,6 +196,9 @@ func chatMatches(c *store.Chat, children []*store.Chat, req string) bool {
 // черновики — TGDraftCounts на весь список: один запрос, а не по чату.
 func (s *Server) chatRow(c *store.Chat, children []*store.Chat, группа string, черновики map[int64]int) Component {
 	name := strings.TrimPrefix(strings.TrimPrefix(c.Title, "Telegram · "), "MAX · ")
+	if c.Kind == store.ChatKindAssistant {
+		name = c.Title
+	}
 	row := Component{
 		Type: "row", Layout: "wide", ID: "чат-" + strconv.FormatInt(c.ID, 10),
 		Subtitle: name, Meta: whenShort(c.LastAt), MetaInline: true,

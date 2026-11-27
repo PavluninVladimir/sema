@@ -18,19 +18,20 @@ type Chat struct {
 	// три уровня: контейнер (группа с топиками, канал) без ленты →
 	// разговор с людьми → тред с Сёмой. Тред — это тот же чат с родителем
 	Parent int64  // чат-родитель; 0 у корневых
-	Kind   string // "" | dm | group | channel | topic | post | sema | msg
+	Kind   string // "" | assistant | dm | group | channel | topic | post | sema | msg
 	Anchor int64  // сообщение-якорь у треда по сообщению
 	Topic  int64  // номер топика или поста в мессенджере
 }
 
 // Виды чатов.
 const (
-	ChatKindGroup   = "group"   // группа с топиками — контейнер без ленты
-	ChatKindChannel = "channel" // канал — одна лента постов и комментариев, как в Telegram
-	ChatKindTopic   = "topic"   // топик группы — разговор под контейнером
-	ChatKindPost    = "post"    // пост канала отдельным разговором — снято, остаётся для переезда
-	ChatKindSema    = "sema"    // тред «Сёма» — ветка Сёмы под разговором, один на разговор
-	ChatKindMsg     = "msg"     // тред по сообщению
+	ChatKindAssistant = "assistant" // основной разговор с Сёмой в «Моих чатах»
+	ChatKindGroup     = "group"     // группа с топиками — контейнер без ленты
+	ChatKindChannel   = "channel"   // канал — одна лента постов и комментариев, как в Telegram
+	ChatKindTopic     = "topic"     // топик группы — разговор под контейнером
+	ChatKindPost      = "post"      // пост канала отдельным разговором — снято, остаётся для переезда
+	ChatKindSema      = "sema"      // тред «Сёма» — ветка Сёмы под разговором, один на разговор
+	ChatKindMsg       = "msg"       // тред по сообщению
 )
 
 // IsThread — ветка с Сёмой под другим чатом.
@@ -165,6 +166,19 @@ func (s *Store) CreateChat(title string) (int64, error) {
 		s.touch(ScreenChats)
 	}
 	return id, err
+}
+
+// EnsureAssistantChat создаёт самостоятельный разговор один раз, даже при одновременном входе.
+func (s *Store) EnsureAssistantChat() error {
+	res, err := s.db.Exec(`INSERT INTO chats (title, kind) VALUES (?, ?) ON CONFLICT DO NOTHING`, "Сёма", ChatKindAssistant)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err == nil && count != 0 {
+		s.touch(ScreenChats)
+	}
+	return err
 }
 
 func (s *Store) RenameChat(id int64, title string) error {

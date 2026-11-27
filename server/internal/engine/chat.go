@@ -365,6 +365,12 @@ func (e *Engine) chatPrompt(ctx context.Context, chatID int64) (string, error) {
 	var b strings.Builder
 	b.WriteString(chatSystem + "\n")
 	b.WriteString(assignHint())
+	if e.WeChatConnected() {
+		b.WriteString("\nThe built-in WeChat integration receives and stores new messages from chats with «Читать» enabled. " +
+			"For a recurring WeChat translation or relay, direct the owner to «Чаты → WeChat → нужный чат → Пересылка сообщений». " +
+			"The owner selects existing Telegram or MAX chats, source and target language and enables the rule there. " +
+			"Each destination needs permission to send. Do not request an external webhook or claim you enabled a rule.\n")
+	}
 	if e.ChatScriptsEnabled() {
 		b.WriteString(e.chatScriptsPrompt())
 		b.WriteString(e.installedModulesPrompt(userText))

@@ -352,7 +352,7 @@ func (s *Server) buildSettingsIndex() *settingsIndex {
 	b := &indexBuilder{s: s, idx: &settingsIndex{At: started,
 		byKey: map[string][]*indexEntry{}, byAction: map[string][]*indexEntry{}}, visited: map[string]bool{}, shared: shared}
 	for _, group := range settingsGroups {
-		for _, section := range group.Sections {
+		for _, section := range group.sections() {
 			b.section(group, section)
 		}
 	}
@@ -380,7 +380,7 @@ func (s *Server) buildSettingsIndex() *settingsIndex {
 func (b *indexBuilder) section(group settingsGroup, addr string) {
 	title := sectionTitle[addr]
 	base := indexCtx{path: []string{group.Name, title}, section: addr,
-		admin: baseScreen(addr) == accessScreen, words: synonyms[addr]}
+		admin: adminSettingsScreen(addr), words: synonyms[addr]}
 	b.screen(addr, base)
 	for _, ent := range b.s.indexEntities(addr) {
 		path := append(append([]string(nil), base.path...), ent.Title)
@@ -449,7 +449,7 @@ func (s *Server) buildIndexDoc(addr string, shared *indexShared) (doc *Document)
 		}
 	}()
 	doc = &Document{Components: []Component{}, Active: "settings", offline: true, shared: shared}
-	if _, err := s.buildSettingsBody(doc, addr, "", "", defaultRows, false); err != nil {
+	if _, err := s.buildSettingsBody(doc, addr, "", "", defaultRows); err != nil {
 		log.Printf("индекс настроек: экран %q: %v", addr, err)
 		return nil
 	}
@@ -738,8 +738,16 @@ func (s *Server) indexEntities(section string) []indexEntity {
 	case secretsScreen:
 		secrets, _ := st.VaultSecrets()
 		for _, sec := range secrets {
+			if sec.Kind == store.SecretMessengerBot {
+				continue
+			}
 			out = append(out, indexEntity{Title: sec.Name, Caption: "секрет · " + sec.Kind,
 				Addr: engine.SecretScreen(sec.Name, "")})
+		}
+	case botsScreen:
+		bots, _ := st.MessengerBots()
+		for _, bot := range bots {
+			out = append(out, indexEntity{Title: botTitle(bot), Caption: botCaption(bot), Addr: botScreenAddr(bot.ID)})
 		}
 	case agentsScreen:
 		agents, _ := st.Agents()

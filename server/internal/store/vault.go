@@ -25,6 +25,8 @@ const (
 	// как приватная часть ключа SSH, а руками он не заменяется — это JSON,
 	// который пишет и читает только вход.
 	SecretOAuth = "oauth"
+	// SecretMessengerBot доступен только подсистеме подключений ботов.
+	SecretMessengerBot = "messenger-bot"
 )
 
 type Secret struct {
@@ -230,7 +232,7 @@ func (s *Store) DeleteSecret(name string) error {
 // только из места, которое пишет в журнал.
 func (s *Store) SecretValue(name string) (string, bool) {
 	var v string
-	if err := s.db.QueryRow(`SELECT value FROM secrets WHERE name = ?`, name).Scan(&v); err != nil {
+	if err := s.db.QueryRow(`SELECT value FROM secrets WHERE name = ? AND kind <> ?`, name, SecretMessengerBot).Scan(&v); err != nil {
 		return "", false
 	}
 	out := s.open(v)

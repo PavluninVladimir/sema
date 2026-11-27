@@ -18,7 +18,7 @@ func TestIndexCostPerSection(t *testing.T) {
 		shared.cards[c.Name] = c
 	}
 	for _, group := range settingsGroups {
-		for _, section := range group.Sections {
+		for _, section := range group.sections() {
 			started := time.Now()
 			screens := 1
 			s.buildIndexDoc(section, shared)

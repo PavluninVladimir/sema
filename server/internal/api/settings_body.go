@@ -8,13 +8,19 @@ package api
 
 import (
 	"strings"
+
+	"github.com/PavluninVladimir/sema/server/internal/botapi"
 )
 
 // buildSettingsBody — собрать содержимое экрана настроек. Возвращает поиск,
 // который остаётся общему поиску по разделам: у экрана со своим списком
 // (чаты Telegram, модели, правила сервера MCP) верхнее поле ищет по списку, и
 // набранное в разделы уже не уходит.
-func (s *Server) buildSettingsBody(doc *Document, screenName, filter, search string, limit int, phone bool) (string, error) {
+func (s *Server) buildSettingsBody(doc *Document, screenName, filter, search string, limit int) (string, error) {
+	if group, ok := settingsGroupAt(screenName); ok {
+		s.buildSettingsGroup(doc, group)
+		return search, nil
+	}
 	var err error
 	switch {
 	case screenName == accessScreen || strings.HasPrefix(screenName, accessScreen+"~"):
@@ -35,9 +41,21 @@ func (s *Server) buildSettingsBody(doc *Document, screenName, filter, search str
 		// «settings:agents@new»: вкладка раздела, экран агента или приглашение
 		doc.ActiveTab = agentsScreen
 		err = s.buildAgents(doc, screenName, filter, limit)
+	case screenName == wechatScreen || strings.HasPrefix(screenName, wechatScreen+"@"):
+		doc.ActiveTab = wechatScreen
+		err = s.buildWeChat(doc, screenName, filter, search, limit)
+		if doc.ownSearch {
+			search = ""
+		}
 	case screenName == maxScreen:
 		doc.ActiveTab = maxScreen
 		err = s.buildMAX(doc)
+		if !doc.guest {
+			doc.ToolbarActions = append(doc.ToolbarActions, botSettingsLink(botapi.MAX))
+		}
+	case baseScreen(screenName) == botsScreen:
+		doc.ActiveTab = botsScreen
+		err = s.buildMessengerBots(doc, screenName)
 	case screenName == tgScreen || strings.HasPrefix(screenName, tgScreen+"@") || strings.HasPrefix(screenName, tgScreen+"~"):
 		// «settings:telegram@79990000000~answer»: учётка и внутренняя вкладка
 		addr, tab := splitSubtab(screenName)
@@ -47,6 +65,9 @@ func (s *Server) buildSettingsBody(doc *Document, screenName, filter, search str
 		}
 		doc.ActiveTab = tgScreen
 		err = s.buildTelegram(doc, учётка, tab, filter, search, limit)
+		if !doc.guest {
+			doc.ToolbarActions = append(doc.ToolbarActions, botSettingsLink(botapi.Telegram))
+		}
 		// на «Собеседниках» верхнее поле — поиск чатов, а не общий поиск по
 		// разделам: набранное ищет чаты на сервере
 		if doc.ownSearch {
@@ -118,14 +139,8 @@ func (s *Server) buildSettingsBody(doc *Document, screenName, filter, search str
 		if modelsOwnSearch(screenName) {
 			search = ""
 		}
-	case phone && screenName == settingsRoot:
-		// на телефоне колонке места нет: корень — список разделов
-		err = s.buildSettingsRoot(doc, search, limit)
 	default:
-		// «Настройки» без раздела — обзор: раньше они байт в байт
-		// совпадали с «Моделями», и человек не видел, что где. На телефоне
-		// до него идут строкой корня, адресом settings:overview
-		doc.ActiveTab = "settings"
+		doc.ActiveTab = settingsRoot
 		err = s.buildSettingsOverview(doc, search, limit)
 	}
 	return search, err

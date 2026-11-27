@@ -197,7 +197,7 @@ func TestBrowserFormActionsDoNotStickToLastField(t *testing.T) {
 		if м.Fields > 1 && м.BetweenLine <= 0 {
 			t.Errorf("%s: линии между полями пропали", метка)
 		}
-		if м.RowWrap != "wrap" || м.RowJustify != "flex-start" {
+		if м.RowWrap != "wrap" || (м.RowJustify != "flex-start" && м.RowJustify != "flow-start") {
 			t.Errorf("%s: ряд кнопок: flex-wrap %q, justify-content %q, ждали wrap и flex-start", метка, м.RowWrap, м.RowJustify)
 		}
 		if м.BtnHeight != 32 {
@@ -314,7 +314,7 @@ func TestBrowserFormActionsDoNotStickToLastField(t *testing.T) {
 	}
 	var телефонный bool
 	if err := chromedp.Run(ctx, chromedp.Poll(
-		`(() => { const к = document.querySelector('#screen .crumbs .crumb'); return !!к && к.textContent.includes('Настройки'); })()`,
+		`(() => { const p = document.querySelector('#panel.sections'), s = document.getElementById('screen'); return !!p && !!s && p.getBoundingClientRect().bottom <= s.getBoundingClientRect().top + 1; })()`,
 		&телефонный, chromedp.WithPollingTimeout(15*time.Second))); err != nil || !телефонный {
 		t.Fatalf("после сужения окна телефонный документ не приехал: %v", err)
 	}

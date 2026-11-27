@@ -53,6 +53,8 @@ func SecretKindTitle(kind string) string {
 		return "пароль"
 	case store.SecretOAuth:
 		return "вход OAuth"
+	case store.SecretMessengerBot:
+		return "токен бота"
 	default:
 		return "секрет"
 	}
@@ -270,6 +272,9 @@ func (e *Engine) GrantSecret(module, name string, on bool) error {
 		}
 		if sec.Kind == store.SecretOAuth {
 			return fmt.Errorf("токены входа модулю не выдаются: модуль ходит на сервер MCP через sema.mcp.call, а токен держит ядро")
+		}
+		if sec.Kind == store.SecretMessengerBot {
+			return fmt.Errorf("токеном бота пользуется только подключение в Сёме")
 		}
 		m.Granted = append(m.Granted, name)
 		sort.Strings(m.Granted)

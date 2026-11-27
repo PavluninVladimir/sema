@@ -226,6 +226,7 @@ func (e *Engine) builtinToolsFor(consumer string, fill secretFiller) []script.To
 	tools = append(tools, cryptoTools()...)
 	// ссылка на файл для чужой системы (file-share-links)
 	tools = append(tools, e.shareTool(consumer))
+	tools = append(tools, e.wechatSendTool(consumer))
 	return tools
 }
 

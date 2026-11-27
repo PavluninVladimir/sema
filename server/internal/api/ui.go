@@ -49,10 +49,8 @@ type Document struct {
 	PanelTitle  string      `json:"panelTitle,omitempty"`
 	PanelAction *Action     `json:"panelAction,omitempty"` // кнопка «+» в шапке панели
 	// PanelKind — каким рисуется панель. Пусто — список чатов или скриптов.
-	// «sections» — колонка разделов настроек: поле поиска первой строкой
-	// (если у документа Searchable), заголовки групп без адреса
-	// (PanelItem.Kind == "heading"), у пункта счётчик (Meta) или точка
-	// (Level) справа, а не слева от названия
+	// «sections» — навигация по группам настроек, слева или сверху на телефоне.
+	// Поиск идёт перед группами, счётчик (Meta) или точка (Level) справа.
 	PanelKind   string    `json:"panelKind,omitempty"`
 	ActivePanel string    `json:"activePanel,omitempty"`
 	Composer    *Composer `json:"composer,omitempty"`
@@ -114,9 +112,7 @@ type Document struct {
 	// раздела приезжает отдельной частью `rare`, и она берёт его отсюда, а
 	// не собирает заново. Наружу не уходит
 	rare []Component
-	// noPhoneSearch — полоса фильтров у экрана есть, а своего поиска по списку
-	// нет: на телефоне верхнее поле «ищи по настройкам» ему не нужно, как и
-	// любому экрану без полосы. Наружу не уходит
+	// noPhoneSearch скрывает общий поиск на узком экране журнала.
 	noPhoneSearch bool
 	// ownSearch — верхнее поле на этом экране ищет по его собственному списку
 	// (чаты Telegram), а не по настройкам: общий поиск по разделам над ним не
@@ -164,6 +160,7 @@ type Filter struct {
 type PanelItem struct {
 	ID       string  `json:"id"` // экран, на который ведёт
 	Title    string  `json:"title"`
+	Icon     string  `json:"icon,omitempty"`
 	Subtitle string  `json:"subtitle,omitempty"`
 	Group    string  `json:"group,omitempty"`   // заголовок группы перед этим пунктом
 	Level    string  `json:"level,omitempty"`   // ok | info | warn | alert — состояние чата
@@ -406,7 +403,8 @@ type Component struct {
 	// Рамка-песочница для картинки не годится: файл отдаётся с запретом
 	// встраивания, и в рамке человек видел «сайт не позволяет установить
 	// соединение» вместо своей картинки (14 сентября 2026).
-	Image string `json:"image,omitempty"`
+	Image     string `json:"image,omitempty"`
+	inlinePNG []byte
 	// Frame — адрес отдельного документа, который строка показывает рамкой
 	// в песочнице. Так показывается HTML письма: чужая разметка не должна
 	// жить в адресе Сёмы (см. api/mailbody.go). Пусто — рамки нет.

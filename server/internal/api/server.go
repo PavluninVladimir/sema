@@ -58,6 +58,8 @@ type Server struct {
 
 	// подмена проверки хранилища: настоящей нужна сеть, а тесты в неё не ходят
 	checkStorageVia func(name string) (string, error)
+	botTransport    http.RoundTripper // подмена HTTP для тестов подключений ботов
+	botSettingsMu   sync.Mutex        // согласует изменение webhook, токена и локальной записи
 
 	// индекс настроек для поиска, журнала и «Под рукой»: под своим замком, без
 	// данных запроса (settings_index.go)
@@ -114,6 +116,14 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/push/subscribe", s.handlePushSubscribe)
 	mux.HandleFunc("POST /api/push/unsubscribe", s.handlePushUnsubscribe)
 	mux.HandleFunc("GET /api/ui", s.handleUI)
+	mux.HandleFunc("POST "+releaseWebhookPath, s.handleGitHubRelease)
+	mux.HandleFunc("POST "+telegramWebhookPath+"{id}", s.handleTelegramBotUpdate)
+	mux.HandleFunc("GET /api/bots/{id}/telegram", s.handleTelegramBotSettings)
+	mux.HandleFunc("PATCH /api/bots/{id}/telegram", s.handleTelegramBotSettings)
+	mux.HandleFunc("POST /api/bots/{id}/telegram/send", s.handleTelegramBotSend)
+	mux.HandleFunc("GET "+maxQRPath, s.handleMAXQR)
+	mux.HandleFunc("GET "+wechatQRPath, s.handleWeChatQR)
+	mux.HandleFunc("GET "+wechatFilePath, s.handleWeChatFile)
 	// живое обновление: имена изменившихся экранов по постоянному проводу
 	mux.HandleFunc("GET /api/ws", s.handleLive)
 	// возврат с входа OAuth на сервер MCP: под тем же protect, что и всё
@@ -210,6 +220,7 @@ type actionRequest struct {
 	// присланным клиентом адресом возврата OAuth воспользоваться нельзя.
 	origin string // адрес Сёмы, с которого нажали: схема и хост
 	who    string // кто нажал (Identity.Who)
+	ctx    context.Context
 }
 
 func (s *Server) handleAction(w http.ResponseWriter, r *http.Request) {
@@ -283,6 +294,7 @@ func (s *Server) executeSigned(r *http.Request, req actionRequest) (string, erro
 	st := s.eng.Store()
 	метка := st.LastChange()
 	req.origin, req.who = s.requestOrigin(r), s.auth.Identify(r).Who
+	req.ctx = r.Context()
 	redirect, err := s.execute(req)
 	st.SignChanges(метка, whoActs(s.auth.Identify(r)), editOrigin(req))
 	// после действия человека индекс настроек мог устареть: завели сервер,
@@ -324,7 +336,7 @@ func (s *Server) execute(req actionRequest) (string, error) {
 	for _, group := range []func(actionRequest) (string, error){
 		s.mailActions, s.chatsActions, s.scriptsActions,
 		s.tasksActions, s.modelsActions, s.pricesActions, s.toolsActions, s.secretsActions, s.memoryActions, s.serversActions,
-		s.digestGroupAction, s.filesActions, s.settingsChangesActions, s.healthActions, s.accessActions, s.skillsActions, s.notifyActions, s.queueActions, s.sentActions, s.workActions, s.searchActions, s.learningActions, s.integrationsActions, s.sshRuleActions, s.entityActions, s.telegramActions, s.maxActions, s.agentsActions, s.translateActions, s.vendorsActions, s.assignActionsGroup, s.sharesActions,
+		s.digestGroupAction, s.filesActions, s.settingsChangesActions, s.healthActions, s.accessActions, s.skillsActions, s.notifyActions, s.queueActions, s.sentActions, s.workActions, s.searchActions, s.learningActions, s.integrationsActions, s.sshRuleActions, s.entityActions, s.telegramActions, s.maxActions, s.wechatActions, s.messengerBotActions, s.agentsActions, s.translateActions, s.vendorsActions, s.assignActionsGroup, s.sharesActions,
 	} {
 		redirect, err := group(req)
 		if errors.Is(err, errUnhandled) {
@@ -477,7 +489,22 @@ func (s *Server) buildScreenForPhone(screen, filter, search string, limit int, p
 	// «Уведомлений») и ещё раз значком приложения — считаются один раз
 	notifyLvl, notifyCnt := s.notifyLevel(), s.notifyBadge()
 	// список чатов — тоже один раз: он нужен и счётчику, и дереву разговоров
-	allChats, _ := s.eng.Store().Chats()
+	st := s.eng.Store()
+	allChats, chatsErr := st.Chats()
+	if screenName == "ask" {
+		if chatsErr != nil {
+			return nil, chatsErr
+		}
+		if !snapshot && mainConversation(allChats) == 0 {
+			if err := st.EnsureAssistantChat(); err != nil {
+				return nil, err
+			}
+			allChats, chatsErr = st.Chats()
+			if chatsErr != nil {
+				return nil, chatsErr
+			}
+		}
+	}
 	doc := &Document{
 		Title:      "Сёма",
 		Components: []Component{}, // пустой список, а не null
@@ -498,9 +525,8 @@ func (s *Server) buildScreenForPhone(screen, filter, search string, limit int, p
 				// значит это и должно быть число непрочитанных разговоров.
 				// Сколько ждёт решения, говорит точка уровня и подпись
 				// самого разговора с Сёмой
-				Badge: s.unreadConversations(allChats), Level: notifyLvl, Children: s.chatScreens(screen, allChats, notifyLvl), Open: true,
-				// своей строки у узла нет: адрес «ask» открывает тот же
-				// разговор с Сёмой, что и первый ребёнок, — двойник
+				Badge: s.unreadConversations(allChats), Level: notifyLvl, Children: s.chatScreens(screen, allChats, notifyLvl, !viewer.guest && !snapshot), Open: true,
+				// Адрес «ask» на широком экране открывает разговор из «Моих чатов».
 				NoSelf: true,
 				// новый чат — прямо из строки «Чатов»: кнопка жила над панелью
 				// со списком и пропала вместе с ней
@@ -591,10 +617,10 @@ func (s *Server) buildScreenForPhone(screen, filter, search string, limit int, p
 		if phone {
 			// на телефоне «Чаты» — это список, а не последний разговор:
 			// список за бургером на 288 точек обрезал имена на середине
-			err = s.buildChatsList(doc, filter, search)
+			err = s.buildChatsList(doc, allChats, filter, search)
 			break
 		}
-		err = s.buildChats(doc, 0, limit)
+		err = s.buildChats(doc, allChats, 0, limit)
 	case screenName == "scripts" || strings.HasPrefix(screenName, "script:"):
 		doc.Active = "scripts"
 		var sid int64
@@ -661,8 +687,6 @@ func (s *Server) buildScreenForPhone(screen, filter, search string, limit int, p
 		if canon := s.canonMailAddr(screenName); canon != screenName {
 			screenName, screen = canon, canon
 		}
-		// колонка разделов (на телефоне — «назад» в корень) общая для всех
-		// настроек, см. settings_karkas.go
 		defer s.settingsFrame(doc, screenName, phone)
 		// Поиск один на все настройки и доступен из любого раздела.
 		//
@@ -676,7 +700,7 @@ func (s *Server) buildScreenForPhone(screen, filter, search string, limit int, p
 		// набранное уводило на «Главное», и списки раздела было не найти
 		// сам выбор экрана вынесен в buildSettingsBody (settings_body.go): его же
 		// зовёт индекс настроек, собирая экраны без оболочки
-		search, err = s.buildSettingsBody(doc, screenName, filter, search, limit, phone)
+		search, err = s.buildSettingsBody(doc, screenName, filter, search, limit)
 		if req := strings.TrimSpace(search); req != "" && err == nil && doc.ActiveTab != "settings" {
 			s.sectionSearch(doc, req, limit)
 		}
@@ -693,7 +717,7 @@ func (s *Server) buildScreenForPhone(screen, filter, search string, limit int, p
 			s.markChatRead(id)
 			shrinkConversationHeader(doc)
 		default:
-			err = s.buildChats(doc, id, limit)
+			err = s.buildChats(doc, allChats, id, limit)
 		}
 	case strings.HasPrefix(screenName, "msg:"):
 		doc.Active = "inbox"
@@ -793,6 +817,10 @@ var storableScreens = map[string]bool{
 	// показывает ровно то, что он и так там видит.
 	"settings":              true,
 	"settings:overview":     true,
+	settingsChannels:        true,
+	settingsBehavior:        true,
+	settingsSystem:          true,
+	settingsSecurity:        true,
 	"settings:servers":      true,
 	"settings:telegram":     true,
 	"settings:max":          true,

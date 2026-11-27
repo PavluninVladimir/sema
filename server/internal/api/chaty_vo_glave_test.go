@@ -8,6 +8,15 @@ import (
 	"github.com/PavluninVladimir/sema/server/internal/store"
 )
 
+func myChatsMenu(doc *Document) []Screen {
+	for _, group := range doc.Screens[0].Children {
+		if group.Title == "Мои чаты" {
+			return group.Children
+		}
+	}
+	return nil
+}
+
 // Чаты во главе угла: Сёма открывается разговором, а не разбором почты,
 // пункт «Чаты» стоит первым и несёт счётчик ждущих, а отдельного пункта
 // «Ждут вас» в меню нет — всё, что ждёт решения, приходит карточкой в
@@ -25,7 +34,7 @@ func TestChatsComeFirst(t *testing.T) {
 
 	// пустой адрес открывает разговор с Сёмой — и в меню видно, какой
 	// именно: адрес «ask» сам по себе не говорит, где человек стоит
-	if doc.Active != "chat:"+strconv.FormatInt(сёма, 10) {
+	if doc.Heading != "Сёма" || doc.Active == "chat:"+strconv.FormatInt(сёма, 10) {
 		t.Errorf("открыт не разговор с Сёмой, а %q", doc.Active)
 	}
 
@@ -38,20 +47,13 @@ func TestChatsComeFirst(t *testing.T) {
 		t.Errorf("сразу за «Чатами» не «Уведомления», а %q", doc.Screens[1].Title)
 	}
 
-	// разговоры видны под пунктом «Чаты», и первым — тот, что открыт:
-	// иначе человек не видит, где стоит
-	children := doc.Screens[0].Children
-	if len(children) == 0 {
-		t.Fatal("под «Чатами» не видно разговоров")
+	myChats := myChatsMenu(doc)
+	if len(myChats) != 1 || myChats[0].ID != doc.Active {
+		t.Fatalf("основной разговор должен быть в «Моих чатах»: %+v", myChats)
 	}
-	// первым — разговор с Сёмой. Строки «Все разговоры» нет: адрес узла
-	// открывал тот же разговор, что и первый ребёнок, — двойник
-	if children[0].Title != "Сёма · Вадим" {
-		t.Errorf("первым под «Чатами» стоит %q, а не разговор с Сёмой", children[0].Title)
-	}
-	for _, д := range children {
-		if д.ID == "ask" {
-			t.Errorf("под «Чатами» остался пункт-двойник %q", д.Title)
+	for _, group := range doc.Screens[0].Children {
+		if group.ID == "ask" || strings.HasPrefix(group.ID, "chat:") {
+			t.Errorf("под «Чатами» остался отдельный разговор %q", group.Title)
 		}
 	}
 	// и безымянной строки «Обзор» у узла нет
@@ -62,11 +64,8 @@ func TestChatsComeFirst(t *testing.T) {
 	if п.Addr != "" {
 		t.Errorf("у узла «Чаты» есть свой адрес %q — клиент нарисует «Обзор»", п.Addr)
 	}
-	// открыт разговор с Сёмой — подсвечен он
-	for _, ребёнок := range п.Children {
-		if ребёнок.Selected && ребёнок.Name != "Сёма · Вадим" {
-			t.Errorf("подсвечен %q, а открыт разговор с Сёмой", ребёнок.Name)
-		}
+	if !toMenuItem(myChats[0], doc.Active, "").Selected {
+		t.Error("основной разговор не выделен в меню")
 	}
 }
 
@@ -89,8 +88,8 @@ func TestWhereRecordWaitsShownByDot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, д := range doc.Screens[0].Children {
-		if д.Title != "Сёма · Вадим" {
+	for _, д := range myChatsMenu(doc) {
+		if д.ID != doc.Active {
 			continue
 		}
 		// числа тут быть не должно: цифра рядом с названием чата
@@ -100,11 +99,6 @@ func TestWhereRecordWaitsShownByDot(t *testing.T) {
 		}
 		if д.Level == "" {
 			t.Error("на разговоре с Сёмой нет точки уровня — не видно, где ждёт запись")
-		}
-		// сколько именно ждёт — сказано словами там, где есть место
-		doc, err := s.buildScreen("chat:"+strconv.FormatInt(сёма, 10), "", "", 0)
-		if err != nil {
-			t.Fatal(err)
 		}
 		if !strings.Contains(doc.Subheading, "ждёт решения") {
 			t.Errorf("в подписи разговора не сказано, сколько ждёт: %q", doc.Subheading)
@@ -183,7 +177,12 @@ func TestWaitingArriveInSemaConversation(t *testing.T) {
 		return walk(doc.Components)
 	}
 
-	if !has(сёма, "Требует внимания") {
+	doc, err := s.buildScreen("ask", "", "", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	main, err := strconv.ParseInt(strings.TrimPrefix(doc.Active, "chat:"), 10, 64)
+	if err != nil || main == сёма || !has(main, "Требует внимания") {
 		t.Error("запись не пришла в разговор с Сёмой")
 	}
 	if has(conversation, "Требует внимания") {
@@ -208,7 +207,7 @@ func TestCalmRecordsCollapse(t *testing.T) {
 		}
 	}
 
-	doc, err := s.buildScreen("chat:"+strconv.FormatInt(сёма, 10), "", "", 0)
+	doc, err := s.buildScreen("ask", "", "", 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -240,7 +239,7 @@ func TestCalmRecordsCollapse(t *testing.T) {
 // адрес только у узла с детьми, иначе кнопка без детей стала бы мёртвой.
 func TestChatsOpenWithoutASingleConversation(t *testing.T) {
 	s, _ := testServer(t)
-	doc, err := s.buildScreen("", "", "", 0)
+	doc, err := s.buildScreen("files", "", "", 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,17 +256,14 @@ func TestChatsOpenWithoutASingleConversation(t *testing.T) {
 	}
 }
 
-// Ветка «Сёма» заводится под каждым разговором. Записи, ждущие решения,
-// приходят только в главный разговор — самый старый, — а не в каждую
-// ветку Сёмы: иначе одна и та же запись висела бы в пяти местах, и
-// «главным» оказывался бы случайный разговор.
+// Записи видны в самостоятельном разговоре, включая установку со старыми ветками.
 func TestRecordsOnlyInMainConversation(t *testing.T) {
 	s, st := testServer(t)
 	я, _ := st.CreateChat("Telegram · Вадим")
-	главный, _ := st.CreateThread(я, store.ChatKindSema, 0, "Сёма · Вадим")
+	первая, _ := st.CreateThread(я, store.ChatKindSema, 0, "Сёма · Вадим")
 	мила, _ := st.CreateChat("Telegram · Мила")
 	вторая, _ := st.CreateThread(мила, store.ChatKindSema, 0, "Сёма · Мила")
-	_ = st.AddChatMsg(главный, "assistant", "готово")
+	_ = st.AddChatMsg(первая, "assistant", "готово")
 	_ = st.AddChatMsg(вторая, "assistant", "смотрю")
 	if _, err := st.PutNotification(&store.Notification{
 		Key: "servers:daily", Source: "module:watch", Level: "warn",
@@ -288,20 +284,30 @@ func TestRecordsOnlyInMainConversation(t *testing.T) {
 		}
 		return false
 	}
-	if !has(главный) {
-		t.Error("запись не пришла в главный разговор с Сёмой")
-	}
-	if has(вторая) {
-		t.Error("запись пришла и в ветку Сёмы под перепиской с Марусей — она не главная")
-	}
-
-	// пустой адрес открывает главный, а не ту ветку, что свежее
 	doc, err := s.buildScreen("", "", "", 0)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if doc.Active != "chat:"+strconv.FormatInt(главный, 10) {
-		t.Errorf("открылся не главный разговор, а %q", doc.Active)
+	главный, err := strconv.ParseInt(strings.TrimPrefix(doc.Active, "chat:"), 10, 64)
+	if err != nil || главный == первая || главный == вторая || !has(главный) {
+		t.Error("запись не пришла в главный разговор с Сёмой")
+	}
+	if has(первая) || has(вторая) {
+		t.Error("запись попала в ветку мессенджера")
+	}
+	if err := st.RenameChat(главный, "Telegram · Мой разговор"); err != nil {
+		t.Fatal(err)
+	}
+	phone, err := s.buildScreenForPhone("ask", "Мои чаты", "", 0, true, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	myChats := myChatsMenu(phone)
+	if phone.Heading != "Чаты" || len(myChats) != 1 || myChats[0].ID != doc.Active || myChats[0].Title != "Telegram · Мой разговор" {
+		t.Fatalf("переименованный разговор на телефоне должен остаться в «Моих чатах»: %+v", myChats)
+	}
+	if row := docByID(phone, "чат-"+strconv.FormatInt(главный, 10)); row == nil || row.Subtitle != myChats[0].Title {
+		t.Errorf("нет строки основного разговора в отфильтрованном списке: %+v", row)
 	}
 }
 
@@ -351,16 +357,20 @@ func TestMenuMatchesMockup(t *testing.T) {
 	var сёма, telegram, max *Screen
 	for i, ребёнок := range по["ask"].Children {
 		switch ребёнок.Title {
-		case "Сёма · Вадим":
-			сёма = &по["ask"].Children[i]
 		case "Telegram":
 			telegram = &по["ask"].Children[i]
 		case "MAX":
 			max = &по["ask"].Children[i]
 		}
 	}
-	if сёма == nil || сёма.Initials != "СВ" {
-		t.Errorf("у разговора с Сёмой нет инициалов «СВ»: %+v", сёма)
+	myChats := myChatsMenu(doc)
+	for i, chat := range myChats {
+		if chat.Title == "Сёма" {
+			сёма = &myChats[i]
+		}
+	}
+	if сёма == nil || сёма.Initials != "С" {
+		t.Errorf("у разговора с Сёмой нет инициала «С»: %+v", сёма)
 	}
 	if telegram == nil || !telegram.Tile || telegram.Icon != "logo.telegram" {
 		t.Errorf("группа Telegram не плиткой с логотипом: %+v", telegram)

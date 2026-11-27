@@ -26,6 +26,32 @@ func testStore(t *testing.T) *Store {
 	return st
 }
 
+func TestEnsureAssistantChatCreatesOneRoot(t *testing.T) {
+	st := testStore(t)
+	const requests = 8
+	start := make(chan struct{})
+	results := make(chan error, requests)
+	for range requests {
+		go func() {
+			<-start
+			results <- st.EnsureAssistantChat()
+		}()
+	}
+	close(start)
+	for range requests {
+		if err := <-results; err != nil {
+			t.Error(err)
+		}
+	}
+	chats, err := st.Chats()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(chats) != 1 || chats[0].Parent != 0 || chats[0].Kind != ChatKindAssistant || chats[0].Title != "Сёма" {
+		t.Fatalf("ожидался один самостоятельный разговор: %+v", chats)
+	}
+}
+
 // Свойство очереди: при любой последовательности взятий, неудач и завершений
 // сумма по состояниям равна числу поставленных работ.
 func TestPropertyQueueLosesNothing(t *testing.T) {

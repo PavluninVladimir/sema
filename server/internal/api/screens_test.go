@@ -136,6 +136,7 @@ func TestAllScreensBuildOnEmptyDatabase(t *testing.T) {
 		// внутренняя вкладка («memory~areas») — тот же пункт меню
 		case doc.Active == screen, strings.HasPrefix(screen, doc.Active+":"), strings.HasPrefix(screen, doc.Active+"~"):
 		case screen == "queue" && doc.Active == "health",
+			screen == "ask" && strings.HasPrefix(doc.Active, "chat:") && doc.Heading == "Сёма",
 			// «Что ушло наружу» — раздел настроек со своей лентой и отправками;
 			// прежние адреса («sent», «sent~log») ведут в него
 			screen == "sent" && doc.Active == "settings",

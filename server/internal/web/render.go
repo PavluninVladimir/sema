@@ -10,6 +10,7 @@ package web
 // Своего JavaScript почти нет.
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -331,7 +332,8 @@ type Block struct {
 	// Картинка — адрес картинки строки: показывается как картинка, а не
 	// рамкой. Рамка для картинки не годится — файл отдаётся с запретом
 	// встраивания
-	ImageURL string
+	ImageURL  string
+	InlinePNG []byte
 	// Рамка — адрес чужого документа (тело письма), который показывается
 	// в песочнице. Разметка письма не должна жить в адресе Сёмы: её CSS
 	// перекрасил бы интерфейс, а её ссылки вели бы по путям Сёмы
@@ -434,7 +436,11 @@ type Composer struct {
 }
 
 var tmpl = template.Must(template.New("screen").Funcs(template.FuncMap{
-	"attrs":          attrs,
+	"attrs": attrs,
+	"pngDataURL": func(png []byte) template.URL {
+		// Тип и алфавит задаёт сервер, URL из данных пользователя здесь нет.
+		return template.URL("data:image/png;base64," + base64.StdEncoding.EncodeToString(png))
+	},
 	"icon":           Icon,
 	"hasIcon":        HasIcon,
 	"percent":        func(v *float64) string { return fmt.Sprintf("%.0f%%", *v) },

@@ -400,25 +400,25 @@ func TestIntegrationsSettingsNotLost(t *testing.T) {
 func TestSectionSubtabsAreAddressable(t *testing.T) {
 	s, _ := testServer(t)
 	для := map[string]string{
-		accessScreen + "~" + accessTabNetwork:       accessScreen,
-		accessScreen + "~" + accessTabInside:        accessScreen,
-		accessScreen + "~" + accessTabLog:           accessScreen,
-		notifySettingsScreen + "~" + notifyTabRules: notifySettingsScreen,
-		serversScreen + "~" + serversTabAuto:        serversScreen,
-		serversScreen + "~" + serversTabLog:         serversScreen,
-		"settings:storages~" + storTabSources:       "settings:storages",
+		accessScreen + "~" + accessTabNetwork:       settingsSecurity,
+		accessScreen + "~" + accessTabInside:        settingsSecurity,
+		accessScreen + "~" + accessTabLog:           settingsSecurity,
+		notifySettingsScreen + "~" + notifyTabRules: settingsChannels,
+		serversScreen + "~" + serversTabAuto:        settingsSystem,
+		serversScreen + "~" + serversTabLog:         settingsSystem,
+		"settings:storages~" + storTabSources:       settingsSystem,
 		// «Шифрование» переехало с «Инструментов» к «Ключам и секретам»
-		secretsScreen + "~" + secretsTabCrypt: secretsScreen,
-		secretsScreen + "~" + secretsTabLog:   secretsScreen,
-		agentsScreen + "~" + agentsTabGateway: agentsScreen,
+		secretsScreen + "~" + secretsTabCrypt: settingsSecurity,
+		secretsScreen + "~" + secretsTabLog:   settingsSecurity,
+		agentsScreen + "~" + agentsTabGateway: settingsSystem,
 	}
-	for screen, section := range для {
+	for screen, group := range для {
 		doc, err := s.buildScreen(screen, "", "", 0)
 		if err != nil {
 			t.Fatalf("%s: %v", screen, err)
 		}
-		if doc.ActivePanel != section {
-			t.Errorf("%s: в списке разделов выбран %q", screen, doc.ActivePanel)
+		if doc.ActivePanel != group {
+			t.Errorf("%s: в списке групп выбран %q", screen, doc.ActivePanel)
 		}
 		if doc.ActiveSubtab != screen {
 			t.Errorf("%s: выбранная внутренняя вкладка %q", screen, doc.ActiveSubtab)

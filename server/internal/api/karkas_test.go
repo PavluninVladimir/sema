@@ -16,7 +16,8 @@ import (
 func settingsScreens() []string {
 	out := []string{settingsRoot, settingsOverview}
 	for _, group := range settingsGroups {
-		out = append(out, group.Sections...)
+		out = append(out, group.ID)
+		out = append(out, group.sections()...)
 	}
 	return out
 }
@@ -39,10 +40,10 @@ func TestEverySectionHasOneGroup(t *testing.T) {
 		if group.Name != wantGroups[i] {
 			t.Errorf("группа №%d зовётся «%s», а должна «%s»", i+1, group.Name, wantGroups[i])
 		}
-		if len(group.Sections) == 0 {
+		if len(group.sections()) == 0 {
 			t.Errorf("группа %q без разделов", group.Name)
 		}
-		for _, section := range group.Sections {
+		for _, section := range group.sections() {
 			if previous, before := where[section]; before {
 				t.Errorf("раздел %q стоит и в «%s», и в «%s» — это снова каталог", section, previous, group.Name)
 			}
@@ -51,10 +52,14 @@ func TestEverySectionHasOneGroup(t *testing.T) {
 				t.Errorf("у раздела %q нет короткого имени для списка", section)
 			}
 		}
-		// список длиннее шести строк сам становится каталогом
-		if len(group.Sections) > 6 {
-			t.Errorf("в группе «%s» %d разделов — список перестаёт читаться", group.Name, len(group.Sections))
+		for _, block := range group.Blocks {
+			if len(block.Sections) == 0 || len(block.Sections) > 6 {
+				t.Errorf("%s → %s: %d строк в подгруппе", group.Name, block.Title, len(block.Sections))
+			}
 		}
+	}
+	if where[botsScreen] != "Каналы" {
+		t.Errorf("%q находится в группе %q, ожидались «Каналы»", botsTitle, where[botsScreen])
 	}
 	if where[settingsRoot] != "" {
 		t.Errorf("«Обзор» стоит в группе «%s»: он над группами, а не в них", where[settingsRoot])
@@ -136,8 +141,9 @@ func TestOldTabCanonicalizedToSection(t *testing.T) {
 					break
 				}
 			}
-			if !phone && doc.ActivePanel != section {
-				t.Errorf("после %q в колонке выбран %q, а должен %q", tab, doc.ActivePanel, section)
+			group, _, _ := settingsSectionOf(section)
+			if doc.ActivePanel != group.ID {
+				t.Errorf("после %q выбрана группа %q, а должна %q", tab, doc.ActivePanel, group.ID)
 			}
 		}
 	}
@@ -170,92 +176,31 @@ func panelShape(panel []PanelItem) string {
 	return b.String()
 }
 
-// Колонка одна на все настройки: «Обзор» наверху, потом четыре группы с
-// заголовками и все разделы в том же порядке и под теми же именами, что
-// были у вкладок. Выбран ровно один пункт, и это тот, где человек стоит.
-// Состав колонки не зависит от экрана: меняются подсветка и счётчики.
-func TestPanelIsOneColumn(t *testing.T) {
+func TestSettingsPanelShowsGroups(t *testing.T) {
 	s, _ := testServer(t)
-	var sample string
-	for _, screen := range settingsScreens() {
-		doc, err := s.buildScreen(screen, "", "", 50)
-		if err != nil {
-			t.Fatalf("%s: %v", screen, err)
-		}
-		if doc.PanelKind != "sections" || doc.PanelTitle != "Настройки" {
-			t.Errorf("%s: вид колонки %q, название %q", screen, doc.PanelKind, doc.PanelTitle)
-		}
-		// «Обзор» — первый пункт, не заголовок
-		if len(doc.Panel) == 0 || doc.Panel[0].Kind != "" || doc.Panel[0].ID != settingsRoot || doc.Panel[0].Title != "Обзор" {
-			t.Fatalf("%s: колонка начинается с %+v, а должна с «Обзор»", screen, doc.Panel[:1])
-		}
-		// порядок: заголовок группы, её разделы, следующий заголовок
-		var headings []string
-		for i, item := range doc.Panel {
-			if item.Kind == "heading" {
-				headings = append(headings, item.Title)
-				if item.ID != "" || item.Delete != nil || item.Meta != "" || item.Level != "" {
-					t.Errorf("%s: у заголовка группы «%s» есть адрес, действие или счётчик: %+v", screen, item.Title, item)
-				}
-				continue
+	want := []string{settingsRoot, settingsChannels, settingsBehavior, settingsSystem, settingsSecurity}
+	for _, phone := range []bool{false, true} {
+		for _, screen := range settingsScreens() {
+			doc, err := s.buildScreenForPhone(screen, "", "", 50, phone, false)
+			if err != nil {
+				t.Fatalf("%s: %v", screen, err)
 			}
-			if item.ID == "" {
-				t.Errorf("%s: пункт №%d без адреса и не заголовок: %+v", screen, i, item)
+			if doc.PanelKind != "sections" || doc.PanelTitle != "Настройки" || len(doc.Panel) != len(want) {
+				t.Fatalf("%s: неверная панель %q: %+v", screen, doc.PanelKind, doc.Panel)
 			}
-		}
-		if strings.Join(headings, "|") != strings.Join(wantGroups, "|") {
-			t.Errorf("%s: заголовки групп %v, а должны %v", screen, headings, wantGroups)
-		}
-		for _, group := range settingsGroups {
-			var ids []string
-			in := false
-			for _, item := range doc.Panel {
-				switch {
-				case item.Kind == "heading":
-					in = item.Title == group.Name
-				case in:
-					ids = append(ids, item.ID)
+			for i, item := range doc.Panel {
+				if item.ID != want[i] || item.Kind != "" || item.Title == "" {
+					t.Errorf("%s: пункт %d: %+v", screen, i, item)
 				}
 			}
-			if strings.Join(ids, "|") != strings.Join(group.Sections, "|") {
-				t.Errorf("%s: под «%s» стоят %v, а должны %v", screen, group.Name, ids, group.Sections)
+			group, _, _ := settingsSectionOf(screen)
+			active := group.ID
+			if active == "" {
+				active = settingsRoot
 			}
-		}
-		for _, item := range doc.Panel {
-			if item.Kind == "" && item.Title != sectionTitle[item.ID] {
-				t.Errorf("%s: раздел %q зовётся «%s», а в списке «%s»", screen, item.ID, item.Title, sectionTitle[item.ID])
+			if doc.ActivePanel != active {
+				t.Errorf("%s: выбрано %q, ожидалось %q", screen, doc.ActivePanel, active)
 			}
-		}
-		// выбран ровно один, и это он
-		want, _ := func() (string, bool) { _, section, ok := settingsSectionOf(screen); return section, ok }()
-		if doc.ActivePanel != want {
-			t.Errorf("%s: выбран %q, а должен %q", screen, doc.ActivePanel, want)
-		}
-		var selected int
-		markup, err := web.Render(toScreen(doc))
-		if err != nil {
-			t.Fatalf("%s: %v", screen, err)
-		}
-		tree, _ := html.Parse(strings.NewReader("<div id=\"window\">" + string(markup) + "</div>"))
-		var walk func(n *html.Node)
-		walk = func(n *html.Node) {
-			if n.Type == html.ElementNode && hasClass(n, "item") && hasClass(n, "selected") && inside(n, nodeByID(tree, "panel")) {
-				selected++
-			}
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				walk(c)
-			}
-		}
-		walk(tree)
-		if selected != 1 {
-			t.Errorf("%s: в колонке отмечено %d пунктов, а должен один", screen, selected)
-		}
-		// состав один и тот же на каждом экране
-		shape := panelShape(doc.Panel)
-		if sample == "" {
-			sample = shape
-		} else if shape != sample {
-			t.Errorf("%s: состав колонки отличается от остальных экранов настроек:\n%s", screen, shape)
 		}
 	}
 }
@@ -273,46 +218,26 @@ func nodeByID(n *html.Node, id string) *html.Node {
 	return nil
 }
 
-// Счётчик «есть что решить» стоит у строки раздела, и только у неё: три
-// письма ждут решения по спаму — три у «Почты», а не у заголовка группы
-// и не у соседей. У «Обзора» счётчик — число разделов с замечаниями.
-func TestPanelCounterOnSectionRow(t *testing.T) {
+func TestMailCounterInCatalog(t *testing.T) {
 	s, st := testServer(t)
 	for i := 0; i < 3; i++ {
 		m := &store.Message{MessageID: "<ждёт" + string(rune('а'+i)) + "@т>", Subject: "Тема",
-			FromAddr: "a" + string(rune('а'+i)) + "@пример.рф", Date: time.Now(),
-			Status: store.StatusPending, Confidence: 0.9, Account: "проба"}
+			FromAddr: "a@пример.рф", Date: time.Now(), Status: store.StatusPending, Confidence: 0.9, Account: "проба"}
 		if err := st.InsertMessage(m); err != nil {
 			t.Fatal(err)
 		}
 	}
-	// с любого экрана настроек счётчики одни и те же
-	for _, screen := range []string{settingsRoot, modelsScreen, accessScreen} {
+	for _, screen := range []string{settingsRoot, settingsChannels} {
 		doc, err := s.buildScreen(screen, "", "", 50)
 		if err != nil {
-			t.Fatalf("%s: %v", screen, err)
+			t.Fatal(err)
 		}
-		marks := map[string]PanelItem{}
-		for _, item := range doc.Panel {
-			if item.Meta != "" || item.Level != "" {
-				marks[item.ID+item.Kind] = item
-			}
+		mail := docByID(doc, "catalog-"+mailScreen)
+		if mail == nil || len(mail.Badges) != 1 || mail.Badges[0].Text != "3" || mail.Badges[0].Level != LevelWarn {
+			t.Errorf("%s: неверный счётчик у «Почты»: %+v", screen, mail)
 		}
-		mail, ok := marks["settings:mail"]
-		if !ok || mail.Meta != "3" || mail.Level != LevelWarn {
-			t.Errorf("%s: у «Почты» ждали счётчик 3 уровня warn, а есть %+v", screen, mail)
-		}
-		overview, ok := marks[settingsRoot]
-		if !ok || overview.Level == "" || overview.Meta == "" {
-			t.Errorf("%s: у «Обзора» счётчика нет: %+v", screen, overview)
-		}
-		for key, item := range marks {
-			if item.Kind == "heading" {
-				t.Errorf("%s: счётчик у заголовка группы: %+v", screen, item)
-			}
-			if item.Level == LevelOK {
-				t.Errorf("%s: норма помечена (%s): она молчит", screen, key)
-			}
+		if overview := doc.Panel[0]; overview.ID != settingsRoot || overview.Level == "" || overview.Meta == "" {
+			t.Errorf("%s: нет счётчика у «Обзора»: %+v", screen, overview)
 		}
 	}
 }
@@ -400,73 +325,45 @@ func TestSearchIsFirstRowOfColumn(t *testing.T) {
 	}
 }
 
-// Телефон, корень: список разделов экраном. Те же «Обзор» и четыре группы,
-// что в колонке на широком экране; колонки и вкладок нет, поле поиска
-// первой строкой.
-func TestPhoneRootIsSectionList(t *testing.T) {
-	s, st := testServer(t)
-	m := &store.Message{MessageID: "<ждёт@т>", Subject: "Тема", FromAddr: "a@пример.рф",
-		Date: time.Now(), Status: store.StatusPending, Confidence: 0.9, Account: "проба"}
-	if err := st.InsertMessage(m); err != nil {
-		t.Fatal(err)
-	}
-	doc, err := s.buildScreenForPhone(settingsRoot, "", "", 50, true, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(doc.Panel) != 0 || doc.PanelTitle != "" || doc.PanelKind != "" || len(doc.Tabs) != 0 {
-		t.Errorf("на телефоне у корня колонка или вкладки: панель %d, вид %q, вкладок %d", len(doc.Panel), doc.PanelKind, len(doc.Tabs))
-	}
-	if !doc.Searchable {
-		t.Error("у корня настроек на телефоне нет поиска")
-	}
-	if doc.Screen != settingsRoot || doc.Heading != "Настройки" {
-		t.Errorf("корень зовётся %q, заголовок %q", doc.Screen, doc.Heading)
-	}
-	// первым — «Обзор» своим адресом, дальше группы в порядке колонки
-	var addrs, headings []string
-	for _, comp := range doc.Components {
-		if comp.Type != "section" {
-			continue
-		}
-		if comp.Title != "" {
-			headings = append(headings, comp.Title)
-		}
-		for _, child := range comp.Children {
-			for _, a := range child.Actions {
-				if a.Action == "$goto" {
-					addrs = append(addrs, a.Target)
+func TestSettingsCatalogLinks(t *testing.T) {
+	s, _ := testServer(t)
+	for _, phone := range []bool{false, true} {
+		for _, group := range settingsGroups {
+			doc, err := s.buildScreenForPhone(group.ID, "", "", 50, phone, false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if doc.Heading != group.Name || len(doc.Components) != len(group.Blocks) {
+				t.Fatalf("%s: неверная структура каталога", group.ID)
+			}
+			for i, block := range group.Blocks {
+				section := doc.Components[i]
+				if section.Title != block.Title || len(section.Children) != len(block.Sections) {
+					t.Fatalf("%s: неверная подгруппа %q", group.ID, section.Title)
+				}
+				for j, addr := range block.Sections {
+					row := section.Children[j]
+					if row.Subtitle != sectionTitle[addr] || len(row.Actions) != 1 || row.Actions[0].Target != addr {
+						t.Errorf("%s: неверная строка %s: %+v", group.ID, addr, row)
+					}
 				}
 			}
 		}
 	}
-	want := []string{settingsOverview}
-	for _, group := range settingsGroups {
-		want = append(want, group.Sections...)
-	}
-	if strings.Join(addrs, "|") != strings.Join(want, "|") {
-		t.Errorf("строки корня ведут в %v, а должны в %v", addrs, want)
-	}
-	if strings.Join(headings, "|") != strings.Join(wantGroups, "|") {
-		t.Errorf("заголовки групп корня %v, а должны %v", headings, wantGroups)
-	}
-	// у «Почты» счётчик, у «Обзора» тоже
-	dump := dumpScreen(doc)
-	for _, needed := range []string{"Почта", "Обзор", "ящик"} {
-		if !strings.Contains(dump, needed) {
-			t.Errorf("в корне нет %q:\n%s", needed, clipTest(dump))
+}
+
+func TestSettingsCatalogHidesAdminScreens(t *testing.T) {
+	s, _ := testServer(t)
+	for _, screen := range []string{settingsChannels, settingsSecurity, settingsOverview} {
+		doc, err := s.buildScreenForPhone(screen, "", "", 50, true, false, asGuest())
+		if err != nil {
+			t.Fatal(err)
 		}
-	}
-	var mail *Component
-	for i, comp := range doc.Components {
-		for j, child := range comp.Children {
-			if child.Subtitle == "Почта" {
-				mail = &doc.Components[i].Children[j]
+		for _, addr := range []string{botsScreen, maxScreen, wechatScreen, accessScreen} {
+			if docByID(doc, "catalog-"+addr) != nil || docByID(doc, "беда-"+addr) != nil {
+				t.Errorf("%s: гость видит ссылку на %s", screen, addr)
 			}
 		}
-	}
-	if mail == nil || len(mail.Badges) == 0 || mail.Badges[0].Text != "1" {
-		t.Errorf("у строки «Почта» счётчика нет: %+v", mail)
 	}
 }
 
@@ -485,53 +382,32 @@ func TestPhoneRootSearchShowsResults(t *testing.T) {
 	if !strings.Contains(dump, "Нашлось") || !strings.Contains(dump, "Уведомления") {
 		t.Errorf("по «пуши» не нашлись «Уведомления»:\n%s", clipTest(dump))
 	}
-	if strings.Contains(dump, "Безопасность") {
-		t.Errorf("с запросом на экране остался весь список:\n%s", clipTest(dump))
+	if docByID(doc, "settings-catalog") != nil {
+		t.Error("с запросом остался каталог")
 	}
 }
 
-// Телефон, раздел: колонки нет, вкладок нет, над заголовком «‹ Настройки»
-// ведёт в корень, а верхнее поле поиска не занимает полосу.
-func TestPhoneSectionHasBackNotColumn(t *testing.T) {
+func TestSettingsBackToCatalog(t *testing.T) {
 	s, _ := testServer(t)
-	for _, screen := range settingsScreens() {
-		if screen == settingsRoot {
-			continue
-		}
-		doc, err := s.buildScreenForPhone(screen, "", "", 50, true, false)
-		if err != nil {
-			t.Fatalf("%s: %v", screen, err)
-		}
-		if len(doc.Panel) != 0 || doc.PanelKind != "" || len(doc.Tabs) != 0 {
-			t.Errorf("%s: на телефоне колонка или вкладки: панель %d, вкладок %d", screen, len(doc.Panel), len(doc.Tabs))
-		}
-		if len(doc.Components) == 0 || doc.Components[0].Type != "crumb" {
-			t.Errorf("%s: первым компонентом не «назад»", screen)
-			continue
-		}
-		back := doc.Components[0].Actions
-		if len(back) != 1 || back[0].Action != "$goto" || back[0].Target != settingsRoot || back[0].Label != "‹ Настройки" {
-			t.Errorf("%s: «назад» устроен не так: %+v", screen, back)
-		}
-		if doc.Searchable && len(doc.Filters) == 0 {
-			t.Errorf("%s: у раздела на телефоне осталась отдельная полоса поиска", screen)
-		}
-		// разметка: ни колонки, ни шторки, ни вкладок экрана
-		markup, err := web.Render(toScreen(doc))
-		if err != nil {
-			t.Fatalf("%s: %v", screen, err)
-		}
-		for _, extra := range []string{"section-picker", "panel-picker", `id="panel"`, `class="tabs-bar"`} {
-			if strings.Contains(string(markup), extra) {
-				t.Errorf("%s: на телефоне в разметке есть %q", screen, extra)
+	for _, phone := range []bool{false, true} {
+		for _, group := range settingsGroups {
+			for _, screen := range group.sections() {
+				doc, err := s.buildScreenForPhone(screen, "", "", 50, phone, false)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if len(doc.Components) == 0 || doc.Components[0].Type != "crumb" {
+					t.Fatalf("%s: нет обратного пути", screen)
+				}
+				back := doc.Components[0].Actions
+				if len(back) != 1 || back[0].Target != group.ID || back[0].Label != "‹ "+group.Name {
+					t.Errorf("%s: неверный обратный путь: %+v", screen, back)
+				}
 			}
 		}
 	}
 }
 
-// Обзор: на широком экране `settings` и `settings:overview` — один и тот
-// же экран рядом с колонкой, на телефоне `settings:overview` — содержимое
-// Обзора с «назад» в корень, а `settings` — список.
 func TestOverviewHasOwnAddress(t *testing.T) {
 	s, _ := testServer(t)
 	a, err := s.buildScreen(settingsRoot, "", "", 50)
@@ -556,9 +432,8 @@ func TestOverviewHasOwnAddress(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ph.Heading != "Обзор" || len(ph.Components) < 2 || ph.Components[0].Type != "crumb" ||
-		ph.Components[0].Actions[0].Target != settingsRoot {
-		t.Errorf("Обзор на телефоне: заголовок %q, первый компонент %+v", ph.Heading, ph.Components[:1])
+	if ph.Heading != "Обзор" || len(ph.Panel) != 5 || docByID(ph, "settings-catalog") == nil {
+		t.Errorf("Обзор на телефоне: заголовок %q, панель из %d пунктов", ph.Heading, len(ph.Panel))
 	}
 	if !strings.Contains(dumpScreen(ph), "Ждут решения") {
 		t.Errorf("на телефонном Обзоре нет полки «Ждут решения»")

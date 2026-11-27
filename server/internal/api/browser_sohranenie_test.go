@@ -16,7 +16,7 @@ import (
 // Проверять такое вызовом функции из консоли бессмысленно: сборка
 // разметки бывает безупречной, а живое нажатие не работает — на этом уже
 // горели с кнопкой меню на телефоне, которую собственный обработчик
-// закрывал тем же кликом. Здесь человек тыкает тумблер, потом раздел в колонке,
+// закрывал тем же кликом. Здесь человек тыкает тумблер, потом группу в колонке,
 // потом «Остаться» и «Сохранить» — ровно как за столом.
 func TestBrowserSavingBarAndLeaving(t *testing.T) {
 	if os.Getenv("SEMA_BROWSER") == "" {
@@ -78,9 +78,9 @@ func TestBrowserSavingBarAndLeaving(t *testing.T) {
 		t.Errorf("полоса говорит %q, а должна называть, что именно изменилось", label)
 	}
 
-	// нажали другой раздел в колонке: экран остаётся, всплывает местная панель
-	if err := chromedp.Run(ctx, chromedp.Click(`#panel .item[hx-get="/ui?screen=`+tgScreen+`"]`, chromedp.ByQuery)); err != nil {
-		t.Fatalf("нажать раздел в колонке: %v", err)
+	// Нажали другую группу в колонке: экран остаётся, всплывает панель.
+	if err := chromedp.Run(ctx, chromedp.Click(settingsGroupButton(settingsBehavior), chromedp.ByQuery)); err != nil {
+		t.Fatalf("нажать группу в колонке: %v", err)
 	}
 	var ушёл string
 	if err := chromedp.Run(ctx, chromedp.Poll(
@@ -128,20 +128,20 @@ func TestBrowserSavingBarAndLeaving(t *testing.T) {
 		t.Fatalf("сохранение не прошло (%v), у формы написано %q", err, что)
 	}
 
-	// сохранённое больше не держит: тот же раздел открывается сразу
-	if err := chromedp.Run(ctx, chromedp.Click(`#panel .item[hx-get="/ui?screen=`+tgScreen+`"]`, chromedp.ByQuery)); err != nil {
-		t.Fatalf("нажать раздел в колонке: %v", err)
+	// После сохранения группа открывается сразу.
+	if err := chromedp.Run(ctx, chromedp.Click(settingsGroupButton(settingsBehavior), chromedp.ByQuery)); err != nil {
+		t.Fatalf("нажать группу в колонке: %v", err)
 	}
 	var уехал bool
 	if err := chromedp.Run(ctx, chromedp.Poll(
-		`!document.getElementById('screen').dataset.screen.startsWith('settings:mail')`, &уехал,
+		`document.getElementById('screen').dataset.screen === `+jsString(settingsBehavior), &уехал,
 		chromedp.WithPollingTimeout(10*time.Second))); err != nil || !уехал {
 		t.Fatalf("без несохранённого переход должен идти сразу: %v", err)
 	}
 }
 
-// На телефоне раздел — целый экран с «‹ Настройки» над заголовком, и
-// вернуться в корень можно, не сохранив правку. Панель ухода обязана быть
+// На телефоне ссылка «‹ Каналы» над заголовком ведёт в каталог группы,
+// даже если правку ещё не сохранили. Панель ухода обязана быть
 // видна: человек увидел бы, что нажатие ничего не сделало, и нажал бы ещё
 // раз. (До 1 октября 2026 на телефоне разделы приезжали шторкой снизу, и
 // панель всплывала за ней.)
@@ -180,7 +180,7 @@ func TestBrowserPhoneLeavingByBack(t *testing.T) {
 		chromedp.WithPollingTimeout(10*time.Second))); err != nil || !has {
 		t.Fatalf("полоса сохранения не появилась: %v", err)
 	}
-	// «‹ Настройки» — настоящее нажатие
+	// «‹ Каналы» — настоящее нажатие
 	if err := chromedp.Run(ctx, chromedp.Click(`.crumbs .crumb`, chromedp.ByQuery)); err != nil {
 		t.Fatalf("нажать «назад»: %v", err)
 	}

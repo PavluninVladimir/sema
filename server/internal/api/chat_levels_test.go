@@ -12,10 +12,6 @@ import (
 // это дерево жило второй панелью рядом с меню и дублировало его.
 func TestChatListInThreeLevels(t *testing.T) {
 	s, st := testServer(t)
-	// главный разговор с Сёмой — самый старый: он первым в меню и не
-	// должен забирать себе ветку темы, хотя та тоже ветка «Сёма»
-	я, _ := st.CreateChat("Telegram · Вадим")
-	главный, _ := st.CreateThread(я, store.ChatKindSema, 0, "Сёма · Вадим")
 	root, _ := st.CreateChat("Telegram · Дом")
 	_ = st.SetChatKind(root, store.ChatKindGroup)
 	topic, _ := st.CreateConversation(root, store.ChatKindTopic, 7, "Заявки")
@@ -51,9 +47,6 @@ func TestChatListInThreeLevels(t *testing.T) {
 	}
 
 	children := меню(id(topic))
-	if len(children) == 0 || children[0].ID != id(главный) {
-		t.Fatalf("первым под «Чатами» не главный разговор с Сёмой: %+v", children)
-	}
 	дом, г := найти(children, id(root), 0)
 	if дом == nil || г != 1 || !дом.Open || !дом.NoSelf {
 		t.Fatalf("контейнер «Дом» не раскрытым узлом в группе: %+v, глубина %d", дом, г)

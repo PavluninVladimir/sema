@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/chromedp/chromedp"
-
-	"github.com/PavluninVladimir/sema/server/internal/store"
 )
 
 // Меню не прыгает при переходе между разговорами. Запись экрана
@@ -25,9 +23,7 @@ func TestBrowserChatsMenuDoesNotJump(t *testing.T) {
 		t.Skip("нужен Chrome: запуск SEMA_BROWSER=1 go test ./internal/api -run Браузер")
 	}
 	s, st := testServer(t)
-	я, _ := st.CreateChat("Telegram · Вадим")
-	главный, _ := st.CreateThread(я, store.ChatKindSema, 0, "Сёма · Вадим")
-	_ = st.AddChatMsg(главный, "assistant", "готово")
+	главный := primaryChatForChromeTest(t, s)
 	мила, _ := st.CreateChat("Telegram · Мила")
 	_ = st.AddChatMsg(мила, "peer", "привет")
 	семья, _ := st.CreateChat("MAX · Семья")
@@ -115,9 +111,7 @@ func TestBrowserPlusCreatesNewChat(t *testing.T) {
 		t.Skip("нужен Chrome: запуск SEMA_BROWSER=1 go test ./internal/api -run Браузер")
 	}
 	s, st := testServer(t)
-	я, _ := st.CreateChat("Telegram · Вадим")
-	главный, _ := st.CreateThread(я, store.ChatKindSema, 0, "Сёма · Вадим")
-	_ = st.AddChatMsg(главный, "assistant", "готово")
+	главный := primaryChatForChromeTest(t, s)
 	before, _ := st.Chats()
 
 	srv := httptest.NewServer(s.Handler())
@@ -164,4 +158,24 @@ func TestBrowserPlusCreatesNewChat(t *testing.T) {
 	if !раскрыт {
 		t.Error("нажатие плюса свернуло «Чаты»")
 	}
+	var inMyChats bool
+	if err := chromedp.Run(ctx, chromedp.Evaluate(`(() => {
+		const group = document.getElementById('menu-чаты:Мои чаты');
+		return !!group && Array.from(group.querySelectorAll('[hx-get]')).some(item => item.getAttribute('hx-get') === '/ui?screen=' + `+jsString(screen)+`);
+	})()`, &inMyChats)); err != nil || !inMyChats {
+		t.Errorf("новый чат не появился в «Моих чатах»: %v", err)
+	}
+}
+
+func primaryChatForChromeTest(t *testing.T, s *Server) int64 {
+	t.Helper()
+	doc, err := s.buildScreen("ask", "", "", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	id, err := strconv.ParseInt(strings.TrimPrefix(doc.Active, "chat:"), 10, 64)
+	if err != nil || id <= 0 {
+		t.Fatalf("основной разговор не открылся: %q", doc.Active)
+	}
+	return id
 }

@@ -30,6 +30,8 @@ import (
 )
 
 type Engine struct {
+	wechatLogin wechatLoginState
+	maxQR       maxQRState
 	// счётчикиДляТеста — подмена списка пар «сделано из всего».
 	//
 	// Настоящие пары приходят от живых воркеров, и поднять их в проверке

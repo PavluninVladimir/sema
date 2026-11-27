@@ -205,6 +205,8 @@ func (e *Engine) NotifyDecide(ctx context.Context, id int64, idx int, by string)
 
 func (e *Engine) notifyCoreOp(ctx context.Context, n *store.Notification, a store.NotifyAction, by string) error {
 	switch a.Op {
+	case "wechat_confirm_ssh", "wechat_reject_ssh":
+		return e.decideWeChatSSH(ctx, n.ID, a.Ref, by, a.Op == "wechat_confirm_ssh")
 	// ответ человека про картинку, в которой не нашлось текста. Вопрос без
 	// кнопок вопросом не был: закрыв запись, человек ничего не решал, и
 	// следующий проход спрашивал снова

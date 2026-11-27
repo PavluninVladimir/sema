@@ -193,34 +193,19 @@ func traverseScreens(t *testing.T, srv *httptest.Server, ш, в int64, теле�
 			`//*[@id='menu']//*[contains(@class,'item') and contains(@class,'selected')]`, "")
 	}
 
-	// ---- все разделы настроек ----
-	// обход меню кончается на «Почте», колонки настроек там нет — сначала в
-	// настройки, тем же пунктом меню. Дальше на десктопе колонка разделов
-	// (одна на все, без вкладок), а на телефоне — корень настроек: строка
-	// раздела, потом «‹ Настройки» назад в корень
+	// Все группы и их разделы доступны из общего каркаса.
 	if телефон {
 		if err := нажать(`//*[@id='tabbar']//button[@data-panel='menu']`); err != nil {
 			t.Fatalf("телефон: открыть меню: %v", err)
 		}
 	}
-	шаг("меню → Настройки", `//*[@id='menu']//*[contains(@class,'item') and @hx-get='/ui?screen=settings']`, "settings", "", "")
-	// строка корня (телефон) или пункт колонки (десктоп) — и обратно
-	section := func(screen, name string) {
-		if телефон {
-			шаг("корень → "+name, `//*[@id='feed']//*[contains(@class,'row') and @data-goto='`+screen+`']`, screen, "", "")
-			шаг(name+" → назад", `//nav[contains(@class,'crumbs')]//button[contains(@class,'crumb')]`, "settings", "", "")
-			return
-		}
-		target := screen
-		if screen == settingsOverview {
-			target = "settings"
-		}
-		шаг("раздел "+name, sectionOf(name), target, sectionSelected, name)
-	}
-	section(settingsOverview, "Обзор")
+	шаг("меню → Настройки", `//*[@id='menu']//*[contains(@class,'item') and @hx-get='/ui?screen=settings']`, settingsRoot, "", "")
 	for _, group := range settingsGroups {
-		for _, name := range group.Sections {
-			section(name, sectionTitle[name])
+		шаг("группа "+group.Name, sectionOf(group.Name), group.ID, sectionSelected, group.Name)
+		for _, screen := range group.sections() {
+			name := sectionTitle[screen]
+			шаг("каталог → "+name, catalogOf(screen), screen, sectionSelected, group.Name)
+			шаг(name+" → назад", `//nav[contains(@class,'crumbs')]//button[contains(@class,'crumb')]`, group.ID, sectionSelected, group.Name)
 		}
 	}
 

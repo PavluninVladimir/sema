@@ -1442,14 +1442,9 @@ body.push-offer .row-wrap:has(> .row.offer) { display: block; border-bottom: 0; 
   padding: 9px 10px;
   gap: 8px;
 }
-/* Колонка разделов настроек — это не список чатов: у раздела одно короткое
-   имя без второй строки и без времени справа, а над ним четыре заголовка
-   групп. Высота чата в 58 точек превращала восемнадцать разделов в три
-   экрана, поэтому здесь строка в 30 точек, как в макете
-   design/nastroyki-2/Karkas.html: колонка помещается в окно целиком.
-   Поле поиска — первая строка, счётчик замечаний — справа от названия. */
+/* Навигация настроек: группы в короткой колонке, справочник в экране. */
 #panel.sections {
-  width: 232px; flex: 0 0 232px;
+  width: 208px; flex: 0 0 208px;
   padding: 12px 10px 20px;
   background: var(--menu-bg);
   display: flex; flex-direction: column; gap: 2px;
@@ -1462,17 +1457,14 @@ body.push-offer .row-wrap:has(> .row.offer) { display: block; border-bottom: 0; 
 }
 #panel.sections .panel-search .search:focus { border-color: var(--accent); }
 #panel.sections .panel-search .search-icon { left: 9px; }
-#panel.sections .panel-heading {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
-  color: var(--text-faint); padding: 12px 10px 4px;
-}
 #panel.sections .panel-row .item {
-  min-height: 30px; height: 30px; align-items: center; padding: 0 10px;
+  min-height: 36px; height: 36px; align-items: center; padding: 0 10px;
   border-radius: 8px; gap: 8px; color: var(--text-secondary); font-size: 13px;
 }
 #panel.sections .panel-row .item:hover { color: var(--text); }
-#panel.sections .panel-row .item.selected { color: var(--text); }
+#panel.sections .panel-row .item.selected { color: var(--text); font-weight: 600; }
 #panel.sections .panel-row .title { font: inherit; color: inherit; }
+#panel.sections .panel-row .item-icon { width: 15px; height: 15px; flex: 0 0 15px; }
 #panel.sections .panel-row .counter {
   align-self: center; font: 500 11px/1.3 var(--font-mono); color: var(--text-faint);
 }
@@ -1484,6 +1476,27 @@ body.push-offer .row-wrap:has(> .row.offer) { display: block; border-bottom: 0; 
 #panel.sections .panel-row .mark.warn { background: var(--warn); }
 #panel.sections .panel-row .mark.alert { background: var(--alert); }
 #panel.sections .panel-row .item .counter, #panel.sections .panel-row .item .mark { margin-left: auto; }
+.row.catalog-link::after {
+  content: ""; width: 6px; height: 6px; flex: 0 0 6px; align-self: center;
+  border: solid var(--text-faint); border-width: 0 1.5px 1.5px 0;
+  transform: rotate(-45deg); margin: 0 4px;
+}
+
+@media (max-width: 720px) {
+  #middle:has(> #panel.sections) { flex-direction: column; }
+  #panel.sections {
+    width: 100%; flex: 0 0 auto; flex-direction: row; flex-wrap: wrap;
+    gap: 2px 4px; padding: 8px 10px;
+    border-right: 0; border-bottom: 1px solid var(--border);
+    overflow: visible;
+  }
+  #panel.sections .panel-header { display: none; }
+  #panel.sections .panel-search { flex: 0 0 100%; margin-bottom: 3px; }
+  #panel.sections .panel-search .search { height: 36px; }
+  #panel.sections .panel-row { flex: 0 0 auto; }
+  #panel.sections .panel-row .item { height: auto; min-height: 36px; padding: 0 8px; }
+  #panel.sections .panel-row .item-icon { display: none; }
+}
 
 .panel-row .title { font: 600 15px/1.3 var(--font-sans); color: var(--text); }
 .panel-row .counter {

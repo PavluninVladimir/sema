@@ -16,13 +16,23 @@ jobs:
         working-directory: server
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v7
         with:
           go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
       - run: go build ./...
       - run: go vet ./...
-      # браузерные тесты (SEMA_BROWSER=1) здесь не идут: им нужен Chrome
-      - run: go test ./internal/... ./cmd/...
+      - run: go test ./...
+      - name: Настройки, Telegram и чаты в Chrome
+        env:
+          SEMA_BROWSER: '1'
+        run: |
+          command -v google-chrome
+          go test ./internal/api -p 1 -count=1 -timeout 8m \
+            -run '^(TestBrowserKarkas(Desktop|Phone|Resize)|TestBrowserTelegramBotWebhookForm|TestBrowserPlusCreatesNewChat)$'
+      - run: python3 -m unittest discover -s ../deploy -p 'test_*.py'
 
   secrets:
     runs-on: ubuntu-latest
@@ -30,6 +40,70 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [server, secrets]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: publish-sema
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      VERSION: build-${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+      - name: Пакеты Linux amd64 и arm64
+        run: |
+          make -C server linux pi VERSION="$VERSION"
+          mkdir -p dist
+          for arch in amd64 arm64; do
+            mkdir -p "dist/$arch"
+            install -m 0755 "server/sema-server-linux-$arch" "dist/$arch/sema"
+            tar -C "dist/$arch" -czf "dist/sema-linux-$arch.tar.gz" sema
+          done
+          install -m 0755 deploy/sema-update.py dist/sema-update.py
+          cd dist
+          sha256sum sema-linux-amd64.tar.gz sema-linux-arm64.tar.gz sema-update.py > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - name: Запуск пакета и проверка версии
+        run: |
+          smoke_data=$(mktemp -d)
+          dist/amd64/sema -data "$smoke_data" -listen 127.0.0.1:18765 > "$smoke_data/smoke.log" 2>&1 &
+          smoke_pid=$!
+          trap 'kill "$smoke_pid" 2>/dev/null || true; wait "$smoke_pid" 2>/dev/null || true' EXIT
+          if ! curl -fsS --retry 12 --retry-connrefused --retry-delay 1 --max-time 3 http://127.0.0.1:18765/api/health > "$smoke_data/health.json"; then
+            tail -25 "$smoke_data/smoke.log"
+            exit 1
+          fi
+          jq -e --arg version "$VERSION" '.ok and .version == $version' "$smoke_data/health.json"
+      - name: Публикация выпуска
+        id: publish
+        run: |
+          if [ "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')" != "$GITHUB_SHA" ]; then
+            echo "Основная ветка уже обновилась, этот запуск пропущен."
+            exit 0
+          fi
+          if ! gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "Сёма · ${GITHUB_SHA:0:12}" --generate-notes --latest \
+              dist/sema-linux-amd64.tar.gz dist/sema-linux-arm64.tar.gz dist/sema-update.py dist/SHA256SUMS
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+      - name: Извещение Сёмы
+        if: steps.publish.outputs.ready == 'true'
+        env:
+          SEMA_RELEASE_WEBHOOK_URL: ${{ vars.SEMA_RELEASE_WEBHOOK_URL }}
+          SEMA_RELEASE_WEBHOOK_SECRET: ${{ secrets.SEMA_RELEASE_WEBHOOK_SECRET }}
+        run: python3 deploy/notify-release.py

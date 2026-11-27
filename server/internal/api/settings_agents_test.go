@@ -25,7 +25,7 @@ func TestAgentsSectionTabs(t *testing.T) {
 	for _, tab := range []string{agentsTabList, agentsTabGateway} {
 		screen := entityAddr(agentsScreen, "", tab)
 		doc := serverDoc(t, s, screen)
-		if doc.Screen != screen || doc.ActiveSubtab != screen || doc.ActivePanel != agentsScreen {
+		if doc.Screen != screen || doc.ActiveSubtab != screen || doc.ActivePanel != settingsSystem {
 			t.Errorf("%s: экран %q, вкладка %q, колонка %q", screen, doc.Screen, doc.ActiveSubtab, doc.ActivePanel)
 		}
 		var titles []string
@@ -49,8 +49,8 @@ func TestAgentsSectionTabs(t *testing.T) {
 		t.Errorf("вкладка «Шлюз»: %+v", b)
 	}
 	// порядок: полка первой, журнал и «Тонкая настройка» в конце — настройка перед журналом
-	if doc.Components[0].Type != "shelf" {
-		t.Errorf("первым должна стоять полка, а стоит %q", doc.Components[0].Type)
+	if len(doc.Components) < 2 || doc.Components[1].Type != "shelf" {
+		t.Error("полка должна стоять сразу после обратной ссылки")
 	}
 	var order []string
 	for _, c := range doc.Components {
@@ -133,8 +133,8 @@ func TestAgentsListRowsAreThin(t *testing.T) {
 		t.Errorf("у рабочей нет «Принять новый отпечаток…» с вопросом: %+v", byName["рабочая"].Actions)
 	}
 	// полка: сменившийся отпечаток с «Было → Стало»
-	shelf := doc.Components[0]
-	if len(shelf.Children) != 1 || shelf.Children[0].ID != "agent-wait-fp-рабочая" || len(shelf.Children[0].Facts) != 2 {
+	shelf := findByType(doc, "shelf")
+	if shelf == nil || len(shelf.Children) != 1 || shelf.Children[0].ID != "agent-wait-fp-рабочая" || len(shelf.Children[0].Facts) != 2 {
 		t.Errorf("полка: %+v", shelf)
 	}
 }
@@ -187,7 +187,7 @@ func TestAgentScreenTabsAndDanger(t *testing.T) {
 		if strings.Join(titles, "|") != "Обзор|Способности|Журнал" {
 			t.Errorf("%s: вкладки %v", screen, titles)
 		}
-		if doc.Screen != screen || doc.ActiveSubtab != screen || doc.ActivePanel != agentsScreen || doc.Heading != "мак" {
+		if doc.Screen != screen || doc.ActiveSubtab != screen || doc.ActivePanel != settingsSystem || doc.Heading != "мак" {
 			t.Errorf("%s: экран %q, вкладка %q, колонка %q, заголовок %q", screen, doc.Screen, doc.ActiveSubtab, doc.ActivePanel, doc.Heading)
 		}
 		if doc.Components[0].Type != "crumb" || doc.Components[0].Actions[0].Label != "‹ Агенты" || doc.Components[0].Actions[0].Target != agentsScreen {
@@ -312,12 +312,16 @@ func TestAgentCapabilityIsAllowedOnlyByName(t *testing.T) {
 		t.Fatal(err)
 	}
 	list := serverDoc(t, s, agentsScreen)
+	shelf := findByType(list, "shelf")
+	if shelf == nil {
+		t.Fatal("нет полки в списке агентов")
+	}
 	found := false
-	for _, r := range list.Components[0].Children {
+	for _, r := range shelf.Children {
 		found = found || r.ID == "agent-wait-caps-новый"
 	}
 	if !found {
-		t.Errorf("агент без разрешённых способностей не на полке: %+v", list.Components[0])
+		t.Errorf("агент без разрешённых способностей не на полке: %+v", shelf)
 	}
 	// и вкладка «Способности» говорит о числе до захода в неё
 	if b := serverDoc(t, s, entityAddr(agentsScreen, "новый", "")).Subtabs[1]; b.Badge != "2 не разрешены" {

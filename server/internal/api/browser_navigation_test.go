@@ -40,6 +40,10 @@ type navStep struct {
 func sectionOf(name string) string {
 	return `//div[@id='panel']//button[contains(@class,'item') and contains(normalize-space(.),'` + name + `')]`
 }
+func catalogOf(screen string) string {
+	return `//*[@id='feed']//*[contains(@class,'row') and @data-goto='` + screen + `']`
+}
+
 func subtabOf(name string) string {
 	return `//div[contains(@class,'subtabs-bar')]//a[@role='tab' and contains(normalize-space(.),'` + name + `')]`
 }
@@ -99,17 +103,19 @@ func TestBrowserSettingsChains(t *testing.T) {
 	}
 
 	шаги := []navStep{
-		// Обзор → «Модели и роли» → «Проблемы», дальше по колонке через все
-		// четыре группы
-		{"Обзор → Модели и роли", sectionOf("Модели и роли"), modelsScreen, sectionSelected, "Модели и роли"},
+		{"Обзор → Поведение", sectionOf("Поведение"), settingsBehavior, sectionSelected, "Поведение"},
+		{"Поведение → Модели и роли", catalogOf(modelsScreen), modelsScreen, sectionSelected, "Поведение"},
 		{"Модели → Проблемы", subtabOf("Проблемы"), modelsScreen + "~" + modelsTabIssues, subtabSelected, "Проблемы"},
-		{"→ Почта", sectionOf("Почта"), "settings:mail", sectionSelected, "Почта"},
-		{"Почта → Telegram", sectionOf("Telegram"), tgScreen, sectionSelected, "Telegram"},
-		{"→ Серверы", sectionOf("Серверы"), serversScreen, sectionSelected, "Серверы"},
-		{"Серверы → Инструменты", sectionOf("Инструменты"), "settings:tools", sectionSelected, "Инструменты"},
-		{"→ Вход и доступ", sectionOf("Вход и доступ"), accessScreen, sectionSelected, "Вход и доступ"},
+		{"→ Каналы", sectionOf("Каналы"), settingsChannels, sectionSelected, "Каналы"},
+		{"Каналы → Почта", catalogOf(mailScreen), mailScreen, sectionSelected, "Каналы"},
+		{"Почта → Каналы", `//nav[contains(@class,'crumbs')]//button[contains(@class,'crumb')]`, settingsChannels, sectionSelected, "Каналы"},
+		{"Каналы → Telegram", catalogOf(tgScreen), tgScreen, sectionSelected, "Каналы"},
+		{"→ Система", sectionOf("Система"), settingsSystem, sectionSelected, "Система"},
+		{"Система → Серверы", catalogOf(serversScreen), serversScreen, sectionSelected, "Система"},
+		{"→ Безопасность", sectionOf("Безопасность"), settingsSecurity, sectionSelected, "Безопасность"},
+		{"Безопасность → Вход и доступ", catalogOf(accessScreen), accessScreen, sectionSelected, "Безопасность"},
 		{"Доступ → Доверенная сеть", subtabOf("Доверенная сеть"), accessScreen + "~" + accessTabNetwork, subtabSelected, "Доверенная сеть"},
-		{"→ Обзор", sectionOf("Обзор"), "settings", sectionSelected, "Обзор"},
+		{"→ Обзор", sectionOf("Обзор"), settingsRoot, sectionSelected, "Обзор"},
 	}
 	for _, ш := range шаги {
 		before := screenFingerprint(t, ctx)
@@ -120,7 +126,7 @@ func TestBrowserSettingsChains(t *testing.T) {
 		// адрес в строке браузера — тот же экран, закодированный
 		var хэш string
 		if err := chromedp.Run(ctx, chromedp.Poll(
-			`location.hash === '#screen=' + encodeURIComponent(`+jsString(ш.Screen)+`)`,
+			`new URLSearchParams(location.hash.slice(1)).get('screen') === `+jsString(ш.Screen),
 			nil, chromedp.WithPollingTimeout(10*time.Second))); err != nil {
 			_ = chromedp.Run(ctx, chromedp.Evaluate(`location.hash`, &хэш))
 			t.Errorf("%s: в адресе %q, а экран %q", ш.What, хэш, ш.Screen)
@@ -154,10 +160,8 @@ func TestBrowserSettingsChains(t *testing.T) {
 		}); true`, nil)); err != nil {
 		t.Fatal(err)
 	}
-	if err := chromedp.Run(ctx, chromedp.Click(sectionOf("Почта"), chromedp.BySearch)); err != nil {
-		t.Fatalf("с журнала сервера на «Почту»: %v", err)
-	}
-	waitScreen(t, ctx, "settings:mail")
+	clickSettings(t, ctx, settingsGroupButton(settingsChannels), settingsChannels)
+	clickSettings(t, ctx, settingsCatalogRow(mailScreen), mailScreen)
 
 	// после всего обхода — ни одной ошибки ни в консоли, ни у htmx
 	var htmxОшибки []string

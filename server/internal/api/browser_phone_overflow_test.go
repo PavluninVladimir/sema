@@ -70,16 +70,9 @@ func phoneFixtures(t *testing.T) (*Server, map[string]string) {
 	s, st := rulesMCPFix(t)
 	экраны := map[string]string{}
 
-	// разговор «Сёма · Вадим» с записями: ночные смены, строка без
+	// Основной разговор с записями: ночные смены, строка без
 	// пробелов (ссылка), длинная команда
-	я, err := st.CreateChat("Telegram · Вадим")
-	if err != nil {
-		t.Fatal(err)
-	}
-	сёма, err := st.CreateThread(я, store.ChatKindSema, 0, "Сёма · Вадим")
-	if err != nil {
-		t.Fatal(err)
-	}
+	сёма := primaryChatForChromeTest(t, s)
 	_ = st.AddChatMsg(сёма, "assistant", "Готово. Смотрите https://sema.example.org/очень/длинная/ссылка/без/единого/пробела/которая/не/переносится/сама?x=1&y=2&z=3")
 	_ = st.AddChatMsg(сёма, "tool", `{"title":"Ночная смена · Microtik","result":"сделано 2, ждёт вас 1","code":"sudo /usr/bin/apt-get -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef -y upgrade && systemctl restart очень-длинное-имя-службы-без-пробелов.service"}`)
 	// карточки разных видов с длинными строками без пробелов
