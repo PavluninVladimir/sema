@@ -71,3 +71,27 @@ func TestMessengerBotTokenLifecycle(t *testing.T) {
 		t.Fatalf("отключение затронуло другие подключения: %+v, %v", bots, err)
 	}
 }
+
+func TestMessengerBotServerMigration(t *testing.T) {
+	st := testStore(t)
+	st.UseSecretBox(mustBox(t))
+	id, err := st.AddMessengerBot(MessengerBot{Platform: "telegram", ExternalID: 5}, "5:TEST_BOT_TOKEN")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := st.db.Exec(`ALTER TABLE messenger_bots DROP COLUMN telegram_api_url`); err != nil {
+		t.Fatal(err)
+	}
+	for range 2 {
+		if err := st.migrateMessengerBots(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	bot, err := st.MessengerBot(id)
+	if err != nil || bot.TelegramAPIURL != "" || bot.ExternalID != 5 {
+		t.Fatalf("прежнее подключение не сохранилось: %+v, %v", bot, err)
+	}
+	if token, err := st.MessengerBotToken(bot); err != nil || token != "5:TEST_BOT_TOKEN" {
+		t.Fatal("токен прежнего подключения не читается")
+	}
+}

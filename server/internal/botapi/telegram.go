@@ -8,14 +8,56 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/netip"
+	"net/url"
+	"strings"
 	"time"
 )
 
 const TelegramWebhookSecretHeader = "X-Telegram-Bot-Api-Secret-Token"
+const TelegramCloudURL = "https://api.telegram.org"
 
 type TelegramClient struct {
 	Token     string
+	BaseURL   string
 	Transport http.RoundTripper
+}
+
+// NormalizeTelegramAPIURL принимает адрес сервера без пути, токена и параметров.
+func NormalizeTelegramAPIURL(raw string) (string, error) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return "", nil
+	}
+	base, err := url.Parse(raw)
+	if err != nil || base.Hostname() == "" || base.User != nil || strings.ContainsAny(raw, "?#") ||
+		(base.Path != "" && base.EscapedPath() != "/") || (base.Scheme != "https" && base.Scheme != "http") {
+		return "", errors.New("укажите адрес сервера Bot API без токена, пути и параметров")
+	}
+	if base.Scheme == "http" {
+		host := strings.TrimSuffix(strings.ToLower(base.Hostname()), ".")
+		ip, parseErr := netip.ParseAddr(host)
+		local := strings.HasSuffix(host, ".local") || strings.HasSuffix(host, ".internal") || strings.HasSuffix(host, ".lan") ||
+			!strings.ContainsAny(host, ".:")
+		if parseErr == nil {
+			local = ip.Unmap().IsLoopback() || ip.Unmap().IsPrivate()
+		}
+		if !local {
+			return "", errors.New("для сервера Bot API вне локальной сети нужен HTTPS")
+		}
+	}
+	return base.Scheme + "://" + base.Host, nil
+}
+
+func telegramMethodURL(base, token, method string) (string, error) {
+	base, err := NormalizeTelegramAPIURL(base)
+	if err != nil {
+		return "", err
+	}
+	if base == "" {
+		base = TelegramCloudURL
+	}
+	return base + "/bot" + token + "/" + method, nil
 }
 
 type TelegramWebhookInfo struct {
@@ -85,7 +127,11 @@ func telegramCall[T any](ctx context.Context, bot TelegramClient, method string,
 	if err != nil {
 		return zero, errors.New("не удалось подготовить запрос Telegram")
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://api.telegram.org/bot"+bot.Token+"/"+method, bytes.NewReader(body))
+	endpoint, err := telegramMethodURL(bot.BaseURL, bot.Token, method)
+	if err != nil {
+		return zero, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
 		return zero, errors.New("не удалось подготовить запрос Telegram")
 	}

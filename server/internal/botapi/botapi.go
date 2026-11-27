@@ -1,4 +1,4 @@
-// Package botapi проверяет подключения к официальным API ботов.
+// Package botapi проверяет подключения к API ботов.
 package botapi
 
 import (
@@ -57,6 +57,14 @@ var telegramToken = regexp.MustCompile(`^[0-9]+:[A-Za-z0-9_-]+$`)
 // Probe возвращает только фиксированные состояния: ошибка HTTP может
 // содержать URL Telegram с токеном, а тело отказа приходит снаружи.
 func Probe(ctx context.Context, platform, token string, transport http.RoundTripper) (Identity, State) {
+	return probe(ctx, platform, token, "", transport)
+}
+
+func ProbeTelegram(ctx context.Context, token, baseURL string, transport http.RoundTripper) (Identity, State) {
+	return probe(ctx, Telegram, token, baseURL, transport)
+}
+
+func probe(ctx context.Context, platform, token, baseURL string, transport http.RoundTripper) (Identity, State) {
 	if token == "" || len(token) > 4096 || strings.IndexFunc(token, func(r rune) bool { return r < '!' || r > '~' }) >= 0 {
 		return Identity{}, BadToken
 	}
@@ -66,7 +74,11 @@ func Probe(ctx context.Context, platform, token string, transport http.RoundTrip
 		if !telegramToken.MatchString(token) {
 			return Identity{}, BadToken
 		}
-		endpoint = "https://api.telegram.org/bot" + token + "/getMe"
+		var err error
+		endpoint, err = telegramMethodURL(baseURL, token, "getMe")
+		if err != nil {
+			return Identity{}, Unavailable
+		}
 	case MAX:
 		endpoint = "https://platform-api2.max.ru/me"
 	default:

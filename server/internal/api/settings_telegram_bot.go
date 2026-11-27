@@ -9,8 +9,40 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/PavluninVladimir/sema/server/internal/botapi"
 	"github.com/PavluninVladimir/sema/server/internal/store"
 )
+
+const (
+	telegramBotCloud = "Telegram"
+	telegramBotOwn   = "Свой сервер Bot API"
+)
+
+func telegramBotServerFields(baseURL string) []Field {
+	selected := telegramBotCloud
+	if baseURL != "" {
+		selected = telegramBotOwn
+	}
+	return []Field{
+		{Type: "picker", Name: "bot_server", Label: "Подключать к", Options: []string{telegramBotCloud, telegramBotOwn}, Value: selected},
+		{Type: "text", Name: "bot_server_url", Label: "Адрес своего сервера Bot API", Value: baseURL,
+			Hint: "Например, https://bot-api.example.org. Сёма отправляет токен бота выбранному серверу."},
+	}
+}
+
+func telegramBotServerFromForm(params map[string]string) (string, error) {
+	switch params["bot_server"] {
+	case "", telegramBotCloud:
+		return "", nil
+	case telegramBotOwn:
+		if strings.TrimSpace(params["bot_server_url"]) == "" {
+			return "", errors.New("укажите адрес своего сервера Bot API")
+		}
+		return botapi.NormalizeTelegramAPIURL(params["bot_server_url"])
+	default:
+		return "", errors.New("выберите сервер Bot API")
+	}
+}
 
 func (s *Server) telegramBotSections(bot store.MessengerBot) []Component {
 	state, err := s.eng.Store().TelegramBotStateFor(bot.ID)
@@ -18,6 +50,13 @@ func (s *Server) telegramBotSections(bot store.MessengerBot) []Component {
 		return []Component{emptyState("Настройки бота недоступны", "Повторите попытку позже.", "tray")}
 	}
 	id := strconv.FormatInt(bot.ID, 10)
+	connection := Component{Type: "form", ID: "telegram-bot-server", Title: "Сервер Bot API", Style: formRows,
+		Fields: telegramBotServerFields(bot.TelegramAPIURL),
+		Submit: &Action{Action: "set_telegram_bot_server", Target: id, Label: "Проверить и сохранить"},
+	}
+	if state.WebhookURL != "" {
+		connection.Fields[0].Hint = "Перед сменой сервера выключите webhook."
+	}
 	address := s.telegramWebhookURL(bot.ID)
 	if state.WebhookURL != "" {
 		address = state.WebhookURL
@@ -91,7 +130,7 @@ func (s *Server) telegramBotSections(bot store.MessengerBot) []Component {
 			Meta:    "Для сервисного токена оставьте только право «Управление ботами Telegram».",
 			Actions: []Action{{Action: "$goto", Target: accessScreen + "~" + accessTabTokens, Label: "Открыть токены"}}},
 	}}
-	return []Component{webhook, api, features}
+	return []Component{connection, webhook, api, features}
 }
 
 func (s *Server) telegramBotSettingsAction(req actionRequest) (string, error) {
@@ -101,6 +140,8 @@ func (s *Server) telegramBotSettingsAction(req actionRequest) (string, error) {
 		ctx = context.Background()
 	}
 	switch req.Action {
+	case "set_telegram_bot_server":
+		return addr, s.setTelegramBotServer(req)
 	case "check_telegram_bot_webhook":
 		return addr, s.checkTelegramWebhook(ctx, req.Target)
 	case "set_telegram_bot_webhook":
@@ -136,4 +177,39 @@ func (s *Server) telegramBotSettingsAction(req actionRequest) (string, error) {
 		return addr, err
 	}
 	return "", errUnhandled
+}
+
+func (s *Server) setTelegramBotServer(req actionRequest) error {
+	baseURL, err := telegramBotServerFromForm(req.Params)
+	if err != nil {
+		return err
+	}
+	s.botSettingsMu.Lock()
+	defer s.botSettingsMu.Unlock()
+	bot, err := s.telegramBot(req.Target)
+	if err != nil || bot.TelegramAPIURL == baseURL {
+		return err
+	}
+	st := s.eng.Store()
+	state, err := st.TelegramBotStateFor(bot.ID)
+	if err != nil {
+		return err
+	}
+	if state.WebhookURL != "" {
+		return errors.New("выключите webhook перед сменой сервера Bot API")
+	}
+	token, err := st.MessengerBotToken(bot)
+	if err != nil {
+		return err
+	}
+	bot.TelegramAPIURL = baseURL
+	identity, status := s.probeMessengerBot(req, bot, token)
+	if status != botapi.OK {
+		return errors.New(status.Message())
+	}
+	if identity.ID != bot.ExternalID {
+		return errors.New("этот сервер вернул другой ID бота")
+	}
+	applyBotCheck(&bot, identity, status)
+	return st.SaveTelegramBotAPIURL(bot)
 }

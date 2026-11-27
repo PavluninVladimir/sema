@@ -130,8 +130,11 @@ func (s *Server) buildNewMessengerBot(doc *Document, platform string) error {
 	if platform == botapi.MAX {
 		hint = "Возьмите токен в настройках бота на платформе MAX."
 	}
-	doc.Components = append(doc.Components, Component{Type: "form", ID: "bot-new", Style: formRows,
-		Fields: []Field{{Type: "secure", Name: "token", Label: "Токен бота", Hint: hint}},
+	fields := []Field{{Type: "secure", Name: "token", Label: "Токен бота", Hint: hint}}
+	if platform == botapi.Telegram {
+		fields = append(fields, telegramBotServerFields("")...)
+	}
+	doc.Components = append(doc.Components, Component{Type: "form", ID: "bot-new", Style: formRows, Fields: fields,
 		Submit: &Action{Action: "add_messenger_bot", Target: platform, Label: "Подключить", Style: "primary"}})
 	return nil
 }
@@ -175,7 +178,7 @@ func (s *Server) messengerBotActions(req actionRequest) (string, error) {
 	switch req.Action {
 	case "add_messenger_bot":
 		return s.addMessengerBot(req)
-	case "set_telegram_bot_webhook", "check_telegram_bot_webhook", "save_telegram_bot_features":
+	case "set_telegram_bot_webhook", "check_telegram_bot_webhook", "save_telegram_bot_features", "set_telegram_bot_server":
 		return s.telegramBotSettingsAction(req)
 	case "check_messenger_bot", "replace_messenger_bot_token", "delete_messenger_bot":
 	default:
@@ -212,7 +215,7 @@ func (s *Server) messengerBotActions(req actionRequest) (string, error) {
 			return "", err
 		}
 	}
-	identity, state := s.probeMessengerBot(req, bot.Platform, token)
+	identity, state := s.probeMessengerBot(req, bot, token)
 	if state == botapi.OK && identity.ID != bot.ExternalID {
 		if replace {
 			return "", errors.New("этот токен принадлежит другому боту")
@@ -238,11 +241,19 @@ func (s *Server) addMessengerBot(req actionRequest) (string, error) {
 	if !st.SecretsEncrypted() {
 		return "", errors.New("для сохранения токена нужен ключ шифрования Сёмы")
 	}
-	identity, state := s.probeMessengerBot(req, platform, token)
+	bot := store.MessengerBot{Platform: platform}
+	if platform == botapi.Telegram {
+		baseURL, err := telegramBotServerFromForm(req.Params)
+		if err != nil {
+			return "", err
+		}
+		bot.TelegramAPIURL = baseURL
+	}
+	identity, state := s.probeMessengerBot(req, bot, token)
 	if state != botapi.OK {
 		return "", errors.New(state.Message())
 	}
-	bot := store.MessengerBot{Platform: platform, ExternalID: identity.ID}
+	bot.ExternalID = identity.ID
 	applyBotCheck(&bot, identity, state)
 	id, err := st.AddMessengerBot(bot, token)
 	if err != nil {
@@ -251,12 +262,15 @@ func (s *Server) addMessengerBot(req actionRequest) (string, error) {
 	return botScreenAddr(id), nil
 }
 
-func (s *Server) probeMessengerBot(req actionRequest, platform, token string) (botapi.Identity, botapi.State) {
+func (s *Server) probeMessengerBot(req actionRequest, bot store.MessengerBot, token string) (botapi.Identity, botapi.State) {
 	ctx := req.ctx
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	return botapi.Probe(ctx, platform, token, s.botTransport)
+	if bot.Platform == botapi.Telegram {
+		return botapi.ProbeTelegram(ctx, token, bot.TelegramAPIURL, s.botTransport)
+	}
+	return botapi.Probe(ctx, bot.Platform, token, s.botTransport)
 }
 
 func applyBotCheck(bot *store.MessengerBot, identity botapi.Identity, state botapi.State) {

@@ -14,10 +14,11 @@ type MessengerBot struct {
 	Name, Username string
 	Status         string
 	CheckedAt      string
+	TelegramAPIURL string
 	version        int64
 }
 
-const messengerBotFields = `id, external_id, platform, name, username, status, checked_at, version`
+const messengerBotFields = `id, external_id, platform, name, username, status, checked_at, telegram_api_url, version`
 
 func (s *Store) migrateMessengerBots() error {
 	_, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS messenger_bots (
@@ -28,16 +29,27 @@ func (s *Store) migrateMessengerBots() error {
 		username    TEXT NOT NULL,
 		status      TEXT NOT NULL,
 		checked_at  TEXT NOT NULL,
+		telegram_api_url TEXT NOT NULL DEFAULT '',
 		version     INTEGER NOT NULL DEFAULT 1,
 		UNIQUE (platform, external_id)
 	)`)
+	if err != nil {
+		return err
+	}
+	var existing bool
+	if err := s.db.QueryRow(`SELECT EXISTS(SELECT 1 FROM pragma_table_info('messenger_bots') WHERE name = 'telegram_api_url')`).Scan(&existing); err != nil {
+		return err
+	}
+	if !existing {
+		_, err = s.db.Exec(`ALTER TABLE messenger_bots ADD COLUMN telegram_api_url TEXT NOT NULL DEFAULT ''`)
+	}
 	return err
 }
 
 func (b MessengerBot) secretName() string { return fmt.Sprintf("messenger-bot/%d", b.ID) }
 
 func (b *MessengerBot) scan(row interface{ Scan(...any) error }) error {
-	return row.Scan(&b.ID, &b.ExternalID, &b.Platform, &b.Name, &b.Username, &b.Status, &b.CheckedAt, &b.version)
+	return row.Scan(&b.ID, &b.ExternalID, &b.Platform, &b.Name, &b.Username, &b.Status, &b.CheckedAt, &b.TelegramAPIURL, &b.version)
 }
 
 func (s *Store) MessengerBots() ([]MessengerBot, error) {
@@ -77,9 +89,9 @@ func (s *Store) AddMessengerBot(bot MessengerBot, token string) (int64, error) {
 		return 0, err
 	}
 	defer tx.Rollback()
-	err = tx.QueryRow(`INSERT INTO messenger_bots(platform, external_id, name, username, status, checked_at)
-		VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(platform, external_id) DO NOTHING RETURNING id`,
-		bot.Platform, bot.ExternalID, bot.Name, bot.Username, bot.Status, bot.CheckedAt).Scan(&bot.ID)
+	err = tx.QueryRow(`INSERT INTO messenger_bots(platform, external_id, name, username, status, checked_at, telegram_api_url)
+		VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(platform, external_id) DO NOTHING RETURNING id`,
+		bot.Platform, bot.ExternalID, bot.Name, bot.Username, bot.Status, bot.CheckedAt, bot.TelegramAPIURL).Scan(&bot.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = tx.QueryRow(`SELECT id FROM messenger_bots WHERE platform = ? AND external_id = ?`, bot.Platform, bot.ExternalID).Scan(&bot.ID)
 		return bot.ID, err
@@ -128,6 +140,13 @@ func (s *Store) MessengerBotToken(bot MessengerBot) (string, error) {
 func (s *Store) SaveMessengerBotCheck(bot MessengerBot) error {
 	return messengerBotUpdated(s.db.Exec(`UPDATE messenger_bots SET name = ?, username = ?, status = ?, checked_at = ?
 		WHERE id = ? AND version = ?`, bot.Name, bot.Username, bot.Status, bot.CheckedAt, bot.ID, bot.version))
+}
+
+// SaveTelegramBotAPIURL обновляет подключение после проверки токена на новом адресе.
+func (s *Store) SaveTelegramBotAPIURL(bot MessengerBot) error {
+	return messengerBotUpdated(s.db.Exec(`UPDATE messenger_bots SET telegram_api_url = ?, name = ?, username = ?,
+		status = ?, checked_at = ?, version = version + 1 WHERE id = ? AND version = ? AND platform = 'telegram'`,
+		bot.TelegramAPIURL, bot.Name, bot.Username, bot.Status, bot.CheckedAt, bot.ID, bot.version))
 }
 
 // ReplaceMessengerBotToken записывает сведения и проверенный токен вместе.
