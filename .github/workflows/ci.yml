@@ -25,6 +25,22 @@ jobs:
       - run: go build ./...
       - run: go vet ./...
       - run: go test ./...
+      - run: python3 -m unittest discover -s ../deploy -p 'test_*.py'
+
+  browser:
+    # Chrome использует песочницу с пользовательским пространством имён.
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
       - name: Настройки, Telegram и чаты в Chrome
         env:
           SEMA_BROWSER: '1'
@@ -32,7 +48,6 @@ jobs:
           command -v google-chrome
           go test ./internal/api -p 1 -count=1 -timeout 8m \
             -run '^(TestBrowserKarkas(Desktop|Phone|Resize)|TestBrowserTelegramBotWebhookForm|TestBrowserPlusCreatesNewChat)$'
-      - run: python3 -m unittest discover -s ../deploy -p 'test_*.py'
 
   secrets:
     runs-on: ubuntu-latest
@@ -47,7 +62,7 @@ jobs:
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [server, secrets]
+    needs: [server, browser, secrets]
     runs-on: ubuntu-latest
     concurrency:
       group: publish-sema
