@@ -26,3 +26,18 @@ Docker другое имя контейнера или адрес здоровь
 Обновляющий скрипт принимает путь к его файлу через `--webhook-secret-file`.
 Сигнал появляется в «Уведомлениях». Хост проверяет GitHub независимо от доставки
 сигнала.
+
+В «Настройки → Работа Сёмы → Обновления» видны адрес webhook, репозиторий,
+текущая версия и состояние немедленной проверки. Для запуска по webhook
+выполните на Docker-хосте `docker exec sema mkdir -p -m 700 /data/.release-webhook`.
+Установите шаблоны `deploy/sema-update-webhook.path` и `.service` в
+`/etc/systemd/system/`. В `.path` подставьте вместо `@VOLUME@` поле `Source`
+тома `/data` из `docker inspect sema`. В `.service` подставьте `@UPDATER_USER@`,
+`@UPDATER@` и `@KEY@` для того же пользователя, скрипта и ключа, которые уже
+использует cron. Примените `systemctl daemon-reload` и
+`systemctl enable --now sema-update-webhook.path`.
+
+Webhook запускает проверку сразу. Строка cron выше обеспечивает резервную
+проверку каждые 15 минут. Выключатель в настройках управляет запуском по
+webhook. Обе проверки используют одну блокировку. Журнал немедленной проверки
+доступен через `journalctl -u sema-update-webhook.service`.

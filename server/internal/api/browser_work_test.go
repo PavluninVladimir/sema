@@ -124,10 +124,10 @@ func TestBrowserWorkSettingsReachClient(t *testing.T) {
 	workPoll(t, ctx, "поля «Экрана и связи» нарисованы", `!!document.querySelector('#feed input[name="poll_s"]') && !!document.querySelector('#feed input[name="tz"]')`)
 
 	first := workRead(t, ctx)
-	if first.H1 != "Работа Сёмы" || first.SelectedTab != "Экран и связь" || len(first.Selected) != 1 || !strings.Contains(first.Selected[0], "Работа Сёмы") {
+	if first.H1 != "Работа Сёмы" || first.SelectedTab != "Экран и связь" || len(first.Selected) != 1 || first.Selected[0] != "Система" {
 		t.Errorf("вкладка «Экран и связь»: %+v", first)
 	}
-	if strings.Join(first.Subtabs, " · ") != "Самонаблюдение · Экран и связь · Чаты и ветки" {
+	if strings.Join(first.Subtabs, " · ") != "Самонаблюдение · Экран и связь · Чаты и ветки · Обновления" {
 		t.Errorf("вкладки раздела: %v", first.Subtabs)
 	}
 	for _, name := range []string{"tz", "poll_s", "poll_live_s", "live_ms", "ws_per_session"} {
@@ -343,7 +343,7 @@ func TestBrowserWorkAndSentInFrameDesktop(t *testing.T) {
 	}
 }
 
-// Телефон, 390×844: в корне настроек раздел зовётся «Работа Сёмы», у него три
+// Телефон, 390×844: в корне настроек раздел зовётся «Работа Сёмы», у него четыре
 // вкладки и ничего не едет вбок; «Что ушло наружу» открывается целым экраном с
 // ссылкой «‹ Безопасность».
 func TestBrowserWorkAndSentPhone(t *testing.T) {
@@ -388,12 +388,12 @@ func TestBrowserWorkAndSentPhone(t *testing.T) {
 	_ = chromedp.Run(ctx, chromedp.Evaluate(`document.querySelector('#feed .row.clickable[data-goto="settings:watch"]').scrollIntoView({block: 'center'}); true`, nil))
 	karkasShot(t, ctx, "work-phone-1b-root-system")
 
-	// строка раздела → экран с «‹ Система» и тремя вкладками
+	// строка раздела → экран с «‹ Система» и четырьмя вкладками
 	if err := chromedp.Run(ctx, chromedp.Click(`#feed .row.clickable[data-goto="settings:watch"]`, chromedp.ByQuery)); err != nil {
 		t.Fatalf("нажать строку «Работа Сёмы»: %v", err)
 	}
 	waitScreen(t, ctx, watchScreen)
-	workPoll(t, ctx, "вкладки раздела нарисованы", `document.querySelectorAll('#screen .subtabs-bar .segment').length === 3`)
+	workPoll(t, ctx, "вкладки раздела нарисованы", `document.querySelectorAll('#screen .subtabs-bar .segment').length === 4`)
 	v := workRead(t, ctx)
 	if !v.Panel || v.Crumb != "‹ Система" || v.H1 != "Работа Сёмы" {
 		t.Errorf("«Работа Сёмы» на телефоне: %+v", v)
@@ -402,18 +402,17 @@ func TestBrowserWorkAndSentPhone(t *testing.T) {
 		t.Errorf("«Самонаблюдение» едет вбок: %d при %d", v.SW, v.CW)
 	}
 	karkasShot(t, ctx, "work-phone-2-watch")
-	for i, tab := range []string{entityAddr(watchScreen, "", workTabScreen), entityAddr(watchScreen, "", workTabChats)} {
-		if err := chromedp.Run(ctx, chromedp.Click(`#screen .subtabs-bar a.segment[hx-get="/ui?screen=`+tab+`"]`, chromedp.ByQuery)); err != nil {
-			t.Fatalf("нажать вкладку %s: %v", tab, err)
-		}
+	for i, tab := range []string{workTabScreen, workTabChats, workTabUpdates} {
+		tab = entityAddr(watchScreen, "", tab)
+		stnClick(t, ctx, `#screen .subtabs-bar a.segment[hx-get="/ui?screen=`+tab+`"]`)
 		waitScreen(t, ctx, tab)
-		field := []string{"poll_s", "cmd_ttl"}[i]
+		field := []string{"poll_s", "cmd_ttl", "immediate"}[i]
 		workPoll(t, ctx, "поля вкладки нарисованы", `!!document.querySelector('#feed input[name="`+field+`"]')`)
 		tabView := workRead(t, ctx)
 		if tabView.SW > tabView.CW {
 			t.Errorf("вкладка %s едет вбок: %d при %d", tab, tabView.SW, tabView.CW)
 		}
-		karkasShot(t, ctx, []string{"work-phone-3-screen", "work-phone-4-chats"}[i])
+		karkasShot(t, ctx, []string{"work-phone-3-screen", "work-phone-4-chats", "work-phone-updates"}[i])
 	}
 	// «Тонкая настройка» вкладки «Экран и связь» — раскрывается без бокового сдвига
 	karkasOpen(t, ctx, entityAddr(watchScreen, "", workTabScreen))

@@ -19,7 +19,8 @@ import (
 
 // workScreens — три вкладки раздела.
 func workScreens() []string {
-	return []string{watchScreen, entityAddr(watchScreen, "", workTabScreen), entityAddr(watchScreen, "", workTabChats)}
+	return []string{watchScreen, entityAddr(watchScreen, "", workTabScreen), entityAddr(watchScreen, "", workTabChats),
+		entityAddr(watchScreen, "", workTabUpdates)}
 }
 
 // notifyScreens — вкладки «Уведомлений» и «Добавить канал».
@@ -60,9 +61,9 @@ func movedFieldNames() []string {
 	return names
 }
 
-// У раздела одно имя в колонке и над содержимым, и три вкладки: первая — то,
+// У раздела одно имя в колонке и над содержимым, и четыре вкладки: первая — то,
 // что здесь было, остальные — переехавшее.
-func TestWorkSectionHasOneNameAndThreeTabs(t *testing.T) {
+func TestWorkSectionHasOneName(t *testing.T) {
 	s, _ := testServer(t)
 	for i, screen := range workScreens() {
 		doc, err := s.buildScreen(screen, "", "", 0)
@@ -83,7 +84,7 @@ func TestWorkSectionHasOneNameAndThreeTabs(t *testing.T) {
 		if strings.Join(ids, " ") != strings.Join(workScreens(), " ") {
 			t.Errorf("%s: вкладки %v", screen, ids)
 		}
-		if strings.Join(names, " · ") != "Самонаблюдение · Экран и связь · Чаты и ветки" {
+		if strings.Join(names, " · ") != "Самонаблюдение · Экран и связь · Чаты и ветки · Обновления" {
 			t.Errorf("%s: имена вкладок %v", screen, names)
 		}
 		if doc.ActiveSubtab != screen {
@@ -120,7 +121,7 @@ func TestWorkSettingsNotLost(t *testing.T) {
 	s, _ := testServer(t)
 	has := screenSettings(t, s, workScreens()...)
 	checkSet(t, "Работа Сёмы", has, append(movedFieldNames(),
-		"!set_live_settings", "!set_chat_settings", "!set_timezone",
+		"!set_live_settings", "!set_chat_settings", "!set_timezone", "immediate", "!set_release_webhook",
 		// наблюдатель — как был
 		"!toggle_watch", "!toggle_watch_stop", "!toggle_watch_disagree", "!toggle_watch_doctor",
 		"repeat", "window", "keep", "!save_watch_limits"))

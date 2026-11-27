@@ -1,5 +1,7 @@
 import importlib.util
 from pathlib import Path
+import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -11,6 +13,24 @@ VERSION = "build-" + "a" * 40
 
 
 class ReleaseTest(unittest.TestCase):
+    def test_webhook_consumes_signal_with_the_same_update_lock(self):
+        with tempfile.TemporaryDirectory() as cache, \
+             patch.dict(update.os.environ, {"XDG_CACHE_HOME": cache}), \
+             patch.object(update.platform, "machine", return_value="aarch64"), \
+             patch.object(sys, "argv", ["sema-update.py", "--apply", "--from-webhook"]), \
+             patch.object(update, "fetch_json", return_value={"tag_name": VERSION}), \
+             patch.object(update, "asset_for", return_value=("url", "sha256")), \
+             patch.object(update, "health", return_value=VERSION), \
+             patch.object(update.fcntl, "flock") as flock:
+            def consume(*args):
+                self.assertEqual(flock.call_args.args[1], update.fcntl.LOCK_EX)
+                self.assertEqual(args, ("exec", "sema", "rm", "-f", "--", "/data/.release-webhook/request"))
+
+            with patch.object(update, "docker", side_effect=consume) as docker:
+                update.main()
+                docker.assert_called_once()
+            self.assertTrue((Path(cache) / "sema-updater" / "sema.lock").is_file())
+
     def test_asset_is_bound_to_published_repository_and_digest(self):
         repository = "example/sema"
         name = "sema-linux-arm64.tar.gz"

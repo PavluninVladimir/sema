@@ -970,6 +970,9 @@ func (e *Engine) MigrateAccountPasswords() {
 
 func (e *Engine) Store() *store.Store { return e.store }
 
+// DataDir — рабочий каталог данных Сёмы.
+func (e *Engine) DataDir() string { return e.conf.Data }
+
 // ReadServerFolders — читать ли папки, где решение принял почтовый
 // сервер или человек: спам провайдера, корзину и «всю почту» Gmail.
 //

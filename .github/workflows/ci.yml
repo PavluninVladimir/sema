@@ -47,7 +47,7 @@ jobs:
         run: |
           command -v google-chrome
           go test ./internal/api -p 1 -count=1 -timeout 8m \
-            -run '^(TestBrowserKarkas(Desktop|Phone|Resize)|TestBrowserTelegramBotWebhookForm|TestBrowserPlusCreatesNewChat)$'
+            -run '^(TestBrowserKarkas(Desktop|Phone|Resize)|TestBrowserTelegramBotWebhookForm|TestBrowserPlusCreatesNewChat|TestBrowserWorkAndSentPhone)$'
 
   secrets:
     runs-on: ubuntu-latest

@@ -1,0 +1,10 @@
+[Unit]
+Description=Проверка обновления Сёмы по webhook GitHub
+Wants=network-online.target
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+User=@UPDATER_USER@
+UMask=0077
+ExecStart=/usr/bin/python3 "@UPDATER@" --apply --from-webhook --webhook-secret-file "@KEY@"
