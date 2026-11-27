@@ -1,0 +1,9 @@
+[Unit]
+Description=Сигнал о выпуске Сёмы из GitHub
+After=docker.service
+
+[Path]
+PathExists=@VOLUME@/.release-webhook/request
+
+[Install]
+WantedBy=multi-user.target

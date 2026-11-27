@@ -1595,8 +1595,9 @@ var limitedActions = map[string]bool{
 }
 
 func adminSettingsScreen(screen string) bool {
+	screen, _ = splitHighlight(screen)
 	return strings.HasPrefix(screen, accessScreen) || strings.HasPrefix(screen, wechatScreen) ||
-		strings.HasPrefix(screen, maxScreen) || strings.HasPrefix(screen, botsScreen)
+		strings.HasPrefix(screen, maxScreen) || strings.HasPrefix(screen, botsScreen) || screen == watchScreen+"~"+workTabUpdates
 }
 
 func (s *Server) allowScreen(w http.ResponseWriter, r *http.Request, screen string) bool {

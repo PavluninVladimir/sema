@@ -14,10 +14,11 @@ package api
 // команд и пинатель (`chats.*`), хвост родителя в ветке, часовой пояс.
 // Ключи в базе не менялись — переехало только место на экране.
 //
-// Три вкладки. Первая — то, что здесь было: наблюдатель и его находки. Вторая
+// Первая вкладка — то, что здесь было: наблюдатель и его находки. Вторая
 // — «Экран и связь»: часовой пояс, опрос и провод; редкое (сколько ждать
 // клиента, срок снимка) — в «Тонкой настройке». Третья — «Чаты и ветки»: срок
-// чатов команд, пинатель, хвост родителя в ветке.
+// чатов команд, пинатель, хвост родителя в ветке. «Обновления» показывает
+// источник сборки и webhook выпуска.
 
 import (
 	"fmt"
@@ -28,9 +29,10 @@ import (
 // Вкладки раздела. Первая без хвоста: адрес `settings:watch` ведёт туда же,
 // куда вёл всегда.
 const (
-	workTabWatch  = ""       // «Самонаблюдение» — наблюдатель и находки
-	workTabScreen = "screen" // «Экран и связь» — часовой пояс, опрос, провод
-	workTabChats  = "chats"  // «Чаты и ветки» — чаты команд, пинатель, хвост ветки
+	workTabWatch   = ""       // «Самонаблюдение» — наблюдатель и находки
+	workTabScreen  = "screen" // «Экран и связь» — часовой пояс, опрос, провод
+	workTabChats   = "chats"  // «Чаты и ветки» — чаты команд, пинатель, хвост ветки
+	workTabUpdates = "updates"
 )
 
 // workLiveParams — поля вкладки «Экран и связь»: имя поля формы, ключ в реестре
@@ -81,6 +83,7 @@ func (s *Server) buildWork(doc *Document, screen string) error {
 		{ID: workTabWatch, Name: "Самонаблюдение"},
 		{ID: workTabScreen, Name: "Экран и связь"},
 		{ID: workTabChats, Name: "Чаты и ветки"},
+		{ID: workTabUpdates, Name: "Обновления"},
 	}
 	// открытая находка видна до того, как человек откроет вкладку
 	if open > 0 {
@@ -93,6 +96,9 @@ func (s *Server) buildWork(doc *Document, screen string) error {
 		return s.buildWorkScreen(doc)
 	case workTabChats:
 		return s.buildWorkChats(doc)
+	case workTabUpdates:
+		s.buildReleaseSettings(doc)
+		return nil
 	}
 	return s.buildSelfWatch(doc, open)
 }
@@ -212,6 +218,8 @@ func (s *Server) workActions(req actionRequest) (string, error) {
 		return "", s.saveSettings(req, workChatParams...)
 	case "set_timezone":
 		return "", s.saveTimezone(req)
+	case "set_release_webhook":
+		return "", s.saveSettings(req, settingParam{"immediate", releaseImmediate.Key, "немедленная проверка обновления"})
 	}
 	return "", errUnhandled
 }

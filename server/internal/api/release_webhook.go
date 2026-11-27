@@ -5,9 +5,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -15,9 +17,13 @@ import (
 	"github.com/PavluninVladimir/sema/server/internal/store"
 )
 
-const releaseWebhookPath = "/api/webhooks/github-release"
+const (
+	releaseWebhookPath = "/api/webhooks/github-release"
+	releaseSignalDir   = ".release-webhook"
+)
 
 var githubBuildVersion = regexp.MustCompile(`^build-[0-9a-f]{40}$`)
+var releaseImmediate = store.Careful(store.DefFlag("release.webhook_immediate", true))
 
 type githubReleaseNotice struct {
 	Repository string `json:"repository"`
@@ -44,12 +50,8 @@ func (s *Server) handleGitHubRelease(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	repository := os.Getenv("SEMA_RELEASE_REPOSITORY")
-	if repository == "" {
-		repository = "PavluninVladimir/sema"
-	}
 	var notice githubReleaseNotice
-	if json.Unmarshal(raw, &notice) != nil || !strings.EqualFold(repository, notice.Repository) ||
+	if json.Unmarshal(raw, &notice) != nil || !strings.EqualFold(releaseRepository(), notice.Repository) ||
 		!githubBuildVersion.MatchString(notice.Version) || time.Since(time.Unix(notice.Sent, 0)).Abs() > 10*time.Minute {
 		http.Error(w, "неверное извещение о выпуске", http.StatusBadRequest)
 		return
@@ -61,5 +63,31 @@ func (s *Server) handleGitHubRelease(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "не удалось сохранить извещение", http.StatusServiceUnavailable)
 		return
 	}
+	if s.eng.Store().SettingFlag(releaseImmediate) {
+		if err := s.requestReleaseCheck(); err != nil {
+			http.Error(w, "не удалось запустить проверку обновления", http.StatusServiceUnavailable)
+			return
+		}
+	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func releaseRepository() string {
+	if repository := os.Getenv("SEMA_RELEASE_REPOSITORY"); repository != "" {
+		return repository
+	}
+	return "PavluninVladimir/sema"
+}
+
+func (s *Server) requestReleaseCheck() error {
+	// Пустой файл — только сигнал. Хост находит выпуск самостоятельно.
+	path := filepath.Join(s.eng.DataDir(), releaseSignalDir, "request")
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if errors.Is(err, os.ErrNotExist) || errors.Is(err, os.ErrExist) {
+		return nil // Служба на хосте ещё не настроена или сигнал уже ожидает её.
+	}
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }

@@ -189,16 +189,23 @@ def main():
     parser.add_argument("--health-url", default="http://127.0.0.1:8765/api/health")
     parser.add_argument("--webhook-secret-file", type=Path)
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--from-webhook", action="store_true", help="снять сигнал из тома после получения блокировки")
     args = parser.parse_args()
     if not REPOSITORY.fullmatch(args.repository) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.container):
         parser.error("проверьте имя репозитория и контейнера")
     arch = ARCHES.get(platform.machine())
     if not arch:
         parser.error("эта архитектура пока не поддерживается")
+    if args.from_webhook and not args.apply:
+        parser.error("обработка webhook требует --apply")
     cache = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "sema-updater"
     cache.mkdir(mode=0o700, parents=True, exist_ok=True)
     with (cache / f"{args.container}.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if args.from_webhook:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            docker("exec", args.container, "rm", "-f", "--", "/data/.release-webhook/request")
+        else:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         release = fetch_json(f"https://api.github.com/repos/{args.repository}/releases/latest")
         url, digest = asset_for(release, args.repository, arch)
         version = release["tag_name"]
