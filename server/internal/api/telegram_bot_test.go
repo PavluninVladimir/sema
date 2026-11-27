@@ -245,6 +245,10 @@ func TestBrowserTelegramBotWebhookForm(t *testing.T) {
 	defer srv.Close()
 	ctx := phoneChrome(t, srv.URL, time.Minute)
 	karkasOpen(t, ctx, botScreenAddr(id))
+	stnPoll(t, ctx, "сервер Bot API в карточке", `(() => {
+		const server = document.querySelector('select[name="bot_server"]');
+		return server?.value === 'Telegram' && Array.from(server.options).some(option => option.value === 'Свой сервер Bot API');
+	})()`)
 	stnPoll(t, ctx, "URL управления и отправки Telegram", `(() => {
 		const api = document.getElementById('sec-telegram-bot-api');
 		return !!api && api.textContent.includes(`+jsString(s.telegramBotAPIURL(id)+"/send")+`);
@@ -276,4 +280,101 @@ func TestBrowserTelegramBotWebhookForm(t *testing.T) {
 	if err := chromedp.Run(ctx, chromedp.Evaluate(`document.documentElement.scrollWidth <= document.documentElement.clientWidth`, &fits)); err != nil || !fits {
 		t.Errorf("карточка бота шире окна телефона: %v", err)
 	}
+}
+
+func TestTelegramBotServerSelection(t *testing.T) {
+	s, st := testServer(t)
+	const publicOrigin, ownServer, otherServer = "https://sema.example.org", "http://bot-api:8081", "https://other.example.org"
+	const token, botID = "42:TEST_BOT_API_TOKEN", 42
+	if err := st.SetSetting(auth.SettingOrigin, publicOrigin); err != nil {
+		t.Fatal(err)
+	}
+	var destinations []string
+	var webhook string
+	s.botTransport = messengerBotTestTransport(func(r *http.Request) (*http.Response, error) {
+		method, ok := strings.CutPrefix(r.URL.Path, "/bot"+token+"/")
+		if !ok {
+			t.Fatal("неверный маршрут Bot API")
+		}
+		base := r.URL.Scheme + "://" + r.URL.Host
+		destinations = append(destinations, base+"/"+method)
+		body := `{"ok":true,"result":true}`
+		switch method {
+		case "getMe":
+			id := botID
+			if base == otherServer {
+				id++
+			}
+			body = fmt.Sprintf(`{"ok":true,"result":{"id":%d,"is_bot":true,"first_name":"Бот"}}`, id)
+		case "sendMessage":
+			body = `{"ok":true,"result":{"message_id":1}}`
+		case "getWebhookInfo":
+			body = fmt.Sprintf(`{"ok":true,"result":{"url":%q}}`, webhook)
+		case "setWebhook":
+			var params struct {
+				URL string `json:"url"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&params); err != nil || params.URL == "" {
+				t.Fatal("Bot API не получил URL webhook")
+			}
+			webhook = params.URL
+		case "deleteWebhook":
+			webhook = ""
+		default:
+			t.Fatalf("неожиданный метод Bot API %s", method)
+		}
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader(body))}, nil
+	})
+	expect := func(r *httptest.ResponseRecorder, status int, lastDestination string) {
+		t.Helper()
+		if r.Code != status || strings.Contains(r.Body.String(), token) {
+			t.Fatalf("неверный результат операции Bot API, HTTP %d вместо %d", r.Code, status)
+		}
+		if lastDestination != "" && (len(destinations) == 0 || destinations[len(destinations)-1] != lastDestination) {
+			t.Fatalf("неверный адрес запроса Bot API, ожидался %s, получены %v", lastDestination, destinations)
+		}
+	}
+	owner, err := st.AddToken("владелец", []string{"all"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := st.AddToken("сервис", []string{auth.TelegramBotsScope})
+	if err != nil {
+		t.Fatal(err)
+	}
+	action := func(req actionRequest, bearer string) *httptest.ResponseRecorder {
+		t.Helper()
+		payload, err := json.Marshal(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return doRequest(s, http.MethodPost, "/api/action", string(payload), снаружиАдрес, bearer)
+	}
+	expect(action(actionRequest{Action: "add_messenger_bot", Screen: botsListAddr(botapi.Telegram), Target: botapi.Telegram,
+		Params: map[string]string{"token": token, "bot_server": telegramBotOwn, "bot_server_url": ownServer + "/"}}, owner),
+		http.StatusOK, ownServer+"/getMe")
+	bots, err := st.MessengerBots()
+	if err != nil || len(bots) != 1 || bots[0].TelegramAPIURL != ownServer {
+		t.Fatalf("адрес сервера не сохранён: %v", err)
+	}
+	id := strconv.FormatInt(bots[0].ID, 10)
+	apiURL := "/api/bots/" + id + "/telegram"
+	change := actionRequest{Action: "set_telegram_bot_server", Target: id, Screen: botScreenAddr(bots[0].ID),
+		Params: map[string]string{"bot_server": telegramBotOwn, "bot_server_url": otherServer}}
+	expect(action(change, service), http.StatusForbidden, ownServer+"/getMe")
+	expect(doRequest(s, http.MethodPatch, apiURL, `{"bot_server_url":"https://other.example.org"}`, снаружиАдрес, service),
+		http.StatusBadRequest, ownServer+"/getMe")
+	change.Params["bot_server_url"] = "https://other.example.org/bot" + token
+	expect(action(change, owner), http.StatusInternalServerError, ownServer+"/getMe")
+	change.Params["bot_server_url"] = otherServer
+	expect(action(change, owner), http.StatusInternalServerError, otherServer+"/getMe")
+	expect(doRequest(s, http.MethodPost, apiURL+"/send", `{"chat_id":123,"text":"Тест"}`, снаружиАдрес, service),
+		http.StatusOK, ownServer+"/sendMessage")
+	expect(doRequest(s, http.MethodPatch, apiURL, `{"webhook":true}`, снаружиАдрес, service), http.StatusOK, ownServer+"/setWebhook")
+	change.Params["bot_server"] = telegramBotCloud
+	expect(action(change, owner), http.StatusInternalServerError, ownServer+"/setWebhook")
+	expect(doRequest(s, http.MethodPatch, apiURL, `{"webhook":false}`, снаружиАдрес, service), http.StatusOK, ownServer+"/deleteWebhook")
+	expect(action(change, owner), http.StatusOK, botapi.TelegramCloudURL+"/getMe")
+	expect(doRequest(s, http.MethodPost, apiURL+"/send", `{"chat_id":123,"text":"Тест"}`, снаружиАдрес, service),
+		http.StatusOK, botapi.TelegramCloudURL+"/sendMessage")
 }

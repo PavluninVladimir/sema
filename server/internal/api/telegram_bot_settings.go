@@ -89,7 +89,7 @@ func (s *Server) telegramBot(target string) (store.MessengerBot, error) {
 
 func (s *Server) telegramBotClient(bot store.MessengerBot) (botapi.TelegramClient, error) {
 	token, err := s.eng.Store().MessengerBotToken(bot)
-	return botapi.TelegramClient{Token: token, Transport: s.botTransport}, err
+	return botapi.TelegramClient{Token: token, BaseURL: bot.TelegramAPIURL, Transport: s.botTransport}, err
 }
 
 func telegramWebhookSecret(token, url string) string {
