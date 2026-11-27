@@ -103,20 +103,35 @@ func TestTelegramBotWebhookAndFeatures(t *testing.T) {
 	}
 	expect(doRequest(s, http.MethodGet, settingsURL, "", снаружиАдрес, ""), http.StatusUnauthorized)
 	expect(doRequest(s, http.MethodPatch, settingsURL, `{"webhook":true}`, снаружиАдрес, guest), http.StatusForbidden)
+	expect(doRequest(s, http.MethodPost, settingsURL+"/send", `{"chat_id":123,"text":"Тест"}`, снаружиАдрес, guest), http.StatusForbidden)
 	owner, err := st.AddToken("владелец", []string{"all"})
 	if err != nil {
 		t.Fatal(err)
 	}
 	read := expect(doRequest(s, http.MethodGet, settingsURL, "", снаружиАдрес, owner), http.StatusOK)
-	if !strings.Contains(read, host+path) || !strings.Contains(read, `"webhook":false`) {
-		t.Fatalf("нет доступного URL для выключенного webhook: %s", read)
+	if !strings.Contains(read, host+path) || !strings.Contains(read, `"webhook":false`) ||
+		!strings.Contains(read, `"api_url":"`+host+settingsURL+`"`) {
+		t.Fatalf("нет адресов webhook и API: %s", read)
 	}
 	card := expect(doRequest(s, http.MethodGet, "/ui?screen="+url.QueryEscape(botScreenAddr(id)), "", local, ""), http.StatusOK)
-	for _, phrase := range []string{"Включить webhook", "Скопировать URL", "Функции бота", "Защищать от флуда", host + path} {
+	for _, phrase := range []string{"Включить webhook", "Скопировать URL", "Функции бота", "Защищать от флуда", host + path,
+		"API Сёмы для ваших сервисов", "Скопировать URL API", host + settingsURL, host + settingsURL + "/send", "Управление ботами Telegram"} {
 		if !strings.Contains(card, phrase) {
 			t.Errorf("на карточке нет %q", phrase)
 		}
 	}
+	if _, err := s.accessActions(actionRequest{Action: "add_token", Params: map[string]string{
+		"name": "сервис бота", "scope_" + auth.TelegramBotsScope: "true",
+	}}); err != nil {
+		t.Fatal(err)
+	}
+	serviceToken := s.lastToken
+	service, ok := st.TokenByValue(serviceToken)
+	if !ok || len(service.Scopes) != 1 || service.Scopes[0] != auth.TelegramBotsScope {
+		t.Fatal("не выдан токен с отдельным правом Telegram")
+	}
+	expect(doRequest(s, http.MethodGet, settingsURL, "", снаружиАдрес, serviceToken), http.StatusOK)
+	expect(doRequest(s, http.MethodGet, "/api/ui?screen="+url.QueryEscape(botScreenAddr(id)), "", снаружиАдрес, serviceToken), http.StatusForbidden)
 
 	webhookURL = "https://elsewhere.example.org/callback"
 	expect(doRequest(s, http.MethodPatch, settingsURL, `{"webhook":true}`, снаружиАдрес, owner), http.StatusBadRequest)
@@ -124,7 +139,7 @@ func TestTelegramBotWebhookAndFeatures(t *testing.T) {
 		t.Fatal("чужой webhook перезаписан")
 	}
 	webhookURL = ""
-	expect(doRequest(s, http.MethodPatch, settingsURL, `{"features":{"groups":[-1009],"block_links":true,"block_words":true,"words":["предлагаю займ"],"commands":true,"start_text":"Начали","welcome":true,"welcome_text":"Добро пожаловать в группу","private_reply":true}}`, снаружиАдрес, owner), http.StatusOK)
+	expect(doRequest(s, http.MethodPatch, settingsURL, `{"features":{"groups":[-1009],"block_links":true,"block_words":true,"words":["предлагаю займ"],"commands":true,"start_text":"Начали","welcome":true,"welcome_text":"Добро пожаловать в группу","private_reply":true}}`, снаружиАдрес, serviceToken), http.StatusOK)
 	form := url.Values{"screen": {botScreenAddr(id)}, "_кнопка": {"set_telegram_bot_webhook|" + strconv.FormatInt(id, 10)}, "webhook": {"true"}, "toggles": {"webhook"}}
 	req := httptest.NewRequest(http.MethodPost, "http://localhost:8765/do", strings.NewReader(form.Encode()))
 	req.RemoteAddr = local
@@ -136,7 +151,11 @@ func TestTelegramBotWebhookAndFeatures(t *testing.T) {
 	if calls["setWebhook"] != 1 {
 		t.Fatal("переключатель карточки не зарегистрировал webhook")
 	}
-	expect(doRequest(s, http.MethodPost, settingsURL+"/send", `{"chat_id":123,"text":"Тест"}`, снаружиАдрес, owner), http.StatusOK)
+	expect(doRequest(s, http.MethodPost, settingsURL+"/send", `{"chat_id":123,"text":"Тест"}`, снаружиАдрес, serviceToken), http.StatusOK)
+	if err := st.RevokeToken(service.ID); err != nil {
+		t.Fatal(err)
+	}
+	expect(doRequest(s, http.MethodGet, settingsURL, "", снаружиАдрес, serviceToken), http.StatusUnauthorized)
 
 	event := func(secret, payload string, status int) {
 		t.Helper()
@@ -226,16 +245,24 @@ func TestBrowserTelegramBotWebhookForm(t *testing.T) {
 	defer srv.Close()
 	ctx := phoneChrome(t, srv.URL, time.Minute)
 	karkasOpen(t, ctx, botScreenAddr(id))
+	stnPoll(t, ctx, "URL управления и отправки Telegram", `(() => {
+		const api = document.getElementById('sec-telegram-bot-api');
+		return !!api && api.textContent.includes(`+jsString(s.telegramBotAPIURL(id)+"/send")+`);
+	})()`)
 	for _, checked := range []bool{true, false} {
-		var dirty, rendered bool
-		err := chromedp.Run(ctx,
-			chromedp.Click(`input[name="webhook"] + label.field-toggle`, chromedp.ByQuery),
-			chromedp.Poll(`!document.getElementById('save-bar')?.hidden`, &dirty, chromedp.WithPollingTimeout(10*time.Second)),
-			chromedp.Click(`#save-bar [data-save="save"]`, chromedp.ByQuery),
-			chromedp.Poll(`document.querySelector('input[name="webhook"]')?.defaultChecked === `+strconv.FormatBool(checked)+
-				` && document.getElementById('save-bar')?.hidden`, &rendered, chromedp.WithPollingTimeout(10*time.Second)))
-		if err != nil || !dirty || !rendered || enabled.Load() != checked {
-			t.Fatalf("переключатель webhook, ожидалось %v: %v", checked, err)
+		stnClick(t, ctx, `input[name="webhook"] + label.field-toggle`)
+		stnPoll(t, ctx, "видна полоса сохранения", `document.getElementById('save-bar')?.hidden === false`)
+		if err := chromedp.Run(ctx, chromedp.Evaluate(`document.querySelector('input[name="webhook"]').setAttribute('data-test-before-save', ''); true`, nil)); err != nil {
+			t.Fatal(err)
+		}
+		stnClick(t, ctx, `#save-bar [data-save="save"]`)
+		stnPoll(t, ctx, "сохранённая форма заново загружена", `(() => {
+			const field = document.querySelector('input[name="webhook"]');
+			return !!field && !field.hasAttribute('data-test-before-save') && field.defaultChecked === `+strconv.FormatBool(checked)+`
+				&& document.getElementById('save-bar')?.hidden && !document.querySelector('.htmx-request');
+		})()`)
+		if enabled.Load() != checked {
+			t.Fatalf("переключатель webhook, ожидалось %v", checked)
 		}
 		if checked {
 			if err := chromedp.Run(ctx, chromedp.Poll(`!document.getElementById('splash')`, nil,

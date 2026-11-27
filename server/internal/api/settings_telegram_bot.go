@@ -79,7 +79,19 @@ func (s *Server) telegramBotSections(bot store.MessengerBot) []Component {
 		},
 		Submit: &Action{Action: "save_telegram_bot_features", Target: id, Label: "Сохранить функции"},
 	}
-	return []Component{webhook, features}
+	apiURL := s.telegramBotAPIURL(bot.ID)
+	api := Component{Type: "section", ID: "telegram-bot-api", Title: "API Сёмы для ваших сервисов", Children: []Component{
+		{Type: "row", Layout: "wide", Subtitle: "URL управления ботом", Caption: apiURL,
+			Meta:    "GET читает настройки. PATCH меняет webhook и функции.",
+			Actions: []Action{{Action: "$copy", Target: apiURL, Label: "Скопировать URL API"}}},
+		{Type: "row", Layout: "wide", Subtitle: "Отправка сообщений", Caption: apiURL + "/send",
+			Meta:    "POST принимает chat_id, text и необязательный message_thread_id.",
+			Actions: []Action{{Action: "$copy", Target: apiURL + "/send", Label: "Скопировать URL отправки"}}},
+		{Type: "row", Layout: "wide", Subtitle: "Токен Сёмы", Caption: "Authorization: Bearer <токен Сёмы>",
+			Meta:    "Для сервисного токена оставьте только право «Управление ботами Telegram».",
+			Actions: []Action{{Action: "$goto", Target: accessScreen + "~" + accessTabTokens, Label: "Открыть токены"}}},
+	}}
+	return []Component{webhook, api, features}
 }
 
 func (s *Server) telegramBotSettingsAction(req actionRequest) (string, error) {

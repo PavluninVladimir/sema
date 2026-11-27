@@ -25,6 +25,15 @@ import (
 
 const telegramWebhookPath = "/api/webhooks/telegram/"
 
+func (s *Server) telegramBotAPIURL(id int64) string {
+	path := "/api/bots/" + strconv.FormatInt(id, 10) + "/telegram"
+	origin, err := url.Parse(s.auth.Origin())
+	if err != nil || origin.Host == "" || origin.User != nil || (origin.Scheme != "http" && origin.Scheme != "https") {
+		return path
+	}
+	return origin.Scheme + "://" + origin.Host + path
+}
+
 func isTelegramWebhookPath(path string) bool {
 	id, ok := strings.CutPrefix(path, telegramWebhookPath)
 	return ok && id != "" && id[0] >= '1' && id[0] <= '9' && strings.IndexFunc(id, func(r rune) bool {
@@ -61,11 +70,13 @@ type telegramBotPatch struct {
 type telegramBotView struct {
 	Enabled bool   `json:"webhook"`
 	URL     string `json:"url"`
+	APIURL  string `json:"api_url"`
 	store.TelegramBotState
 }
 
 func (s *Server) telegramBotViewFor(botID int64, state store.TelegramBotState) telegramBotView {
-	return telegramBotView{Enabled: state.WebhookURL != "", URL: s.telegramWebhookURL(botID), TelegramBotState: state}
+	return telegramBotView{Enabled: state.WebhookURL != "", URL: s.telegramWebhookURL(botID),
+		APIURL: s.telegramBotAPIURL(botID), TelegramBotState: state}
 }
 
 func (s *Server) telegramBot(target string) (store.MessengerBot, error) {
@@ -265,10 +276,6 @@ func telegramBotHTTPError(w http.ResponseWriter, status int, message string) {
 }
 
 func (s *Server) handleTelegramBotSettings(w http.ResponseWriter, r *http.Request) {
-	if !s.mayAdmin(r) {
-		telegramBotHTTPError(w, http.StatusForbidden, "управление ботом доступно владельцу")
-		return
-	}
 	id := r.PathValue("id")
 	bot, err := s.telegramBot(id)
 	if err != nil {
@@ -298,10 +305,6 @@ func (s *Server) handleTelegramBotSettings(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *Server) handleTelegramBotSend(w http.ResponseWriter, r *http.Request) {
-	if !s.mayAdmin(r) {
-		telegramBotHTTPError(w, http.StatusForbidden, "управление ботом доступно владельцу")
-		return
-	}
 	bot, err := s.telegramBot(r.PathValue("id"))
 	if err != nil {
 		telegramBotHTTPError(w, http.StatusNotFound, err.Error())
