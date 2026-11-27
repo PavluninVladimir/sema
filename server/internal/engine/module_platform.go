@@ -7,8 +7,10 @@ package engine
 import (
 	"context"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"log"
@@ -26,15 +28,17 @@ const WorkerModuleEvents = "module_events"
 // Словарь событий ядра: сущность и действие. Старые имена остаются
 // синонимами — модули, написанные раньше, продолжают работать.
 const (
-	EventMessageAdded = "message.added"
-	EventFileAdded    = "file.added"
-	EventFileChanged  = "file.changed"
+	EventMessageAdded       = "message.added"
+	EventFileAdded          = "file.added"
+	EventFileChanged        = "file.changed"
+	EventWeChatMessageAdded = store.EventWeChatMessageAdded
 )
 
 var eventHandlers = map[string]string{
-	EventMessageAdded: "onMessage",
-	EventFileAdded:    "onAttachment",
-	EventFileChanged:  "onFileChanged",
+	EventMessageAdded:       "onMessage",
+	EventFileAdded:          "onAttachment",
+	EventFileChanged:        "onFileChanged",
+	EventWeChatMessageAdded: "onWeChatMessage",
 }
 
 var eventSynonyms = map[string]string{
@@ -53,7 +57,9 @@ func EventKind(kind string) string {
 }
 
 // EventKinds — виды событий по порядку, для экрана установки.
-func EventKinds() []string { return []string{EventMessageAdded, EventFileAdded, EventFileChanged} }
+func EventKinds() []string {
+	return []string{EventMessageAdded, EventFileAdded, EventFileChanged, EventWeChatMessageAdded}
+}
 
 func EventTitle(kind string) string {
 	switch EventKind(kind) {
@@ -63,6 +69,8 @@ func EventTitle(kind string) string {
 		return "новый файл с текстом — из письма, загрузки, папки или от модуля"
 	case EventFileChanged:
 		return "у файла заново извлечён текст"
+	case EventWeChatMessageAdded:
+		return "новое входящее сообщение WeChat (метаданные)"
 	}
 	return kind
 }
@@ -241,6 +249,9 @@ func (e *Engine) runModuleEvent(ctx context.Context, ev *store.ModuleEvent) erro
 		return nil
 	}
 	payload, err := e.eventPayload(ev.Kind, ev.RefID)
+	if ev.Kind == EventWeChatMessageAdded && errors.Is(err, sql.ErrNoRows) {
+		return nil
+	}
 	if err != nil {
 		return err
 	}
@@ -260,6 +271,16 @@ func (e *Engine) runModuleEvent(ctx context.Context, ev *store.ModuleEvent) erro
 // eventPayload — что получает обработчик: письмо с текстом или файл.
 func (e *Engine) eventPayload(kind string, refID int64) (map[string]any, error) {
 	switch EventKind(kind) {
+	case EventWeChatMessageAdded:
+		account, err := e.wechatIdentity()
+		if err != nil {
+			return nil, sql.ErrNoRows
+		}
+		kind, at, err := e.store.WeChatEvent(account, refID)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"id": refID, "kind": kind, "date": at, "local": true}, nil
 	case EventMessageAdded:
 		m, err := e.store.Message(refID)
 		if err != nil {

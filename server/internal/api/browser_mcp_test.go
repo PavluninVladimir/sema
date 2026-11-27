@@ -354,7 +354,7 @@ func TestBrowserMCPPhone(t *testing.T) {
 	karkasOpen(t, ctx, mcpScreen)
 	mcpOpenList(t, ctx)
 	list := mcpRead(t, ctx)
-	if list.Crumb != "‹ Настройки" || list.SW > list.CW {
+	if list.Crumb != "‹ Система" || list.SW > list.CW {
 		t.Errorf("список на телефоне: «назад» %q, ширина %d при %d", list.Crumb, list.SW, list.CW)
 	}
 	for _, row := range list.Rows {

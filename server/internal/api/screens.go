@@ -20,11 +20,7 @@ import (
 // buildChats — разговор на широком экране. Списка рядом больше нет: дерево
 // разговоров живёт в главном меню (chatScreens), а вторая панель с тем же
 // деревом дублировала его и отнимала ширину у самого разговора.
-func (s *Server) buildChats(doc *Document, chatID int64, limit int) error {
-	chats, err := s.eng.Store().Chats()
-	if err != nil {
-		return err
-	}
+func (s *Server) buildChats(doc *Document, chats []*store.Chat, chatID int64, limit int) error {
 	// без выбранного — разговор с Сёмой: сюда приходит всё, что ждёт
 	// решения, и с него человек начинает. Нет такого — самый свежий
 	// разговор; у контейнера ленты нет, открывать его незачем
@@ -131,6 +127,7 @@ func (s *Server) buildChat(doc *Document, chatID int64, limit int) error {
 	if chat.IsContainer() {
 		return s.buildContainer(doc, chat)
 	}
+	main := chat.Kind == store.ChatKindAssistant
 	// переписка отдаётся порциями: раньше было ровно 50 последних, и
 	// более ранних в интерфейсе не существовало вовсе
 	page := s.chatPage()
@@ -158,7 +155,7 @@ func (s *Server) buildChat(doc *Document, chatID int64, limit int) error {
 	maxPeer, isMAX := s.eng.MAXPeerOfChat(chatID)
 	зов := "«" + s.eng.TGHelpWord() + ", …» в начале строки позовёт Сёму"
 	switch {
-	case s.isMainConversation(chat.ID):
+	case main:
 		// главный разговор: длинное объяснение про ветку человеку здесь
 		// не нужно — он в нём живёт, а не разбирается, как он устроен
 		facts = append([]string{"ваш разговор с Сёмой"}, facts...)
@@ -183,7 +180,7 @@ func (s *Server) buildChat(doc *Document, chatID int64, limit int) error {
 	}
 	// счёт ждущих — первым и словами: он главное в этой строке, а в меню
 	// его ставить нельзя — цифру рядом с чатом читают как непрочитанное
-	if s.isMainConversation(chat.ID) {
+	if main {
 		if n := s.eng.NotifyCounter(); n > 0 {
 			facts = append([]string{plural(n, "ждёт решения", "ждут решения", "ждут решения")}, facts...)
 		}
@@ -205,9 +202,7 @@ func (s *Server) buildChat(doc *Document, chatID int64, limit int) error {
 		{Action: "delete_chat", Target: id, Label: "Удалить", Style: "destructive", ConfirmOK: "Удалить",
 			Confirm: "Удалить чат «" + chat.Title + "»? Переписку не восстановить."},
 	}
-	if s.isMainConversation(chat.ID) {
-		// пункта «Ждут вас» в меню больше нет — записи приходят сюда;
-		// но разобранное и отложенное должно остаться достижимым
+	if main {
 		doc.ToolbarMenu = append([]Action{
 			{Action: "$goto", Target: notifyScreen, Label: "Все записи"},
 		}, doc.ToolbarMenu...)
@@ -2496,7 +2491,7 @@ func replyRecipient(m *store.Message) string {
 // туда, где он отвечает. Спокойные записи (ok) сворачиваются в одну
 // строку — четыре ночные смены не должны занимать четыре карточки.
 func (s *Server) waitingInFeed(doc *Document, chat *store.Chat) {
-	if chat == nil || !s.isMainConversation(chat.ID) {
+	if chat.Kind != store.ChatKindAssistant {
 		return
 	}
 	list, err := s.eng.Store().Notifications(true, 100)
@@ -2563,14 +2558,14 @@ func nameInGroup(title string) string {
 	return strings.TrimPrefix(strings.TrimPrefix(title, "Telegram · "), "MAX · ")
 }
 
-// chatScreens — разговоры в меню деревом: разговор с Сёмой первым, дальше
-// группы (Telegram, MAX, задачи…), в них разговоры по свежести, у группы с
+// chatScreens — разговоры в меню деревом: внутри групп (Telegram, MAX, свои
+// чаты и другие) разговоры по свежести, у группы с
 // темами — её темы. Раньше это дерево жило второй панелью рядом с меню и
 // дублировало его. Группы раскрыты всегда: раскрытие «где стоишь» двигало
 // меню при каждом переходе между группами.
 // notifyLvl — уровень уведомлений, уже посчитанный меню. Список chats — общий
 // с соседями по меню: его элементы здесь не правятся.
-func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl string) []Screen {
+func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl string, owner bool) []Screen {
 	st := s.eng.Store()
 	открыт, _ := strconv.ParseInt(strings.TrimPrefix(screen, "chat:"), 10, 64)
 	kids := map[int64][]*store.Chat{}
@@ -2584,6 +2579,10 @@ func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl strin
 	}
 	черновики := st.TGDraftCounts()
 	пункт := func(c *store.Chat, g string) Screen {
+		if c.Kind == store.ChatKindAssistant {
+			return Screen{ID: "chat:" + strconv.FormatInt(c.ID, 10), Title: c.Title, Level: notifyLvl,
+				Initials: initials(c.Title), Tint: "sky"}
+		}
 		значок, оттенок := conversationIcon(c, g)
 		п := Screen{ID: "chat:" + strconv.FormatInt(c.ID, 10), Title: nameInGroup(c.Title), Icon: значок, Tint: оттенок}
 		switch {
@@ -2596,15 +2595,6 @@ func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl strin
 	}
 
 	var out []Screen
-	// разговор с Сёмой — первым: сюда приходит всё, что ждёт решения
-	главный := mainConversation(chats)
-	for _, c := range chats {
-		if c.ID == главный {
-			out = append(out, Screen{ID: "chat:" + strconv.FormatInt(c.ID, 10), Title: c.Title, Level: notifyLvl,
-				Initials: initials(c.Title), Tint: "sky"})
-		}
-	}
-
 	byGroup := map[string][]*store.Chat{}
 	// у контейнера своих сообщений нет: его место задаёт свежий разговор под
 	// ним. Свежесть — своей картой: список общий с соседями по меню, и
@@ -2626,15 +2616,29 @@ func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl strin
 			}
 			свежесть[c.ID] = t
 		}
-		g := chatGroup(c.Title)
+		g := chatGroup(c)
 		byGroup[g] = append(byGroup[g], c)
 	}
 	for _, g := range chatChips {
+		if g == "WeChat" {
+			if owner {
+				if wechat := s.wechatMenu(); wechat != nil {
+					out = append(out, *wechat)
+				}
+			}
+			continue
+		}
 		list := byGroup[g]
 		if len(list) == 0 {
 			continue
 		}
-		sort.SliceStable(list, func(i, j int) bool { return last(list[i]).After(last(list[j])) })
+		sort.SliceStable(list, func(i, j int) bool {
+			left, right := list[i], list[j]
+			if left.Kind == store.ChatKindAssistant || right.Kind == store.ChatKindAssistant {
+				return left.Kind == store.ChatKindAssistant && right.Kind != store.ChatKindAssistant
+			}
+			return last(left).After(last(right))
+		})
 		var children []Screen
 		for _, c := range list {
 			if c.IsContainer() {
@@ -2648,7 +2652,7 @@ func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl strin
 					темы = append(темы, пункт(k, g))
 					// открытая ветка темы — рядом с темой
 					for _, в := range kids[k.ID] {
-						if в.IsThread() && в.ID == открыт && в.ID != главный {
+						if в.IsThread() && в.ID == открыт {
 							ветка := пункт(в, g)
 							ветка.Title = "↳ " + в.Title
 							темы = append(темы, ветка)
@@ -2662,9 +2666,9 @@ func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl strin
 			}
 			children = append(children, пункт(c, g))
 			// открытая ветка разговора — рядом с ним, иначе в меню нечего
-			// подсветить. Разговор с Сёмой уже стоит первым
+			// подсветить
 			for _, k := range kids[c.ID] {
-				if k.IsThread() && k.ID == открыт && k.ID != главный {
+				if k.IsThread() && k.ID == открыт {
 					ветка := пункт(k, g)
 					ветка.Title = "↳ " + k.Title
 					children = append(children, ветка)
@@ -2678,25 +2682,14 @@ func (s *Server) chatScreens(screen string, chats []*store.Chat, notifyLvl strin
 	return out
 }
 
-// mainConversation — разговор с Сёмой, куда приходит всё, что ждёт
-// решения. Ветка вида «Сёма» заводится под каждым разговором — у
-// переписки с человеком своя, у группы своя, — поэтому «первая попавшаяся
-// ветка Сёмы» означала случайную, а записи уведомлений появлялись бы в
-// каждой. Главная — самая старая: она не меняется от новых разговоров.
+// mainConversation — самостоятельный разговор, куда приходит всё, что ждёт решения.
 func mainConversation(chats []*store.Chat) int64 {
-	var id int64
 	for _, c := range chats {
-		if c.Kind == store.ChatKindSema && (id == 0 || c.ID < id) {
-			id = c.ID
+		if c.Kind == store.ChatKindAssistant {
+			return c.ID
 		}
 	}
-	return id
-}
-
-// isMainConversation — открыт ли главный разговор с Сёмой.
-func (s *Server) isMainConversation(chatID int64) bool {
-	chats, err := s.eng.Store().Chats()
-	return err == nil && chatID > 0 && mainConversation(chats) == chatID
+	return 0
 }
 
 // chatGroupIcon — плитка группы разговоров: мессенджер узнаётся по

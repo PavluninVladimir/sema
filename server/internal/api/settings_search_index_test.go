@@ -213,8 +213,8 @@ func TestSearchEmptyAndPhoneRoot(t *testing.T) {
 	}
 	// на разделе результаты стоят над содержимым раздела
 	sec := searchDoc(t, s, "settings:servers", "окно")
-	if len(sec.Components) < 2 || !strings.HasPrefix(sec.Components[0].Title, "Нашлось · ") {
-		t.Errorf("на разделе результаты не сверху: %q", sec.Components[0].Title)
+	if len(sec.Components) < 2 || !strings.HasPrefix(sec.Components[1].Title, "Нашлось · ") {
+		t.Error("результаты должны стоять перед содержимым раздела, после обратной ссылки")
 	}
 }
 

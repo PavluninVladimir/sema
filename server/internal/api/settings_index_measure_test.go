@@ -36,7 +36,7 @@ func TestSettingsIndexCostBySection(t *testing.T) {
 	costs := map[string]*cost{}
 	var names []string
 	for _, group := range settingsGroups {
-		for _, section := range group.Sections {
+		for _, section := range group.sections() {
 			before := b.idx.Screens
 			tr := store.TraceSQL()
 			t0 := time.Now()

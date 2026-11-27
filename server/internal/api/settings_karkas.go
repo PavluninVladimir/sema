@@ -1,31 +1,7 @@
 package api
 
-// Каркас настроек: одна колонка разделов под четырьмя заголовками.
-//
-// Настройки разрослись в каталог: восемнадцать разделов, и человек ищет
-// параметр перебором. Замеры 11 сентября 2026: «Модели и роли» — 3597
-// узлов и 319 КБ, «Телеграм» — 1487, «Серверы» — 1142; на телефоне
-// «Почта» занимала больше одиннадцати экранов прокрутки, «Доступ» —
-// больше семи.
-//
-// Первый каркас (11 сентября) делил их на пять вкладок, и внутри вкладки
-// был ещё список разделов. На телефоне это выходило ≈190 точек из 760 до
-// первой строки содержимого и три нажатия до раздела: вкладка, кнопка,
-// строка шторки. 1 октября 2026 вкладок не стало (макеты —
-// `design/nastroyki-2/Karkas.html`): слова «Каналы · Поведение · Система ·
-// Безопасность» остались заголовками групп, а колонка одна.
-//
-// Колонка — мебель: её состав не меняется от экрана к экрану, меняются
-// подсветка и счётчики. Один выбранный пункт, строка «Обзор» наверху,
-// поле поиска первой строкой.
-//
-// На телефоне колонки нет: корень настроек (`settings`) — тот же список,
-// но экраном (`buildSettingsRoot`), а у раздела над заголовком «‹ Настройки».
-// Какой документ нужен, знает сервер — клиент говорит, что окно узкое,
-// заголовком `X-Sema-Phone`, как у «Чатов».
-//
-// Экраны при этом не переписаны: каркас — общая обёртка над ними, и
-// каждый экран настроек получает её одинаково, чем бы он ни был занят.
+// Каркас настроек: компактный выбор группы и каталоги разделов.
+// Один Panel идёт слева на широком экране и сверху на телефоне.
 
 import (
 	"fmt"
@@ -34,36 +10,60 @@ import (
 )
 
 const (
-	// settingsRoot — «Настройки». На широком экране это Обзор рядом с
-	// колонкой, на телефоне — список разделов
-	settingsRoot = "settings"
-	// settingsOverview — Обзор своим адресом: на телефоне до него идут
-	// строкой корня, и «назад» оттуда ведёт в список. На широком экране это
-	// тот же Обзор, что и `settings`
+	settingsRoot     = "settings"
 	settingsOverview = "settings:overview"
+	settingsChannels = "settings:channels"
+	settingsBehavior = "settings:behavior"
+	settingsSystem   = "settings:system"
+	settingsSecurity = "settings:security"
 )
 
-// settingsGroup — заголовок колонки и разделы под ним. Порядок разделов
-// важен: он же порядок в колонке.
-type settingsGroup struct {
-	// ID — адрес прежней вкладки: старые ссылки («settings:каналы») ведут в
-	// первый раздел группы
-	ID, Name string
+type settingsBlock struct {
+	Title    string
 	Sections []string
 }
 
-// settingsGroups — четыре заголовка. Раздел живёт ровно в одной группе:
-// повторить его в двух значило бы снова завести каталог. «Обзор» не
-// входит ни в одну — он стоит над ними.
+type settingsGroup struct {
+	ID, Legacy, Name, Icon string
+	Blocks                 []settingsBlock
+}
+
+// sections — порядок разделов в каталоге, индексе и старых переходах.
+func (g settingsGroup) sections() []string {
+	var sections []string
+	for _, block := range g.Blocks {
+		sections = append(sections, block.Sections...)
+	}
+	return sections
+}
+
 var settingsGroups = []settingsGroup{
-	{ID: "settings:каналы", Name: "Каналы", Sections: []string{
-		"settings:mail", tgScreen, maxScreen, notifySettingsScreen, translateScreen}},
-	{ID: "settings:поведение", Name: "Поведение", Sections: []string{
-		modelsScreen, searchScreen, skillsScreen, learningScreen}},
-	{ID: "settings:система", Name: "Система", Sections: []string{
-		serversScreen, agentsScreen, mcpScreen, storagesScreen, toolsScreen, watchScreen}},
-	{ID: "settings:безопасность", Name: "Безопасность", Sections: []string{
-		accessScreen, secretsScreen, sentScreen, changesScreen}},
+	{ID: settingsChannels, Legacy: "settings:каналы", Name: "Каналы", Icon: "bubble.left", Blocks: []settingsBlock{
+		{Sections: []string{mailScreen}},
+		{Title: "Мессенджеры", Sections: []string{tgScreen, maxScreen, wechatScreen, botsScreen}},
+		{Title: "Обработка сообщений", Sections: []string{notifySettingsScreen, translateScreen}},
+	}},
+	{ID: settingsBehavior, Legacy: "settings:поведение", Name: "Поведение", Icon: "brain", Blocks: []settingsBlock{
+		{Title: "Решения и ответы", Sections: []string{modelsScreen, searchScreen}},
+		{Title: "Возможности", Sections: []string{skillsScreen, learningScreen}},
+	}},
+	{ID: settingsSystem, Legacy: "settings:система", Name: "Система", Icon: "server.rack", Blocks: []settingsBlock{
+		{Title: "Инфраструктура", Sections: []string{serversScreen, storagesScreen, mcpScreen}},
+		{Title: "Выполнение", Sections: []string{agentsScreen, toolsScreen, watchScreen}},
+	}},
+	{ID: settingsSecurity, Legacy: "settings:безопасность", Name: "Безопасность", Icon: "lock", Blocks: []settingsBlock{
+		{Title: "Учётная запись", Sections: []string{accessScreen, secretsScreen}},
+		{Title: "Аудит", Sections: []string{sentScreen, changesScreen}},
+	}},
+}
+
+func settingsGroupAt(screen string) (settingsGroup, bool) {
+	for _, group := range settingsGroups {
+		if group.ID == screen {
+			return group, true
+		}
+	}
+	return settingsGroup{}, false
 }
 
 // sectionTitle — как раздел зовётся в списке. Короткое имя, а не заголовок
@@ -77,6 +77,8 @@ var sectionTitle = map[string]string{
 	"settings:mail":      "Почта",
 	tgScreen:             "Telegram",
 	maxScreen:            "MAX",
+	botsScreen:           botsTitle,
+	wechatScreen:         "WeChat",
 	notifySettingsScreen: "Уведомления",
 	translateScreen:      "Перевод",
 	modelsScreen:         "Модели и роли",
@@ -115,8 +117,11 @@ func settingsSectionOf(screen string) (settingsGroup, string, bool) {
 	if base == settingsRoot || base == settingsOverview {
 		return settingsGroup{}, settingsRoot, true
 	}
+	if group, ok := settingsGroupAt(base); ok {
+		return group, base, true
+	}
 	for _, group := range settingsGroups {
-		for _, section := range group.Sections {
+		for _, section := range group.sections() {
 			if section == base {
 				return group, base, true
 			}
@@ -153,6 +158,9 @@ func (s *Server) sectionMarks(doc *Document) map[string]sectionMark {
 	marks := map[string]sectionMark{}
 	troubled, worst := 0, ""
 	for addr, section := range s.sectionIndex(doc) {
+		if doc.guest && adminSettingsScreen(addr) {
+			continue
+		}
 		if section.Level == "" || section.Level == LevelOK {
 			continue
 		}
@@ -168,95 +176,56 @@ func (s *Server) sectionMarks(doc *Document) map[string]sectionMark {
 	return marks
 }
 
-// settingsPanel — колонка разделов: «Обзор», потом четыре группы с
-// заголовками. Заголовок группы — пункт без адреса. Один и тот же состав
-// на каждом экране настроек: выбранным отмечен ровно один пункт.
-func settingsPanel(marks map[string]sectionMark) []PanelItem {
-	makeItem := func(addr string) PanelItem {
-		item := PanelItem{ID: addr, Title: sectionTitle[addr]}
-		if item.Title == "" {
-			item.Title = addr
-		}
-		if m, ok := marks[addr]; ok {
-			item.Level = m.Level
-			if m.Count > 0 {
-				item.Meta = strconv.Itoa(m.Count)
-			}
-		}
-		return item
+// settingsPanel — общий список групп. Счётчики разделов стоят в каталогах.
+func settingsPanel(mark sectionMark) []PanelItem {
+	overview := PanelItem{ID: settingsRoot, Title: sectionTitle[settingsRoot], Icon: "house", Level: mark.Level}
+	if mark.Count > 0 {
+		overview.Meta = strconv.Itoa(mark.Count)
 	}
-	panel := []PanelItem{makeItem(settingsRoot)}
+	panel := []PanelItem{overview}
 	for _, group := range settingsGroups {
-		panel = append(panel, PanelItem{Title: group.Name, Kind: "heading"})
-		for _, section := range group.Sections {
-			panel = append(panel, makeItem(section))
-		}
+		panel = append(panel, PanelItem{ID: group.ID, Title: group.Name, Icon: group.Icon})
 	}
 	return panel
 }
 
-// settingsFrame — колонка разделов (на телефоне — «назад» в корень). Зовётся
-// после того, как экран собран: он сам о каркасе не знает.
+// settingsFrame добавляет общий поиск и обратный путь после сборки экрана.
 func (s *Server) settingsFrame(doc *Document, screen string, phone bool) {
-	_, section, ok := settingsSectionOf(screen)
+	group, section, ok := settingsSectionOf(screen)
 	if !ok {
 		return
 	}
-	// формы настроек сохраняет одна полоса внизу экрана, а не кнопка у
-	// каждой: см. settings_saving.go
 	savingBar(doc.Components)
-	// вкладок у настроек больше нет, и выбранная вкладка не значит ничего
 	doc.Tabs, doc.ActiveTab = nil, ""
 	doc.PanelAction = nil
-	if phone {
-		// колонки нет: корень — список разделов, раздел — целый экран с
-		// «назад» в него. Над содержимым остаётся заголовок и, у каталогов,
-		// внутренние вкладки — и всё
-		doc.Panel, doc.PanelTitle, doc.PanelKind, doc.ActivePanel = nil, "", "", ""
-		// у экрана сущности путь назад уже есть («‹ Серверы»), и «назад» на
-		// нём один: в корень настроек возвращаются через список
-		ownBack := len(doc.Components) > 0 && doc.Components[0].Type == "crumb"
-		if screen != settingsRoot {
-			if !ownBack {
-				doc.Components = append([]Component{{Type: "crumb",
-					Actions: []Action{{Action: "$goto", Target: settingsRoot, Label: "‹ Настройки"}}}}, doc.Components...)
-			}
-			// верхнее поле ищет по всем настройкам, а у раздела на телефоне
-			// ему места нет: поле остаётся только там, где у экрана уже есть
-			// полоса фильтров и собственный поиск по списку (правила сервера
-			// MCP)
-			if len(doc.Filters) == 0 || doc.noPhoneSearch {
-				doc.Searchable = false
-			}
-		}
-		return
-	}
-	// поиск по настройкам виден из любого раздела: он про все настройки
-	// сразу, и возвращаться за ним на «Обзор» человеку незачем. Поле стоит
-	// первой строкой колонки (PanelKind) и при этом одно на экран: ленивые
-	// части экрана своего не рисуют (toScreen снимает SearchHint), а
-	// набранное сверху уходит и в них
-	doc.Searchable = true
-	// у экрана со своим списком поле ищет по списку, и подсказка говорит об этом
-	// (список моделей: «Найти модель по имени»)
+	doc.Searchable = !phone || !doc.noPhoneSearch
 	if doc.SearchHint == "" {
 		doc.SearchHint = "Найти настройку"
 	}
-	// Колонка есть и у Обзора: она мебель, и без неё заголовок уезжал влево
-	// на её ширину при каждом переходе между разделами
 	doc.PanelTitle = "Настройки"
 	doc.PanelKind = "sections"
-	doc.ActivePanel = section
-	doc.Panel = settingsPanel(s.sectionMarks(doc))
+	doc.ActivePanel = settingsRoot
+	if group.ID != "" {
+		doc.ActivePanel = group.ID
+	}
+	doc.Panel = settingsPanel(s.sectionMarks(doc)[settingsRoot])
+	if group.ID == "" || section == group.ID {
+		return
+	}
+	for _, c := range doc.Components {
+		if c.Type == "crumb" {
+			return // у сущности свой обратный путь внутри раздела
+		}
+	}
+	back := Component{Type: "crumb", Actions: []Action{{Action: "$goto", Target: group.ID, Label: "‹ " + group.Name}}}
+	doc.Components = append([]Component{back}, doc.Components...)
 }
 
-// tabScreen — куда вести, когда пришли по адресу прежней вкладки
-// («settings:каналы»): в первый раздел её группы. Самой вкладки больше нет,
-// но закладки, уведомления и ссылки в чужих журналах помнят её адрес.
+// tabScreen сохраняет назначение прежних адресов вкладок группы.
 func tabScreen(screen string) (string, bool) {
 	for _, group := range settingsGroups {
-		if group.ID == screen && len(group.Sections) > 0 {
-			return group.Sections[0], true
+		if group.Legacy == screen {
+			return group.Blocks[0].Sections[0], true
 		}
 	}
 	return "", false

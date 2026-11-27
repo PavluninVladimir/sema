@@ -77,7 +77,7 @@ func TestSecretsSectionTabs(t *testing.T) {
 		if strings.Join(titles, "|") != "Секреты|Шифрование|Журнал" {
 			t.Errorf("%s: вкладки %v", screen, titles)
 		}
-		if doc.ActivePanel != secretsScreen || doc.Heading != "Ключи и секреты" {
+		if doc.ActivePanel != settingsSecurity || doc.Heading != "Ключи и секреты" {
 			t.Errorf("%s: в колонке выбран %q, заголовок %q", screen, doc.ActivePanel, doc.Heading)
 		}
 		if len(doc.ToolbarActions) != 1 || doc.ToolbarActions[0].Label != "Добавить секрет" ||
@@ -207,8 +207,8 @@ func TestSecretsRowsAreThin(t *testing.T) {
 	}
 	// полка: модуль просит секрет, и имя без секрета
 	shelf := findByType(doc, "shelf")
-	if shelf == nil || doc.Components[0].Type != "shelf" {
-		t.Fatalf("полка «Ждут вас» первой: %+v", shelf)
+	if shelf == nil || len(doc.Components) < 2 || &doc.Components[1] != shelf {
+		t.Fatalf("полка «Ждут вас» должна идти после обратной ссылки: %+v", shelf)
 	}
 	text := ""
 	for _, c := range shelf.Children {
@@ -239,7 +239,7 @@ func TestSecretScreenTabs(t *testing.T) {
 		if strings.Join(titles, "|") != "Обзор|Кому выдан|Журнал" {
 			t.Errorf("%s: вкладки %v", screen, titles)
 		}
-		if doc.Screen != screen || doc.ActiveSubtab != screen || doc.ActivePanel != secretsScreen || doc.Heading != "planner-token" {
+		if doc.Screen != screen || doc.ActiveSubtab != screen || doc.ActivePanel != settingsSecurity || doc.Heading != "planner-token" {
 			t.Errorf("%s: экран %q, вкладка %q, колонка %q, заголовок %q", screen, doc.Screen, doc.ActiveSubtab, doc.ActivePanel, doc.Heading)
 		}
 		if doc.Components[0].Type != "crumb" || doc.Components[0].Actions[0].Label != "‹ Ключи и секреты" ||
@@ -686,7 +686,10 @@ func TestSecretsJournalFiltersAndPages(t *testing.T) {
 	if doc.ActiveFilter != "" {
 		t.Errorf("выбран отбор %q", doc.ActiveFilter)
 	}
-	section := doc.Components[0]
+	section := findByType(doc, "section")
+	if section == nil {
+		t.Fatal("нет списка записей журнала")
+	}
 	if len(section.Children) != 20 {
 		t.Errorf("строк первой страницы %d, а нужно 20", len(section.Children))
 	}
@@ -698,14 +701,25 @@ func TestSecretsJournalFiltersAndPages(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows := denied.Components[0].Children
+	deniedSection := findByType(denied, "section")
+	if deniedSection == nil {
+		t.Fatal("нет списка отказов")
+	}
+	rows := deniedSection.Children
 	// два отказа: модулю без права и просьба имени, которого нет
 	if len(rows) != 2 || rows[0].Badges[0].Level != LevelAlert || rows[1].Badges[0].Level != LevelAlert ||
 		!strings.Contains(rows[0].Caption+rows[1].Caption, "право не выдано") {
 		t.Errorf("отказы: %+v", rows)
 	}
-	changes, _ := s.buildScreen(entityAddr(secretsScreen, "", secretsTabLog), store.SecretLogChanges, "", 0)
-	for _, r := range changes.Components[0].Children {
+	changes, err := s.buildScreen(entityAddr(secretsScreen, "", secretsTabLog), store.SecretLogChanges, "", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	changesSection := findByType(changes, "section")
+	if changesSection == nil {
+		t.Fatal("нет списка изменений")
+	}
+	for _, r := range changesSection.Children {
 		if r.Badges[0].Text != "правка" {
 			t.Errorf("в «Изменениях» не правка: %+v", r)
 		}
@@ -735,7 +749,7 @@ func TestEncryptionMovedFromTools(t *testing.T) {
 	fx := secretsAgentsFix(t)
 	s := fx.S
 	doc := serverDoc(t, s, "settings:tools~crypt")
-	if doc.Screen != entityAddr(secretsScreen, "", secretsTabCrypt) || doc.ActivePanel != secretsScreen {
+	if doc.Screen != entityAddr(secretsScreen, "", secretsTabCrypt) || doc.ActivePanel != settingsSecurity {
 		t.Errorf("прежний адрес открыл %q (колонка %q)", doc.Screen, doc.ActivePanel)
 	}
 	crypt := docByID(doc, "crypt")

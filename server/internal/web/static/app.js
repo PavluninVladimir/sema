@@ -424,7 +424,11 @@ document.body.addEventListener('click', (evt) => {
       break;
     }
     case '$file': window.open('/api/files/' + where, '_blank'); break;
-    case '$open': if (/^https?:\/\//.test(where)) window.open(where, '_blank', 'noopener'); break;
+    case '$open':
+      if (/^https?:\/\//.test(where) || where.startsWith('/api/wechat/file?')) {
+        window.open(where, '_blank', 'noopener');
+      }
+      break;
     case '$copy': navigator.clipboard && navigator.clipboard.writeText(where); break;
     // скопировать значение поля этого экрана по его имени: текст уже лежит в поле, и
     // носить его второй раз в самой кнопке незачем (текст скилла — 30 КБ). Копируется
@@ -2494,6 +2498,11 @@ if ('serviceWorker' in navigator) {
     postponed = false;
     htmx.trigger(el, 'sema:refresh');
   };
+  // Пока показываем QR, перечитываем экран и при недоступном живом обновлении.
+  setInterval(() => {
+    if ((!sock || sock.readyState !== WebSocket.OPEN) && document.visibilityState === 'visible' &&
+        document.querySelector('#feed [data-hl="r:max-qr"] .row-image img')) refresh();
+  }, 5000);
   document.body.addEventListener('focusout', () => { if (postponed) setTimeout(refresh, 50); });
   // отложенное из-за прокрутки ждёт покоя: раз в полсекунды смотрим, не
   // остановился ли список. Ждать события «прокрутка кончилась» нельзя —

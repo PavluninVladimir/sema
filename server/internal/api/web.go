@@ -378,7 +378,7 @@ func toScreen(d *Document) web.Screen {
 			Count: счёт, Level: level, Selected: insidePath(в, d.Screen)})
 	}
 	for _, п := range d.Panel {
-		пункт := web.Item{Addr: п.ID, Name: п.Title, Small: п.Subtitle, Level: п.Level,
+		пункт := web.Item{Addr: п.ID, Name: п.Title, Icon: п.Icon, Small: п.Subtitle, Level: п.Level,
 			Count: п.Meta, Group: п.Group, Selected: п.ID == d.ActivePanel, Nested: п.Nested,
 			Depth: п.Depth, Kind: п.Kind, Open: п.Open, Inside: п.Under, InGroup: п.InGroup}
 		if п.Delete != nil {
@@ -649,7 +649,7 @@ func toBlock(к Component) web.Block {
 		Collapsed: к.Collapsed, Open: к.Expanded, Expand: к.Expand, Toggle: к.Toggle, Deferred: к.Deferred,
 		Fragment: к.Lazy, FragmentSearch: к.SearchHint,
 		Output: к.Detail, Fraction: к.Progress, CountdownTo: к.Until,
-		ImageURL: к.Image,
+		ImageURL: к.Image, InlinePNG: к.inlinePNG,
 		FrameURL: к.Frame, BlockedImages: к.FrameImages, Translation: к.FrameTranslated,
 		Sparkline: sparkline(к.Spark),
 	}

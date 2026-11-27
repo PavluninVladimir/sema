@@ -3,11 +3,9 @@ package api
 // Фокус после переходов и клавиатура без мыши.
 //
 // P2.2: после подмены экрана фокус предсказуем — выбрали раздел в колонке
-// с клавиатуры, остались на выбранном разделе новой колонки; перешли по
+// с клавиатуры, остались на выбранной группе; перешли по
 // адресу — фокус на заголовке, и скринридер называет, куда попали.
-// P2.3: (шторки разделов больше нет — 1 октября 2026 колонка разделов
-// стала одной на все настройки, а на телефоне корнем экрана) поле поиска
-// в колонке не теряет фокус, пока человек печатает.
+// P2.3: поле поиска не теряет фокус, пока человек печатает.
 // P2.4: масштаб 200 % — кнопки и значения не наезжают на подписи.
 
 import (
@@ -62,19 +60,23 @@ func TestBrowserFocusAfterNavigation(t *testing.T) {
 	ctx, отмена, srv := openInChrome(t, 1100, 820, "settings")
 	defer отмена()
 
-	// раздел «Модели и роли» — с клавиатуры: фокус на пункт колонки, Enter
-	if err := chromedp.Run(ctx, chromedp.Evaluate(
-		`(() => { const item = Array.from(document.querySelectorAll('#panel .item')).find((el) => el.textContent.includes('Модели и роли')); item.focus(); return true; })()`, nil),
+	// Группа «Поведение» открывается с клавиатуры, фокус остаётся на ней.
+	if err := chromedp.Run(ctx, chromedp.Focus(settingsGroupButton(settingsBehavior), chromedp.ByQuery),
+		chromedp.KeyEvent(keyEnter)); err != nil {
+		t.Fatal(err)
+	}
+	waitScreen(t, ctx, settingsBehavior)
+	var onSection bool
+	if err := chromedp.Run(ctx, chromedp.Poll(
+		`(() => { const el = document.activeElement; return !!el && el.matches('#panel .item.selected') && el.textContent.includes('Поведение'); })()`,
+		&onSection, chromedp.WithPollingTimeout(5*time.Second))); err != nil || !onSection {
+		t.Errorf("после Enter фокус должен быть на выбранной группе, сейчас %s", activeElement(t, ctx))
+	}
+	if err := chromedp.Run(ctx, chromedp.Focus(`#feed .catalog-link[data-goto="settings:models"] .row-link`, chromedp.ByQuery),
 		chromedp.KeyEvent(keyEnter)); err != nil {
 		t.Fatal(err)
 	}
 	waitScreen(t, ctx, modelsScreen)
-	var onSection bool
-	if err := chromedp.Run(ctx, chromedp.Poll(
-		`(() => { const el = document.activeElement; return !!el && el.matches('#panel .item.selected') && el.textContent.includes('Модели и роли'); })()`,
-		&onSection, chromedp.WithPollingTimeout(5*time.Second))); err != nil || !onSection {
-		t.Errorf("после Enter на разделе фокус не на выбранном разделе новой колонки, а на %s", activeElement(t, ctx))
-	}
 
 	// переход по адресу — фокус на заголовке
 	if err := chromedp.Run(ctx, chromedp.Navigate(srv.URL+"/#screen=tasks")); err != nil {
@@ -118,10 +120,7 @@ func TestBrowserColumnSearchKeepsFocus(t *testing.T) {
 	if err := chromedp.Run(ctx, chromedp.Evaluate(`document.querySelectorAll('#panel .panel-row').length`, &count)); err != nil {
 		t.Fatal(err)
 	}
-	want := 1
-	for _, group := range settingsGroups {
-		want += len(group.Sections)
-	}
+	want := 1 + len(settingsGroups)
 	if count != want {
 		t.Errorf("с запросом в колонке %d строк, а должно быть %d: состав колонки не зависит от поиска", count, want)
 	}

@@ -58,6 +58,7 @@ var synonyms = map[string]string{
 	"settings:mail":      "почта ящик imap gmail яндекс письма папки спам архив oauth smtp отправка ответ черновик подключение пароль хранение стирание срок белый список порог",
 	tgScreen:             "телеграм telegram тг чаты группы топики темы каналы бот админ учётка учётки аккаунт аккаунты рабочая личная",
 	maxScreen:            "макс max мессенджер чаты",
+	botsScreen:           "бот боты управление ботами telegram телеграм max макс bot api botfather токен",
 	translateScreen:      "перевод язык переводить иностранные английский translate",
 	notifySettingsScreen: "уведомления пуши push напоминания сроки каналы доставки тихие часы счётчик отложить",
 	watchScreen:          "работа сёмы самонаблюдение находки наблюдатель провод опрос экран связь живое обновление склейка часовой пояс время timezone чаты команд пинатель пинки ветка хвост родителя снимок экрана",
@@ -98,23 +99,16 @@ func matchesWords(r settingsSection, req string) bool {
 // Порядок тот же, что во вкладках каркаса.
 func (s *Server) allSections() []settingsSection {
 	return []settingsSection{
-		s.overviewMail(), s.overviewTelegram(), s.overviewMAX(), s.overviewTranslate(), s.overviewNotifications(),
+		s.overviewMail(), s.overviewTelegram(), s.overviewMAX(),
+		{Screen: botsScreen, Title: botsTitle, Meta: "Telegram и MAX", Why: "Подключение по токену и проверка связи"},
+		s.overviewTranslate(), s.overviewNotifications(),
 		s.overviewModels(), s.overviewSearch(), s.overviewSkills(), s.overviewLearning(), s.overviewTools(),
 		s.overviewHosts(), s.overviewAgents(), s.overviewIntegrations(), s.overviewStorages(), s.overviewWatch(),
 		s.overviewAccess(), s.overviewSecrets(), s.overviewSent(), s.overviewSettingsLog(),
 	}
 }
 
-// buildSettingsOverview — вкладка «Главное».
-//
-// Первый экран настроек обычно делают оглавлением — и он бесполезен:
-// человек приходит сюда не «посмотреть список разделов», а потому что
-// что-то перестало работать или он хочет проверить, всё ли цело.
-// Оглавление тут и не нужно — его роль играют пять вкладок сверху.
-//
-// Поэтому блока три: что сломано и чем это чинить, кто сейчас подключён
-// и жив ли, что менялось за последние дни. Поиск по разделам остаётся
-// четвёртым: названия человек не помнит, он ищет «пуши» и «ключи».
+// buildSettingsOverview — сводка, частые настройки и каталог всех групп.
 func (s *Server) buildSettingsOverview(doc *Document, search string, limit int) error {
 	// заголовок называется как строка колонки: «Обзор» в колонке и «Настройки»
 	// над содержимым читались как два разных места
@@ -125,7 +119,6 @@ func (s *Server) buildSettingsOverview(doc *Document, search string, limit int) 
 	add := func(c Component) { doc.Components = append(doc.Components, c) }
 	req := strings.TrimSpace(search)
 	s.sectionIndex(doc)
-	разделы := doc.sections
 
 	// с запросом Обзор становится поиском по настройкам: искать в подключениях
 	// и журнале человеку незачем, он ищет настройку (settings_search.go)
@@ -138,10 +131,11 @@ func (s *Server) buildSettingsOverview(doc *Document, search string, limit int) 
 		return nil
 	}
 
-	s.awaitingDecision(add, разделы)
+	s.awaitingDecision(add, doc)
 	s.connections(add)
 	s.handySettings(add)
 	s.recentEdits(add, doc.guest)
+	add(s.settingsOverviewCatalog(doc))
 	return nil
 }
 
@@ -154,7 +148,7 @@ func (s *Server) buildSettingsOverview(doc *Document, search string, limit int) 
 // Замечания попроще уходят в свёрнутый список: «у пятидесяти моделей не
 // названа цена» не должно стоять вровень с «роль не отвечает». Но и
 // пропадать не должно — у каждого своя строка и своя кнопка.
-func (s *Server) awaitingDecision(add func(Component), разделы []settingsSection) {
+func (s *Server) awaitingDecision(add func(Component), doc *Document) {
 	var срочные, попроще []Component
 	строка := func(r settingsSection) Component {
 		title := r.Trouble
@@ -182,8 +176,8 @@ func (s *Server) awaitingDecision(add func(Component), разделы []settings
 		withLevel(&c, r.Level)
 		return c
 	}
-	for _, r := range разделы {
-		if r.Level == "" || r.Level == LevelOK {
+	for _, r := range doc.sections {
+		if r.Level == "" || r.Level == LevelOK || (doc.guest && adminSettingsScreen(r.Screen)) {
 			continue
 		}
 		if r.Plain && r.Level != LevelAlert {
@@ -216,7 +210,7 @@ func (s *Server) foundInSettings(разделы []settingsSection, req string, g
 	var kids []Component
 	for _, r := range разделы {
 		// «Вход и доступ» гостю (токен без права «всё») не показывается и в поиске
-		if guest && baseScreen(r.Screen) == accessScreen {
+		if guest && adminSettingsScreen(r.Screen) {
 			continue
 		}
 		if !matchesWords(r, req) {
@@ -506,7 +500,7 @@ func (s *Server) overviewMAX() settingsSection {
 		Why: "второй мессенджер, устроен так же"}
 	acc, ok := s.eng.Store().MAXAccountGet()
 	if !ok || acc.State != "ok" {
-		r.Meta = "вход по телефону не выполнен"
+		r.Meta = "аккаунт не подключён"
 		r.Level, r.Pill = LevelWarn, "не подключён"
 		r.Trouble = "MAX не подключён"
 		r.Button = Action{Action: "$goto", Target: maxScreen, Label: "Подключить"}

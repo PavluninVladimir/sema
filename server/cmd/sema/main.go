@@ -169,6 +169,7 @@ func main() {
 	// Telegram присылает сообщения сам: держим соединение, а не опрашиваем
 	go eng.ListenTelegram(ctx)
 	go eng.ListenMAX(ctx)
+	go eng.ListenWeChat(ctx)
 	go func() {
 		if err := eng.ServeAgents(ctx); err != nil {
 			log.Printf("агенты: слушать не вышло: %v", err)

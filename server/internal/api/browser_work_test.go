@@ -264,7 +264,7 @@ func TestBrowserWorkAndSentInFrameDesktop(t *testing.T) {
 	waitScreen(t, ctx, sentScreen)
 	workPoll(t, ctx, "раздел нарисован", `!!document.querySelector('#panel .item.selected') && !!document.querySelector('#screen .header h1')`)
 	v := workRead(t, ctx)
-	if v.H1 != "Что ушло наружу" || !v.Panel || len(v.Selected) != 1 || !strings.Contains(v.Selected[0], "Что ушло наружу") {
+	if v.H1 != "Что ушло наружу" || !v.Panel || len(v.Selected) != 1 || !strings.Contains(v.Selected[0], "Безопасность") {
 		t.Errorf("«Что ушло наружу» по старому адресу: %+v", v)
 	}
 	// имя в колонке равно заголовку экрана — у каждого пункта колонки
@@ -273,11 +273,8 @@ func TestBrowserWorkAndSentInFrameDesktop(t *testing.T) {
 	}
 	karkasShot(t, ctx, "sent-desktop-1-section")
 
-	// из колонки: «Уведомления» → «Что ушло наружу» настоящими нажатиями
-	if err := chromedp.Run(ctx, chromedp.Click(`#panel .item[hx-get="/ui?screen=settings:notify~show"], #panel .item[hx-get="/ui?screen=settings:notify"]`, chromedp.ByQuery)); err != nil {
-		t.Fatalf("нажать «Уведомления» в колонке: %v", err)
-	}
-	waitScreen(t, ctx, "settings:notify")
+	clickSettings(t, ctx, settingsGroupButton(settingsChannels), settingsChannels)
+	clickSettings(t, ctx, settingsCatalogRow(notifySettingsScreen), notifySettingsScreen)
 	if err := chromedp.Run(ctx, chromedp.Click(`#screen .subtabs-bar a.segment[hx-get="/ui?screen=settings:notify~show"]`, chromedp.ByQuery)); err != nil {
 		t.Fatalf("нажать «Что показывать»: %v", err)
 	}
@@ -292,7 +289,7 @@ func TestBrowserWorkAndSentInFrameDesktop(t *testing.T) {
 	waitScreen(t, ctx, "settings:watch~chats")
 	workPoll(t, ctx, "вкладка «Чаты и ветки» нарисована", `!!document.querySelector('#feed input[name="cmd_ttl"]') && !!document.querySelector('#feed input[name="thread_tail"]')`)
 	chats := workRead(t, ctx)
-	if chats.H1 != "Работа Сёмы" || chats.SelectedTab != "Чаты и ветки" || len(chats.Selected) != 1 || !strings.Contains(chats.Selected[0], "Работа Сёмы") {
+	if chats.H1 != "Работа Сёмы" || chats.SelectedTab != "Чаты и ветки" || len(chats.Selected) != 1 || !strings.Contains(chats.Selected[0], "Система") {
 		t.Errorf("вкладка «Чаты и ветки»: %+v", chats)
 	}
 	karkasShot(t, ctx, "work-desktop-5-chats")
@@ -316,14 +313,11 @@ func TestBrowserWorkAndSentInFrameDesktop(t *testing.T) {
 	}
 	karkasShot(t, ctx, "work-desktop-1-watch")
 
-	// из колонки — «Что ушло наружу»
-	if err := chromedp.Run(ctx, chromedp.Click(`#panel .item[hx-get="/ui?screen=settings:sent"]`, chromedp.ByQuery)); err != nil {
-		t.Fatalf("нажать «Что ушло наружу» в колонке: %v", err)
-	}
-	waitScreen(t, ctx, sentScreen)
+	clickSettings(t, ctx, settingsGroupButton(settingsSecurity), settingsSecurity)
+	clickSettings(t, ctx, settingsCatalogRow(sentScreen), sentScreen)
 	workPoll(t, ctx, "раздел нарисован", `!!document.querySelector('#feed [data-goto="settings:sent~log"]') || !!document.querySelector('#feed .row .action')`)
 	sent := workRead(t, ctx)
-	if sent.H1 != "Что ушло наружу" || len(sent.Selected) != 1 || !strings.Contains(sent.Selected[0], "Что ушло наружу") {
+	if sent.H1 != "Что ушло наружу" || len(sent.Selected) != 1 || !strings.Contains(sent.Selected[0], "Безопасность") {
 		t.Errorf("«Что ушло наружу» из колонки: %+v", sent)
 	}
 	// лента — внутри каркаса: колонка на месте, выбран тот же пункт
@@ -333,7 +327,7 @@ func TestBrowserWorkAndSentInFrameDesktop(t *testing.T) {
 	waitScreen(t, ctx, sentScreen+"~"+sentTabLog)
 	workPoll(t, ctx, "лента нарисована", `document.querySelector('#feed').textContent.includes('Ядро · queue')`)
 	journal := workRead(t, ctx)
-	if journal.H1 != "Журнал отправок" || !journal.Panel || len(journal.Selected) != 1 || !strings.Contains(journal.Selected[0], "Что ушло наружу") || journal.Crumb != "Что ушло наружу" {
+	if journal.H1 != "Журнал отправок" || !journal.Panel || len(journal.Selected) != 1 || !strings.Contains(journal.Selected[0], "Безопасность") || journal.Crumb != "Что ушло наружу" {
 		t.Errorf("лента отправок: %+v", journal)
 	}
 	karkasShot(t, ctx, "sent-desktop-2-journal")
@@ -344,14 +338,14 @@ func TestBrowserWorkAndSentInFrameDesktop(t *testing.T) {
 	waitScreen(t, ctx, sentScreen+"~"+strconv.FormatInt(list[0].ID, 10))
 	workPoll(t, ctx, "текст отправки нарисован", `document.querySelector('#feed').textContent.includes('текст запроса')`)
 	one := workRead(t, ctx)
-	if !one.Panel || len(one.Selected) != 1 || !strings.Contains(one.Selected[0], "Что ушло наружу") || one.Crumb != "Журнал отправок" {
+	if !one.Panel || len(one.Selected) != 1 || !strings.Contains(one.Selected[0], "Безопасность") || one.Crumb != "Журнал отправок" {
 		t.Errorf("одна отправка: %+v", one)
 	}
 }
 
 // Телефон, 390×844: в корне настроек раздел зовётся «Работа Сёмы», у него три
 // вкладки и ничего не едет вбок; «Что ушло наружу» открывается целым экраном с
-// «‹ Настройки».
+// ссылкой «‹ Безопасность».
 func TestBrowserWorkAndSentPhone(t *testing.T) {
 	if os.Getenv("SEMA_BROWSER") == "" {
 		t.Skip("нужен Chrome: запуск SEMA_BROWSER=1 go test ./internal/api -run Browser -p 1")
@@ -394,14 +388,14 @@ func TestBrowserWorkAndSentPhone(t *testing.T) {
 	_ = chromedp.Run(ctx, chromedp.Evaluate(`document.querySelector('#feed .row.clickable[data-goto="settings:watch"]').scrollIntoView({block: 'center'}); true`, nil))
 	karkasShot(t, ctx, "work-phone-1b-root-system")
 
-	// строка раздела → экран с «‹ Настройки» и тремя вкладками
+	// строка раздела → экран с «‹ Система» и тремя вкладками
 	if err := chromedp.Run(ctx, chromedp.Click(`#feed .row.clickable[data-goto="settings:watch"]`, chromedp.ByQuery)); err != nil {
 		t.Fatalf("нажать строку «Работа Сёмы»: %v", err)
 	}
 	waitScreen(t, ctx, watchScreen)
 	workPoll(t, ctx, "вкладки раздела нарисованы", `document.querySelectorAll('#screen .subtabs-bar .segment').length === 3`)
 	v := workRead(t, ctx)
-	if v.Panel || v.Crumb != "‹ Настройки" || v.H1 != "Работа Сёмы" {
+	if !v.Panel || v.Crumb != "‹ Система" || v.H1 != "Работа Сёмы" {
 		t.Errorf("«Работа Сёмы» на телефоне: %+v", v)
 	}
 	if v.SW > v.CW {
@@ -426,12 +420,12 @@ func TestBrowserWorkAndSentPhone(t *testing.T) {
 	rowsPoll(t, ctx, "«Тонкая настройка» нарисована", `!!document.getElementById('fold-rare')`)
 	rowsScrollToFold(t, ctx)
 	rowsOpenFold(t, ctx)
-	if v := rowsRead(t, ctx); v.Rows != 6 || v.SW > v.CW {
+	if v := rowsRead(t, ctx); v.Rows != 7 || v.SW > v.CW {
 		t.Errorf("«Тонкая настройка» на телефоне: %+v", v)
 	}
 	karkasShot(t, ctx, "work-phone-5-screen-fine")
 
-	// «Что ушло наружу»: целый экран с «‹ Настройки»
+	// «Что ушло наружу»: целый экран с «‹ Безопасность»
 	karkasOpen(t, ctx, "settings")
 	if err := chromedp.Run(ctx, chromedp.Click(`#feed .row.clickable[data-goto="settings:sent"]`, chromedp.ByQuery)); err != nil {
 		t.Fatalf("нажать строку «Что ушло наружу»: %v", err)
@@ -439,7 +433,7 @@ func TestBrowserWorkAndSentPhone(t *testing.T) {
 	waitScreen(t, ctx, sentScreen)
 	workPoll(t, ctx, "раздел нарисован", `((document.querySelector('#screen .header h1') || {}).textContent || '').trim() === 'Что ушло наружу'`)
 	sent := workRead(t, ctx)
-	if sent.Panel || sent.Crumb != "‹ Настройки" || sent.SW > sent.CW {
+	if !sent.Panel || sent.Crumb != "‹ Безопасность" || sent.SW > sent.CW {
 		t.Errorf("«Что ушло наружу» на телефоне: %+v", sent)
 	}
 	karkasShot(t, ctx, "sent-phone-1-section")

@@ -46,7 +46,7 @@ func TestBrowserPhoneWalkNoSideScroll(t *testing.T) {
 	// вкладки «Серверов» и «Уведомлений»
 	очередь = append(очередь, settingsRoot, settingsOverview)
 	for _, group := range settingsGroups {
-		очередь = append(очередь, group.Sections...)
+		очередь = append(очередь, group.sections()...)
 	}
 	очередь = append(очередь,
 		serversScreen+"~"+serversTabAuto, serversScreen+"~"+serversTabLog, entityAddr(serversScreen, serversNew, ""),

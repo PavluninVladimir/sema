@@ -19,19 +19,31 @@ const maxScreen = "settings:max"
 
 func (s *Server) buildMAX(doc *Document) error {
 	doc.Heading = "MAX"
-	doc.Subheading = "Личные чаты MAX от вашего имени: что Сёма читает и где отвечает"
+	doc.Subheading = "Личный аккаунт и права чатов"
 	doc.Layout = "wide"
 	add := func(c Component) { doc.Components = append(doc.Components, c) }
 	st := s.eng.Store()
-
-	add(Component{Type: "text", Style: "secondary",
-		Text: "Аккаунт MAX как источник, рядом с почтой и Telegram. Клиент работает от вашего имени: " +
-			"токен доступа лежит в базе зашифрованным и наружу не выдаётся — ни модели, ни модулю."})
 
 	acc, has := st.MAXAccountGet()
 	state := "new"
 	if has {
 		state = acc.State
+	}
+	if !doc.offline && (state == "new" || state == "fail" || state == "captcha" || state == "code") {
+		if s.eng.MAXQRNeedsPassword() {
+			add(Component{Type: "form", ID: "max-qr-password", Title: "Дополнительный пароль MAX",
+				Fields: []Field{{Type: "secure", Name: "password", Label: "Пароль MAX"}},
+				Actions: []Action{
+					{Action: "max_qr_password", Label: "Войти", Style: "primary"},
+					{Action: "max_qr_cancel", Label: "Отменить"},
+				}})
+			return nil
+		}
+		row, pending := s.maxQRRow()
+		add(Component{Type: "section", Title: "Вход по QR", Children: []Component{row}})
+		if pending {
+			return nil
+		}
 	}
 	switch state {
 	case "new", "fail":
@@ -41,14 +53,7 @@ func (s *Server) buildMAX(doc *Document) error {
 			row.Dot, row.Caption = "#C4271C", acc.Note
 		}
 		add(Component{Type: "section", Title: "Вход", Children: []Component{row, s.maxCertRow()}})
-		add(Component{Type: "section", Title: "Проще всего", Children: []Component{{
-			Type: "row", Layout: "wide", ID: "max-web", Level: LevelOK,
-			Subtitle: "Войти страницей MAX",
-			Caption: "откроется web.max.ru внутри окна: там вы проходите проверку и вводите код из SMS, " +
-				"а Сёма забирает ключ доступа со страницы — вручную ничего копировать не нужно",
-			Actions: []Action{{Action: "$weblogin", Target: "https://web.max.ru",
-				Value: "max_set_token", Label: "Открыть вход MAX", Style: "primary"}}}}})
-		add(Component{Type: "form", ID: "max-phone", Title: "Или по телефону",
+		add(Component{Type: "form", ID: "max-phone", Title: "Вход по телефону",
 			Fields:  []Field{{Type: "text", Name: "phone", Label: "Телефон", Hint: "с кодом страны: +79991234567"}},
 			Actions: []Action{{Action: "max_send_code", Label: "Прислать код", Style: "primary"}}})
 		add(Component{Type: "form", ID: "max-token", Title: "Или вставить токен из браузера",
@@ -72,12 +77,6 @@ func (s *Server) buildMAX(doc *Document) error {
 				}},
 			s.maxCertRow(),
 		}})
-		add(Component{Type: "section", Title: "Проще всего", Children: []Component{{
-			Type: "row", Layout: "wide", ID: "max-web", Level: LevelOK,
-			Subtitle: "Войти страницей MAX",
-			Caption:  "проверка и код из SMS проходят на самой странице MAX внутри окна Сёмы",
-			Actions: []Action{{Action: "$weblogin", Target: "https://web.max.ru",
-				Value: "max_set_token", Label: "Открыть вход MAX", Style: "primary"}}}}})
 		add(Component{Type: "form", ID: "max-captcha", Title: "После проверки",
 			Fields: []Field{
 				{Type: "text", Name: "phone", Label: "Телефон", Value: acc.Phone},
@@ -107,22 +106,28 @@ func (s *Server) buildMAX(doc *Document) error {
 		return nil
 	}
 
-	// вошли: аккаунт, связь, право отправки — три строки, а не одна на
-	// всё. В одной строке телефон, «на связи», тумблер, две кнопки и
-	// капсула спорили за место, и на телефоне она не помещалась
-	add(Component{Type: "section", Title: "Аккаунт", Children: []Component{
-		{Type: "row", Layout: "wide", ID: "max-acc", Subtitle: acc.Phone, Caption: acc.Note,
-			Menu: []Action{
-				{Action: "max_refresh_chats", Label: "Обновить список чатов"},
-				{Action: "max_forget", Label: "Забыть аккаунт", Style: "destructive",
-					Confirm: "Забыть аккаунт MAX? Токен сотрётся, собранные сообщения останутся.", ConfirmOK: "Забыть"},
-			}},
-		s.linkRow("max-link", "MAX"),
-		{Type: "row", Layout: "wide", ID: "max-send", Subtitle: "Отправка от вашего имени",
-			Caption: "выключено — Сёма готовит текст, а отправляете вы",
-			Toggle:  map[bool]string{true: "on", false: "off"}[acc.CanSend],
-			Actions: []Action{{Action: "max_toggle_send", Label: "toggle"}}},
-	}})
+	account := Component{Type: "row", Layout: "wide", ID: "max-acc", Icon: "logo.max", Subtitle: "Личный аккаунт",
+		Caption: strings.TrimSpace(acc.Phone + "\n" + acc.Note), Menu: []Action{
+			{Action: "max_refresh_chats", Label: "Обновить список чатов"},
+			{Action: "max_forget", Label: "Забыть аккаунт", Style: "destructive",
+				Confirm: "Забыть аккаунт MAX? Токен сотрётся, собранные сообщения останутся.", ConfirmOK: "Забыть"},
+		}}
+	link := s.linkRow("max-link", "MAX")
+	if link.Level == LevelOK {
+		account.Badges = []Badge{{Text: "На связи", Level: LevelOK}}
+	}
+	rows := []Component{account}
+	if link.Level != LevelOK {
+		rows = append(rows, link)
+	}
+	sending := "Сёма готовит текст, а отправляете вы"
+	if acc.CanSend {
+		sending = "Сёма может отправлять сообщения от вашего имени"
+	}
+	rows = append(rows, Component{Type: "row", Layout: "wide", ID: "max-send", Subtitle: "Отправка от вашего имени",
+		Caption: sending, Toggle: map[bool]string{true: "on", false: "off"}[acc.CanSend],
+		Actions: []Action{{Action: "max_toggle_send", Label: "toggle"}}})
+	add(Component{Type: "section", Title: "Аккаунт", Children: rows})
 
 	chats, err := st.MAXChats(false)
 	if err != nil {
@@ -267,10 +272,7 @@ func looksLike(req string, поля ...string) bool {
 	return true
 }
 
-// maxCertRow — тумблер «принимать просроченный сертификат». Часть узлов
-// MAX отдаёт сертификат, истёкший 4 сентября 2026, и вход через них не
-// проходит. Подлинность сервера проверяется в любом случае: без срока,
-// но с цепочкой и именем — подменить ws-api.oneme.ru всё равно нельзя.
+// maxCertRow — настройка проверки срока сертификата серверов MAX.
 func (s *Server) maxCertRow() Component {
 	on := s.eng.MAXAllowExpired()
 	toggle, level, value := "off", LevelOK, "проверяется полностью"
@@ -279,11 +281,10 @@ func (s *Server) maxCertRow() Component {
 	}
 	return Component{Type: "row", Layout: "wide", ID: "max-cert", Level: level,
 		Subtitle: "Принимать просроченный сертификат",
-		Caption: "у части узлов MAX сертификат истёк 4 сентября — с этой галочкой вход через них проходит; " +
-			"цепочка и имя сервера проверяются по-прежнему",
-		Facts:   []Prop{{Label: "Сертификат", Value: value}},
-		Toggle:  toggle,
-		Actions: []Action{{Action: "max_toggle_cert", Label: "toggle"}}}
+		Caption:  "При включении Сёма принимает просроченный сертификат. Цепочка доверия и имя сервера проверяются.",
+		Facts:    []Prop{{Label: "Сертификат", Value: value}},
+		Toggle:   toggle,
+		Actions:  []Action{{Action: "max_toggle_cert", Label: "toggle"}}}
 }
 
 // phoneOf — номер для формы: у нового аккаунта его ещё нет.
@@ -297,6 +298,21 @@ func phoneOf(acc *store.MAXAccount, has bool) string {
 func (s *Server) maxActions(req actionRequest) (string, error) {
 	st := s.eng.Store()
 	switch req.Action {
+	case "max_qr_begin":
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		return maxScreen, s.eng.MAXBeginQR(ctx)
+	case "max_qr_poll":
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+		return maxScreen, s.eng.MAXPollQR(ctx)
+	case "max_qr_password":
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+		return maxScreen, s.eng.MAXConfirmQRPassword(ctx, req.Params["password"])
+	case "max_qr_cancel":
+		s.eng.MAXCancelQR()
+		return maxScreen, nil
 	case "max_send_code":
 		phone := strings.TrimSpace(req.Params["phone"])
 		if phone == "" {

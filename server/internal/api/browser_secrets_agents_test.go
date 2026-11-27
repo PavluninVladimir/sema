@@ -484,7 +484,7 @@ func TestBrowserSecretsAgentsPhone(t *testing.T) {
 	karkasOpen(t, ctx, secretsScreen)
 	saPoll(t, ctx, "список секретов нарисован", `Array.from(document.querySelectorAll('#feed .row-wrap > .row.clickable[data-goto^="settings:secrets@"]')).filter((r) => r.checkVisibility()).length === 6`)
 	list := saRead(t, ctx)
-	if list.Crumb != "‹ Настройки" || list.SW > list.CW {
+	if list.Crumb != "‹ Безопасность" || list.SW > list.CW {
 		t.Errorf("список секретов на телефоне: «назад» %q, ширина %d при %d", list.Crumb, list.SW, list.CW)
 	}
 	for _, row := range list.SecretRows {
@@ -517,7 +517,7 @@ func TestBrowserSecretsAgentsPhone(t *testing.T) {
 	karkasOpen(t, ctx, agentsScreen)
 	saPoll(t, ctx, "список агентов нарисован", `document.querySelectorAll('#feed .row-wrap > .row.clickable[data-goto^="settings:agents@"]').length === 3`)
 	agents := saRead(t, ctx)
-	if agents.Crumb != "‹ Настройки" || agents.SW > agents.CW {
+	if agents.Crumb != "‹ Система" || agents.SW > agents.CW {
 		t.Errorf("список агентов на телефоне: «назад» %q, ширина %d при %d", agents.Crumb, agents.SW, agents.CW)
 	}
 	for _, row := range agents.AgentRows {

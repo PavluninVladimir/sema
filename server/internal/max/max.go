@@ -39,9 +39,10 @@ const dialTries = 5
 // Адрес и версия протокола. Меняются вместе с веб-клиентом MAX, поэтому
 // вынесены сюда, а не разбросаны по коду.
 const (
-	wsURL   = "wss://ws-api.oneme.ru/websocket"
+	wsHost  = "api.oneme.ru"
+	wsURL   = "wss://" + wsHost + "/websocket"
 	origin  = "https://web.max.ru"
-	proto   = 11
+	proto   = 10
 	uaValue = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 )
 
@@ -91,11 +92,10 @@ func (f *flexID) UnmarshalJSON(raw []byte) error {
 
 // frame — кадр протокола в обе стороны.
 type frame struct {
-	Ver     int             `json:"ver"`
-	Cmd     int             `json:"cmd"`
-	Seq     int             `json:"seq"`
-	Opcode  int             `json:"opcode"`
-	Payload json.RawMessage `json:"payload"`
+	Cmd     int
+	Seq     int
+	Opcode  int
+	Payload json.RawMessage
 }
 
 // Client — соединение с MAX. Живёт долго: одно на всю работу Сёмы.
@@ -148,8 +148,7 @@ func New(deviceID, token string) *Client {
 
 // AllowExpiredCert — принимать узлы MAX с просроченным сертификатом.
 // Цепочка и имя сервера проверяются как обычно, не проверяется только
-// срок: у ws-api.oneme.ru часть узлов отдаёт сертификат, истёкший
-// 4 сентября 2026.
+// срок, если какой-либо узел MAX отдаёт просроченный сертификат.
 func (c *Client) AllowExpiredCert(on bool) { c.allowExpired = on }
 
 // Token — токен доступа после входа по коду: его хранит вызывающий.
@@ -160,10 +159,7 @@ func (c *Client) DeviceID() string { return c.deviceID }
 
 // dial — соединение и INIT. Без INIT сервер не отвечает ни на что.
 //
-// Часть узлов MAX отдаёт просроченный сертификат (`CN=oneme.ru`, истёк
-// 4 сентября 2026 — примерно каждое третье подключение), поэтому попытка
-// повторяется: следующее соединение попадает на исправный узел. Проверку
-// сертификата при этом не отключаем — иначе шифрование ничего не значит.
+// При ошибке сертификата следующая попытка может попасть на другой узел MAX.
 func (c *Client) dial(ctx context.Context) error {
 	var conn *websocket.Conn
 	var err error
@@ -235,7 +231,7 @@ func relaxedClient() *http.Client {
 				when = time.Now()
 			}
 			_, err := leaf.Verify(x509.VerifyOptions{
-				DNSName:       "ws-api.oneme.ru",
+				DNSName:       wsHost,
 				Intermediates: pool,
 				CurrentTime:   when,
 			})
@@ -268,7 +264,7 @@ func (c *Client) hello(ctx context.Context) error {
 			"osVersion":       "macOS",
 			"deviceName":      "Sema",
 			"headerUserAgent": uaValue,
-			"appVersion":      "26.6.17",
+			"appVersion":      "26.10.11",
 			"screen":          "1440x900 2.0x",
 			"timezone":        time.Local.String(),
 		},
@@ -286,7 +282,7 @@ func (c *Client) call(ctx context.Context, opcode int, payload any) (json.RawMes
 		c.mu.Unlock()
 		return nil, fmt.Errorf("нет соединения с MAX")
 	}
-	c.seq++
+	c.seq = c.seq%32767 + 1
 	seq := c.seq
 	ch := make(chan frame, 1)
 	c.waiting[seq] = ch
@@ -297,18 +293,14 @@ func (c *Client) call(ctx context.Context, opcode int, payload any) (json.RawMes
 		c.mu.Unlock()
 	}()
 
-	raw, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-	out, err := json.Marshal(frame{Ver: proto, Cmd: cmdRequest, Seq: seq, Opcode: opcode, Payload: raw})
+	out, err := encodeFrame(cmdRequest, seq, opcode, payload)
 	if err != nil {
 		return nil, err
 	}
 	if trace {
 		log.Printf("max-трасса: → seq=%d op=%d (жду ответа)", seq, opcode)
 	}
-	if err := conn.Write(ctx, websocket.MessageText, out); err != nil {
+	if err := conn.Write(ctx, websocket.MessageBinary, out); err != nil {
 		return nil, err
 	}
 	select {
@@ -345,8 +337,14 @@ func errorOf(payload json.RawMessage) error {
 // read — единственный читатель соединения: раздаёт ответы по seq, а
 // push отдаёт наверх. Возвращается, когда связь оборвалась.
 func (c *Client) read(ctx context.Context) error {
+	c.mu.Lock()
+	conn := c.conn
+	c.mu.Unlock()
+	if conn == nil {
+		return fmt.Errorf("нет соединения с MAX")
+	}
 	for {
-		_, data, err := c.conn.Read(ctx)
+		kind, data, err := conn.Read(ctx)
 		if err != nil {
 			c.failWaiting(err)
 			return err
@@ -354,9 +352,10 @@ func (c *Client) read(ctx context.Context) error {
 		c.mu.Lock()
 		c.last = time.Now()
 		c.mu.Unlock()
-		var f frame
-		if json.Unmarshal(data, &f) != nil {
-			continue // мусор в кадре не повод рвать связь
+		f, err := decodeFrame(kind, data)
+		if err != nil {
+			c.failWaiting(err)
+			return err
 		}
 		if trace {
 			log.Printf("max-трасса: ← cmd=%d seq=%d op=%d поля{%s}",
@@ -586,6 +585,7 @@ func (c *Client) Login(ctx context.Context) (string, error) {
 		Profile struct {
 			Contact struct {
 				ID     flexID `json:"id"`
+				Phone  flexID `json:"phone"`
 				Phones []struct {
 					Number string `json:"number"`
 				} `json:"phones"`
@@ -604,6 +604,9 @@ func (c *Client) Login(ctx context.Context) (string, error) {
 	c.mu.Unlock()
 	if len(r.Profile.Contact.Phones) > 0 {
 		return r.Profile.Contact.Phones[0].Number, nil
+	}
+	if phone := r.Profile.Contact.Phone; phone > 0 {
+		return "+" + strconv.FormatInt(int64(phone), 10), nil
 	}
 	return "", nil
 }
@@ -884,8 +887,7 @@ func (c *Client) reply(seq, opcode int) error {
 	if conn == nil {
 		return fmt.Errorf("нет соединения с MAX")
 	}
-	out, err := json.Marshal(frame{Ver: proto, Cmd: cmdReply, Seq: seq,
-		Opcode: opcode, Payload: json.RawMessage("{}")})
+	out, err := encodeFrame(cmdReply, seq, opcode, nil)
 	if err != nil {
 		return err
 	}
@@ -894,7 +896,7 @@ func (c *Client) reply(seq, opcode int) error {
 	if trace {
 		log.Printf("max-трасса: → seq=%d op=%d (ответ на запрос сервера)", seq, opcode)
 	}
-	return conn.Write(ctx, websocket.MessageText, out)
+	return conn.Write(ctx, websocket.MessageBinary, out)
 }
 
 // sendFrame — кадр без ожидания ответа.
@@ -905,24 +907,20 @@ func (c *Client) reply(seq, opcode int) error {
 func (c *Client) sendFrame(ctx context.Context, opcode int, payload any) error {
 	c.mu.Lock()
 	conn := c.conn
-	c.seq++
+	c.seq = c.seq%32767 + 1
 	seq := c.seq
 	c.mu.Unlock()
 	if conn == nil {
 		return fmt.Errorf("нет соединения с MAX")
 	}
-	raw, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-	out, err := json.Marshal(frame{Ver: proto, Cmd: cmdRequest, Seq: seq, Opcode: opcode, Payload: raw})
+	out, err := encodeFrame(cmdRequest, seq, opcode, payload)
 	if err != nil {
 		return err
 	}
 	if trace {
 		log.Printf("max-трасса: → seq=%d op=%d (без ожидания ответа)", seq, opcode)
 	}
-	return conn.Write(ctx, websocket.MessageText, out)
+	return conn.Write(ctx, websocket.MessageBinary, out)
 }
 
 // silentFor — сколько от MAX не приходило ни одного кадра.

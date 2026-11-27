@@ -61,6 +61,8 @@ var consumersForPills = []string{
 
 func fillUsageLog(t *testing.T, st *store.Store) {
 	t.Helper()
+	// Записи находятся в стороне от границы суток в обоих замерах.
+	fixtureTime := time.Now().Add(-15 * time.Minute)
 	has := []string{"core:archive", "core:attachments", "core:queue", "module:receipts",
 		"module:watch", "script:7", "task:3", "chat:1", "mcp:claude-code", "core", "module"}
 	for i, c := range has {
@@ -70,7 +72,7 @@ func fillUsageLog(t *testing.T, st *store.Store) {
 				kind = "llm"
 			}
 			if err := st.AddUsage(&store.UsageRow{
-				At: time.Now().Add(-time.Duration(i*3+j) * time.Hour), Consumer: c, Kind: kind,
+				At: fixtureTime.Add(-time.Duration(i*3+j) * time.Hour), Consumer: c, Kind: kind,
 				Model: "модель", TokensIn: 100 + i*7 + j, TokensOut: 20 + j, Cached: j,
 				Estimated: j == 3, Seconds: float64(j) / 3, OK: j != 4,
 				Cost: float64(j) / 50, Currency: "USD",

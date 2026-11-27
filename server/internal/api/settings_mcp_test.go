@@ -41,7 +41,7 @@ func TestMCPServerScreenBuildsEveryTab(t *testing.T) {
 			if doc.Screen != screen || doc.ActiveSubtab != screen {
 				t.Errorf("%s: экран %q, выбранная вкладка %q", screen, doc.Screen, doc.ActiveSubtab)
 			}
-			if doc.ActivePanel != mcpScreen {
+			if doc.ActivePanel != settingsSystem {
 				t.Errorf("%s: в колонке разделов выбран %q", screen, doc.ActivePanel)
 			}
 			if got := mcpTabNames(doc); got != "Обзор|Правила|Журнал" {
@@ -166,11 +166,12 @@ func TestMCPListRowsAreThin(t *testing.T) {
 	}
 
 	// полка: два вызова на кнопке и новые инструменты
-	if doc.Components[0].Type != "shelf" || doc.Components[0].Title != "Ждут вас" {
-		t.Fatalf("полка должна стоять первой: %+v", doc.Components[0])
+	shelf := findByType(doc, "shelf")
+	if shelf == nil || len(doc.Components) < 2 || &doc.Components[1] != shelf || shelf.Title != "Ждут вас" {
+		t.Fatalf("полка должна стоять сразу после обратной ссылки: %+v", shelf)
 	}
 	text := ""
-	for _, c := range doc.Components[0].Children {
+	for _, c := range shelf.Children {
 		walkthrough(&c, func(x *Component) {
 			text += x.Subtitle + "|"
 			for _, a := range append(append([]Action{}, x.Actions...), x.Menu...) {
@@ -760,10 +761,11 @@ func TestMCPRulesSearchHintAndPhone(t *testing.T) {
 	if d := phone(rules); !d.Searchable || d.SearchHint != "Найти инструмент" {
 		t.Errorf("телефон, «Правила»: Searchable %v, подсказка %q", d.Searchable, d.SearchHint)
 	}
-	for _, tab := range []string{mcpTabOverview, mcpTabLog} {
-		if d := phone(entityAddr(mcpScreen, "sing", tab)); d.Searchable {
-			t.Errorf("телефон, вкладка %q: верхнее поле осталось, а искать в нём нечего", tab)
-		}
+	if d := phone(entityAddr(mcpScreen, "sing", mcpTabOverview)); !d.Searchable || d.SearchHint != "Найти настройку" {
+		t.Error("телефон, «Обзор»: нужен общий поиск настроек")
+	}
+	if d := phone(entityAddr(mcpScreen, "sing", mcpTabLog)); d.Searchable {
+		t.Error("телефон, «Журнал»: верхнее поле должно быть скрыто")
 	}
 	// поиск отбирает инструменты: «checklist» оставляет чек-листы
 	filtered := serverDocFor(t, s, rules, "", "checklist")
@@ -1000,8 +1002,8 @@ func TestMCPActionsKeepTheOpenScreen(t *testing.T) {
 func TestMCPShelfPendingCalls(t *testing.T) {
 	s, st := mcpScreensFix(t)
 	list := serverDoc(t, s, mcpScreen)
-	shelf := list.Components[0]
-	if shelf.Type != "shelf" || !strings.Contains(shelf.Meta, "2 вызова из круга «Спросить»") || !strings.Contains(shelf.Meta, "3 новых инструмента без решения") {
+	shelf := findByType(list, "shelf")
+	if shelf == nil || !strings.Contains(shelf.Meta, "2 вызова из круга «Спросить»") || !strings.Contains(shelf.Meta, "3 новых инструмента без решения") {
 		t.Fatalf("полка раздела: %+v", shelf)
 	}
 	own := serverDoc(t, s, entityAddr(mcpScreen, "ключ", ""))
@@ -1019,7 +1021,8 @@ func TestMCPShelfPendingCalls(t *testing.T) {
 	if _, err := s.execute(actionRequest{Action: "reject_mcp", Target: strconv.FormatInt(pend[0].ID, 10), Screen: mcpScreen}); err != nil {
 		t.Fatal(err)
 	}
-	if got := serverDoc(t, s, mcpScreen).Components[0].Meta; !strings.Contains(got, "1 вызов") {
-		t.Errorf("после отклонения полка говорит %q", got)
+	shelf = findByType(serverDoc(t, s, mcpScreen), "shelf")
+	if shelf == nil || !strings.Contains(shelf.Meta, "1 вызов") {
+		t.Errorf("после отклонения на полке должен остаться один вызов: %+v", shelf)
 	}
 }

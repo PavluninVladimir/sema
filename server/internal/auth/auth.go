@@ -52,11 +52,13 @@ const (
 	SessionTTL        = 30 * 24 * time.Hour
 	SessionPrefix     = "sema_s_"
 	TokenPrefix       = "sema_"
+	TelegramBotsScope = "telegram_bots"
 )
 
-// Scopes — права токена: экраны, действия, файлы, память (MCP и хуки), всё.
+// Scopes — права токена, доступные при его выдаче.
 var Scopes = []struct{ ID, Title string }{
-	{"ui", "чтение экранов"}, {"actions", "действия"}, {"files", "файлы"}, {"memory", "память (MCP и хуки)"}, {"all", "всё"},
+	{"ui", "чтение экранов"}, {"actions", "действия"}, {"files", "файлы"}, {"memory", "память (MCP и хуки)"},
+	{TelegramBotsScope, "Управление ботами Telegram"}, {"all", "всё"},
 }
 
 // owner — единственный пользователь Сёмы с набором ключей.
@@ -494,6 +496,12 @@ func (a *Auth) Identify(r *http.Request) Identity {
 
 // ScopeFor — какое право нужно маршруту.
 func ScopeFor(path string) string {
+	if botPath, ok := strings.CutPrefix(path, "/api/bots/"); ok {
+		id, operation, _ := strings.Cut(botPath, "/")
+		if id != "" && (operation == "telegram" || operation == "telegram/send") {
+			return TelegramBotsScope
+		}
+	}
 	switch {
 	case strings.HasPrefix(path, "/api/ui"):
 		return "ui"

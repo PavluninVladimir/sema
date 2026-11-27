@@ -9,7 +9,6 @@ package max
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,18 +27,16 @@ func fakeMAX(t *testing.T, replies chan<- frame) {
 
 	go func() {
 		ctx := context.Background()
-		raw, _ := json.Marshal(frame{Ver: proto, Cmd: cmdRequest, Seq: 1,
-			Opcode: opPing, Payload: json.RawMessage("{}")})
-		if err := srv.Write(ctx, websocket.MessageText, raw); err != nil {
+		raw, _ := encodeFrame(cmdRequest, 1, opPing, nil)
+		if err := srv.Write(ctx, websocket.MessageBinary, raw); err != nil {
 			return
 		}
-		_, data, err := srv.Read(ctx)
+		kind, data, err := srv.Read(ctx)
 		if err != nil {
 			close(replies)
 			return
 		}
-		var f frame
-		_ = json.Unmarshal(data, &f)
+		f, _ := decodeFrame(kind, data)
 		replies <- f
 		close(replies)
 	}()

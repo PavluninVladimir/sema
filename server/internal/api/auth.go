@@ -222,11 +222,13 @@ func (s *Server) protect(next http.Handler) http.Handler {
 // `TestOpenPathsAreListed`.
 //   - здоровье и страница входа с её церемониями;
 //   - вход агента по одноразовому коду;
+//   - доставка Telegram с секретом webhook в заголовке;
 //   - документ клиента для серверов входа OAuth (`engine.MCPClientDocPath`):
 //     его скачивает чужой сервер, у которого нет ни сессии, ни токена; в
 //     нём только имя, адрес и адрес возврата Сёмы, взятые из настроек.
 func openPath(p string) bool {
 	return p == "/api/health" || p == "/login" || p == "/api/agents/enroll" || p == engine.MCPClientDocPath ||
+		p == releaseWebhookPath || isTelegramWebhookPath(p) ||
 		strings.HasPrefix(p, "/api/auth/") ||
 		// ссылка на файл открывается без входа: доступ даёт подпись
 		(strings.HasPrefix(p, engine.SharePath) && len(p) > len(engine.SharePath))
@@ -1592,8 +1594,13 @@ var limitedActions = map[string]bool{
 	"new_chat": true, "rename_chat": true, "stop_chat": true,
 }
 
+func adminSettingsScreen(screen string) bool {
+	return strings.HasPrefix(screen, accessScreen) || strings.HasPrefix(screen, wechatScreen) ||
+		strings.HasPrefix(screen, maxScreen) || strings.HasPrefix(screen, botsScreen)
+}
+
 func (s *Server) allowScreen(w http.ResponseWriter, r *http.Request, screen string) bool {
-	if strings.HasPrefix(screen, accessScreen) && !s.mayAdmin(r) {
+	if adminSettingsScreen(screen) && !s.mayAdmin(r) {
 		http.Error(w, "экран доступа открыт только хозяину", http.StatusForbidden)
 		return false
 	}

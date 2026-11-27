@@ -120,8 +120,9 @@ func TestMCPClientDocumentIsPublic(t *testing.T) {
 func TestOpenPathsAreListed(t *testing.T) {
 	open := map[string]bool{
 		"/api/health": true, "/login": true, "/api/agents/enroll": true, "/api/auth/state": true,
-		"/api/auth/register/begin": true, engine.MCPClientDocPath: true,
-		engine.SharePath + "1": true, // ссылка на файл: доступ даёт подпись
+		"/api/auth/register/begin": true, engine.MCPClientDocPath: true, releaseWebhookPath: true,
+		engine.SharePath + "1":    true, // ссылка на файл: доступ даёт подпись
+		telegramWebhookPath + "1": true, // Telegram предъявляет секрет заголовка
 	}
 	for p := range open {
 		if !openPath(p) {
@@ -131,7 +132,7 @@ func TestOpenPathsAreListed(t *testing.T) {
 	closed := []string{"/api/ui", "/api/action", "/api/files", "/api/files/1", "/api/ws", "/api/push/key",
 		"/ui", "/do", "/upload", messagePath + "/1", engine.MCPCallbackPath, "/mcp", "/mcp/oauth", "/mcp/oauth/",
 		engine.MCPClientDocPath + "/", engine.MCPClientDocPath + "x", "/api/agents", "/api/memory/session_start",
-		engine.SharePath, "/share"}
+		engine.SharePath, "/share", telegramWebhookPath, telegramWebhookPath + "1/extra", "/api/bots/1/telegram"}
 	for _, p := range closed {
 		if openPath(p) {
 			t.Errorf("%s открыт без входа", p)
@@ -140,7 +141,7 @@ func TestOpenPathsAreListed(t *testing.T) {
 
 	// все пути, которые сервер вешает на mux, — из исходников: новая ручка, у
 	// которой в openPath появилась строка, обязана попасть и в список выше
-	re := regexp.MustCompile(`Handle(?:Func)?\("(?:GET |POST )?(/[^"]*)"`)
+	re := regexp.MustCompile(`Handle(?:Func)?\("(?:GET |POST |PATCH )?(/[^"]*)"`)
 	reConst := regexp.MustCompile(`Handle(?:Func)?\((?:"(?:GET |POST )"\+)?engine\.(\w+)`)
 	consts := map[string]string{"MCPCallbackPath": engine.MCPCallbackPath, "MCPClientDocPath": engine.MCPClientDocPath,
 		"SharePath": engine.SharePath + "1"}

@@ -91,7 +91,7 @@ func TestAccessTabsAndOldAddresses(t *testing.T) {
 		if got := strings.Join(names, " · "); got != "Ключи · Кто внутри · Токены · Доверенная сеть · Кто стучался" {
 			t.Errorf("%s: вкладки %q", screen, got)
 		}
-		if doc.ActiveSubtab != doc.Subtabs[i].ID || doc.ActivePanel != accessScreen {
+		if doc.ActiveSubtab != doc.Subtabs[i].ID || doc.ActivePanel != settingsSecurity {
 			t.Errorf("%s: выбрана вкладка %q (ждали %q), раздел %q", screen, doc.ActiveSubtab, doc.Subtabs[i].ID, doc.ActivePanel)
 		}
 	}

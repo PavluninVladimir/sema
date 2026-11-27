@@ -62,7 +62,7 @@ func TestServerScreenBuildsEveryTab(t *testing.T) {
 		if doc.Screen != screen || doc.ActiveSubtab != screen {
 			t.Errorf("%s: экран %q, выбранная вкладка %q", screen, doc.Screen, doc.ActiveSubtab)
 		}
-		if doc.ActivePanel != serversScreen {
+		if doc.ActivePanel != settingsSystem {
 			t.Errorf("%s: в колонке разделов выбран %q", screen, doc.ActivePanel)
 		}
 		var titles []string
@@ -210,8 +210,8 @@ func TestServersListRowsAreThin(t *testing.T) {
 	if shelf == nil || shelf.Title != "Ждут вас" || !strings.Contains(shelf.Meta, "4 команды") {
 		t.Fatalf("полка: %+v", shelf)
 	}
-	if doc.Components[0].Type != "shelf" {
-		t.Errorf("полка должна стоять первой, а первый компонент %q", doc.Components[0].Type)
+	if len(doc.Components) < 2 || &doc.Components[1] != shelf {
+		t.Error("полка должна стоять сразу после обратной ссылки")
 	}
 	if hasAction(shelf.Actions, "reject_all_ssh") == nil {
 		t.Errorf("у полки нет «Снять все с очереди»: %+v", shelf.Actions)

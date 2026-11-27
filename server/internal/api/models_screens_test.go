@@ -120,7 +120,7 @@ func TestModelsAllScreensBuild(t *testing.T) {
 			t.Errorf("%s: %v", screen, err)
 			continue
 		}
-		if doc.ActivePanel != modelsScreen {
+		if doc.ActivePanel != settingsBehavior {
 			t.Errorf("%s: в колонке разделов выбран %q", screen, doc.ActivePanel)
 		}
 		if len(doc.Tabs) != 0 {
@@ -186,7 +186,7 @@ func TestModelsOldAddressesStillOpen(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", screen, err)
 		}
-		if doc.ActivePanel != modelsScreen {
+		if doc.ActivePanel != settingsBehavior {
 			t.Errorf("%s: выбран раздел %q", screen, doc.ActivePanel)
 		}
 	}
@@ -960,8 +960,8 @@ func TestModelsOnPhone(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if roles.Searchable {
-		t.Error("на телефоне у таблицы ролей верхнее поле ищет по настройкам, а места ему нет")
+	if !roles.Searchable || roles.SearchHint != "Найти настройку" {
+		t.Error("на телефоне у таблицы ролей нужен общий поиск настроек")
 	}
 	markup, err := web.Render(toScreen(roles))
 	if err != nil || !strings.Contains(string(markup), `data-label="Основная"`) {

@@ -268,6 +268,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 		// переписка чата: пока сообщений сотни, скан незаметен, но
 		// Telegram и MAX растят таблицу, а читается она при каждом открытии
 		`CREATE INDEX IF NOT EXISTS idx_chat_msgs_chat ON chat_msgs(chat_id, id DESC)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_chats_assistant ON chats(kind) WHERE kind = 'assistant'`,
 	} {
 		if _, err := s.db.Exec(q); err != nil {
 			return err
@@ -289,6 +290,12 @@ CREATE TABLE IF NOT EXISTS tasks (
 	s.seedLogMarks()
 	// ключи и секреты плюс журнал обращений к ним
 	if err := s.migrateVault(); err != nil {
+		return err
+	}
+	if err := s.migrateMessengerBots(); err != nil {
+		return err
+	}
+	if err := s.migrateTelegramBotRuntime(); err != nil {
 		return err
 	}
 	// память: записи, граф, потребители, правила, журнал
@@ -315,6 +322,9 @@ CREATE TABLE IF NOT EXISTS tasks (
 		return err
 	}
 	if err := s.migrateMAX(); err != nil {
+		return err
+	}
+	if err := s.migrateWeChat(); err != nil {
 		return err
 	}
 	if err := s.migrateClasses(); err != nil {

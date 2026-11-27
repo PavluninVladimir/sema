@@ -423,7 +423,7 @@ func TestBrowserMailPhone(t *testing.T) {
 	karkasOpen(t, ctx, mailScreen)
 	mailListReady(t, ctx)
 	list := mailRead(t, ctx)
-	if list.Crumb != "‹ Настройки" || list.SW > list.CW {
+	if list.Crumb != "‹ Каналы" || list.SW > list.CW {
 		t.Errorf("список на телефоне: «назад» %q, ширина %d при %d", list.Crumb, list.SW, list.CW)
 	}
 	for _, row := range list.Rows {

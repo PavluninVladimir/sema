@@ -74,6 +74,9 @@ func newDeviceID() string {
 
 // MAXStartLogin — первый шаг входа: код на телефон.
 func (e *Engine) MAXStartLogin(ctx context.Context, phone, captcha string) error {
+	e.maxQR.mu.Lock()
+	defer e.maxQR.mu.Unlock()
+	e.maxQR.clear()
 	phone = strings.TrimSpace(phone)
 	if phone == "" {
 		return fmt.Errorf("нужен номер телефона")
@@ -113,6 +116,9 @@ func (e *Engine) MAXStartLogin(ctx context.Context, phone, captcha string) error
 
 // MAXConfirmCode — второй шаг: код из SMS в обмен на токен доступа.
 func (e *Engine) MAXConfirmCode(ctx context.Context, code string) error {
+	e.maxQR.mu.Lock()
+	defer e.maxQR.mu.Unlock()
+	e.maxQR.clear()
 	acc, ok := e.store.MAXAccountGet()
 	if !ok {
 		return fmt.Errorf("сначала введите номер телефона")
@@ -144,6 +150,9 @@ func (e *Engine) MAXConfirmCode(ctx context.Context, code string) error {
 // путь, когда проверка VK не отдаёт токен наружу. Токен ложится в базу
 // зашифрованным, как и полученный по SMS.
 func (e *Engine) MAXSetToken(ctx context.Context, phone, token string) error {
+	e.maxQR.mu.Lock()
+	defer e.maxQR.mu.Unlock()
+	e.maxQR.clear()
 	token = strings.TrimSpace(token)
 	if token == "" {
 		return fmt.Errorf("нужен токен доступа")
@@ -189,6 +198,9 @@ func (e *Engine) MAXSetToken(ctx context.Context, phone, token string) error {
 
 // MAXForget — забыть аккаунт: токен стирается, собранное остаётся.
 func (e *Engine) MAXForget() error {
+	e.maxQR.mu.Lock()
+	defer e.maxQR.mu.Unlock()
+	e.maxQR.clear()
 	acc, ok := e.store.MAXAccountGet()
 	if !ok {
 		return nil

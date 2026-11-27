@@ -71,7 +71,10 @@ func TestPrefetchGoesNowhere(t *testing.T) {
 	if code, body := get("tasks"); code != 200 || !strings.Contains(body, `id="screen"`) {
 		t.Fatalf("«Задачи» подогреваются: %d, %d байт", code, len(body))
 	}
-	for _, sc := range []string{fmt.Sprintf("chat:%d", c), "inbox", "settings:tools", "settings:models"} {
+	for _, sc := range []string{
+		fmt.Sprintf("chat:%d", c), "inbox", "settings:tools", "settings:models",
+		wechatScreen, wechatChatScreen("group@chatroom"),
+	} {
 		if code, _ := get(sc); code != 204 {
 			t.Errorf("%s: подогрев ответил %d, ждали 204", sc, code)
 		}

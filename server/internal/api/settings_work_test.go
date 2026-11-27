@@ -72,7 +72,7 @@ func TestWorkSectionHasOneNameAndThreeTabs(t *testing.T) {
 		if doc.Heading != "Работа Сёмы" || sectionTitle[watchScreen] != "Работа Сёмы" {
 			t.Errorf("%s: заголовок %q, имя в колонке %q", screen, doc.Heading, sectionTitle[watchScreen])
 		}
-		if doc.ActivePanel != watchScreen {
+		if doc.ActivePanel != settingsSystem {
 			t.Errorf("%s: в колонке выбран %q", screen, doc.ActivePanel)
 		}
 		var ids, names []string
@@ -462,7 +462,7 @@ func TestSentLivesInSettingsFrame(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", screen, err)
 		}
-		if doc.Screen != screen || doc.Active != "settings" || doc.ActivePanel != sentScreen {
+		if doc.Screen != screen || doc.Active != "settings" || doc.ActivePanel != settingsSecurity {
 			t.Errorf("%s: экран %q, меню %q, в колонке %q", screen, doc.Screen, doc.Active, doc.ActivePanel)
 		}
 		var picked []string
@@ -471,19 +471,19 @@ func TestSentLivesInSettingsFrame(t *testing.T) {
 				picked = append(picked, item.Title)
 			}
 		}
-		if len(doc.Panel) < 20 || len(picked) != 1 || picked[0] != "Что ушло наружу" {
+		if len(doc.Panel) != 5 || len(picked) != 1 || picked[0] != "Безопасность" {
 			t.Errorf("%s: колонка из %d пунктов, выбран %v", screen, len(doc.Panel), picked)
 		}
 		if doc.Storable {
 			t.Errorf("%s: экран с отправленным стал хранимым на устройстве", screen)
 		}
-		// телефон: колонки нет, «назад» один — в настройки или в раздел
+		// Телефон: выделена группа, обратный путь ведёт в неё или в раздел.
 		phoneDoc, err := s.buildScreenForPhone(screen, "", "", 0, true, false)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(phoneDoc.Panel) != 0 {
-			t.Errorf("%s: на телефоне осталась колонка", screen)
+		if phoneDoc.ActivePanel != settingsSecurity {
+			t.Errorf("%s: на телефоне активна группа %q", screen, phoneDoc.ActivePanel)
 		}
 		backs := 0
 		for _, c := range phoneDoc.Components {
@@ -491,7 +491,7 @@ func TestSentLivesInSettingsFrame(t *testing.T) {
 				backs++
 			}
 		}
-		if screen == sentScreen && (backs != 1 || phoneDoc.Components[0].Actions[0].Target != settingsRoot) {
+		if screen == sentScreen && (backs != 1 || phoneDoc.Components[0].Actions[0].Target != settingsSecurity) {
 			t.Errorf("%s: «назад» на телефоне: %d, %+v", screen, backs, phoneDoc.Components[0])
 		}
 		if screen != sentScreen && backs != 1 {

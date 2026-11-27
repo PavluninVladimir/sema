@@ -1,0 +1,10 @@
+The WeChat compatibility code and synthetic protocol vectors in this
+directory were adapted from agent-wechat's wechat-protocol crate at revision
+c67b9389da19619f02b812b95fb956dfb0424c4c.
+https://github.com/thisnick/agent-wechat/tree/c67b9389da19619f02b812b95fb956dfb0424c4c/packages/native-client-rust/crates/wechat-protocol
+
+Copyright (c) 2026 Nick Yu and contributors. See LICENSE.agent-wechat.
+
+The MMTLS and business certificate pins are public protocol values from the
+Linux 4.1.13.26 default configuration, as described in the upstream NOTICE.
+The tests use synthetic session data and RFC 5869 test-case 1.

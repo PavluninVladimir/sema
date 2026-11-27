@@ -226,8 +226,8 @@ func (s *Store) KeyMatches() (ok bool, known bool) {
 		return err == nil && out == vaultCheckText, true
 	}
 	if secs, _ := s.VaultSecrets(); len(secs) > 0 {
-		_, ok := s.SecretValue(secs[0].Name)
-		return ok, true
+		raw, _ := s.rawSecret(secs[0].Name)
+		return s.open(raw) != "", true
 	}
 	return false, false
 }

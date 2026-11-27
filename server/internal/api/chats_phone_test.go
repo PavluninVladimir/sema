@@ -82,8 +82,11 @@ func TestOnPhoneChatsAreList(t *testing.T) {
 			}
 		}
 	}
-	if строк != 3 {
-		t.Errorf("строк в списке %d, а чатов 3", строк)
+	if строк != 4 {
+		t.Errorf("строк в списке %d, ожидались три чата и основной разговор", строк)
+	}
+	if row := docByID(узкий, "чат-"+strings.TrimPrefix(широкий.Active, "chat:")); row == nil || row.Subtitle != "Сёма" {
+		t.Errorf("в списке нет основного разговора: %+v", row)
 	}
 }
 
